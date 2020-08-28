@@ -28,7 +28,7 @@ struct CharacterLambdaHandler {
         case ("/characters", .GET):
              let response = characterService.getAllCharacters()
                 .map { APIGateway.V2.Response(with: $0.map { Domain.Character(from: $0) }, statusCode: .ok) }
-                .flatMapError { catchError(context: context, error: $0) }
+                .flatMapError { self.catchError(context: context, error: $0) }
 
             return response
 
