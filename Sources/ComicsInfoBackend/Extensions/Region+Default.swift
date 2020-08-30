@@ -7,13 +7,13 @@
 //
 
 import AWSDynamoDB
-import AWSLambdaRuntime
+import enum AWSLambdaRuntime.Lambda
 import Foundation
 
 extension Region {
 
     static var `default`: Region {
-        guard let envRegion = Lambda.env("AWS_REGION") else {
+        guard let envRegion = Lambda.region else {
             return .eucentral1
         }
 

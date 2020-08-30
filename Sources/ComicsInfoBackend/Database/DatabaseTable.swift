@@ -18,11 +18,11 @@ enum DatabaseTable {
     func getName() -> String {
         switch self {
         case .character:
-            return Lambda.env("CHARACTER_TABLE_NAME") ?? ""
+            return Lambda.characterTableName ?? ""
         case .series:
-            return Lambda.env("SERIES_TABLE_NAME") ?? ""
+            return Lambda.seriesTableName ?? ""
         case .comic:
-            return Lambda.env("COMIC_TABLE_NAME") ?? ""
+            return Lambda.comicTableName ?? ""
         }
     }
 

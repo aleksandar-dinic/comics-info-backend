@@ -27,15 +27,13 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
         context: Lambda.Context,
         event: APIGateway.V2.Request
     ) -> EventLoopFuture<APIGateway.V2.Response> {
-        switch event.rawPath {
-        case "/characters":
-            let characterLambdaHandler = CharacterLambdaHandler(database: database)
-
+        switch Handler.current {
+        case let .characters(action):
+            let characterLambdaHandler = CharacterLambdaHandler(action: action, database: database)
             return characterLambdaHandler.handle(context: context, event: event)
 
-        default:
+        case .series, .comics, .none:
             let response = APIGateway.V2.Response(statusCode: .notFound)
-
             return context.eventLoop.makeSucceededFuture(response)
         }
     }

@@ -10,8 +10,15 @@ import Foundation
 
 enum APIError: Error {
 
-    case decodingError
+    case decodingError(_ error: DecodingError)
     case requestError
     case characterNotFound
+
+}
+
+enum DecodingError {
+
+    case keyNotFound(_ key: String)
+    case typeMismatch(forKey: String)
 
 }

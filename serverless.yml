@@ -44,19 +44,19 @@ functions:
         handler: characters.read
         events:
         - httpApi:
-            path: /characters/{id}
+            path: /characters/{identifier}
             method: GET
     updateCharacter:
         handler: characters.update
         events:
         - httpApi:
-            path: /characters/{id}
+            path: /characters/{identifier}
             method: PUT
     deleteCharacter:
         handler: characters.delete
         events:
         - httpApi:
-            path: /characters/{id}
+            path: /characters/{identifier}
             method: DELETE
     listCharacters:
         handler: characters.list
