@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum Handler {
+enum Handler: Equatable {
 
     case characters(_ action: HandlerAction)
     case series(_ action: HandlerAction)

@@ -18,16 +18,18 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
     typealias Out = APIGateway.V2.Response
 
     private let database: Database
+    private let handlerFectory: HandlerFectory
 
     init(context: Lambda.InitializationContext) {
         database = DatabaseFectory().makeDatabase(eventLoop: context.eventLoop)
+        handlerFectory = HandlerFectory()
     }
 
     func handle(
         context: Lambda.Context,
         event: APIGateway.V2.Request
     ) -> EventLoopFuture<APIGateway.V2.Response> {
-        switch Handler.current {
+        switch handlerFectory.makeHandler(forRequest: event) {
         case let .characters(action):
             let characterLambdaHandler = CharacterLambdaHandler(action: action, database: database)
             return characterLambdaHandler.handle(context: context, event: event)

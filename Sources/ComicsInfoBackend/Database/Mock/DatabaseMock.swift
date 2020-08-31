@@ -26,7 +26,11 @@ struct DatabaseMock: Database {
     }
 
     func get(fromTable table: DatabaseTable, forID ID: String) -> EventLoopFuture<[String : Any]?> {
-        eventLoop.makeSucceededFuture(["name": "Name"])
+        eventLoop.makeSucceededFuture([
+            "identifier": "1",
+            "popularity": 0,
+            "name": "Name"
+        ])
     }
 
 }

@@ -20,15 +20,17 @@ final class CharacterService {
     }
 
     func getAllCharacters() -> EventLoopFuture<[Character]> {
-        return database.getAll(fromTable: .character).flatMapThrowing {
+        database.getAll(fromTable: .character).flatMapThrowing {
             try $0?.compactMap { try Character(from: $0) } ?? []
         }
     }
 
     func getCharacter(forID characterID: String) -> EventLoopFuture<Character> {
-        return database.get(fromTable: .character, forID: characterID).flatMapThrowing { output in
-            if output == nil { throw APIError.characterNotFound }
-            return try Character(from: output ?? [:])
+        database.get(fromTable: .character, forID: characterID).flatMapThrowing { items in
+            guard let items = items else {
+                throw APIError.characterNotFound
+            }
+            return try Character(from: items)
         }
     }
 
