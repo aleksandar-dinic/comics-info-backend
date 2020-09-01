@@ -36,6 +36,9 @@ let package = Package(
         // which this package depends on.
         .target(
             name: "ComicsInfoBackend",
+            dependencies: ["ComicsInfoCore"]),
+        .target(
+            name: "ComicsInfoCore",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
                 .product(name: "AWSDynamoDB", package: "aws-sdk-swift"),
@@ -44,6 +47,6 @@ let package = Package(
             ]),
         .testTarget(
             name: "ComicsInfoBackendTests",
-            dependencies: ["ComicsInfoBackend"])
+            dependencies: ["ComicsInfoCore"])
     ]
 )

@@ -6,7 +6,9 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSLambdaRuntime
 import Foundation
+import ComicsInfoCore
 
-Lambda.run(ComicsInfoLambdaHandler.init)
+let comicsInfo = ComicsInfo()
+
+comicsInfo.run()
