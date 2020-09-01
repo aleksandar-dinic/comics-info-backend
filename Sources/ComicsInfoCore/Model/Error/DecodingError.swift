@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum DecodingError {
+enum DecodingError: Equatable {
 
     case keyNotFound(_ key: String)
     case typeMismatch(forKey: String)
