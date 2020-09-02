@@ -15,11 +15,14 @@ import NIO
 struct CharacterLambdaHandler {
 
     private let action: HandlerAction
-    private let characterService: CharacterService
+    private let characterRepository: CharacterRepository
 
-    init(action: HandlerAction, database: Database) {
+    init(action: HandlerAction, characterAPIService: CharacterAPIService) {
         self.action = action
-        characterService = CharacterService(database: database)
+        let characterRepositoryFactory = CharacterRepositoryFactory(
+            characterAPIService: characterAPIService
+        )
+        characterRepository = characterRepositoryFactory.makeCharacterRepository()
     }
 
     func handle(
@@ -42,12 +45,12 @@ struct CharacterLambdaHandler {
         context: Lambda.Context,
         event: APIGateway.V2.Request
     ) -> EventLoopFuture<APIGateway.V2.Response> {
-        guard let identifier = event.pathParameters?["identifier"] else {
+        guard let identifier = event.pathParameters?[.identifier] else {
             let response = APIGateway.V2.Response(statusCode: .notFound)
             return context.eventLoop.makeSucceededFuture(response)
         }
 
-        let response = characterService.getCharacter(forID: identifier)
+        let response = characterRepository.getCharacter(withID: identifier, fromDataSource: .database, on: context.eventLoop)
             .map { APIGateway.V2.Response(with: Domain.Character(from: $0), statusCode: .ok) }
             .flatMapError { self.catchError(context: context, error: $0) }
 
@@ -58,7 +61,7 @@ struct CharacterLambdaHandler {
         context: Lambda.Context,
         event: APIGateway.V2.Request
     ) -> EventLoopFuture<APIGateway.V2.Response> {
-        characterService.getAllCharacters()
+        characterRepository.getAllCharacters(fromDataSource: .database, on: context.eventLoop)
            .map { APIGateway.V2.Response(with: $0.map { Domain.Character(from: $0) }, statusCode: .ok) }
            .flatMapError { self.catchError(context: context, error: $0) }
     }

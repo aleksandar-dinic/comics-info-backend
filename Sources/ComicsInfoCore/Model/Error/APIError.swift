@@ -12,6 +12,7 @@ enum APIError: Error, Equatable {
 
     case decodingError(_ error: DecodingError)
     case requestError
+    case charactersNotFound
     case characterNotFound
 
 }

@@ -35,7 +35,10 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
         )
         switch handler {
         case let .characters(action):
-            let characterLambdaHandler = CharacterLambdaHandler(action: action, database: database)
+            let characterLambdaHandler = CharacterLambdaHandler(
+                action: action,
+                characterAPIService: CharacterDatabaseProvider(database: database)
+            )
             return characterLambdaHandler.handle(context: context, event: event)
 
         case .series, .comics, .none:

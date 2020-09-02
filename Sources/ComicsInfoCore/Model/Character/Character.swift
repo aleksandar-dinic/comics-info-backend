@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Character {
+struct Character: Codable {
 
     /// The unique ID of the character resource.
     let identifier: String

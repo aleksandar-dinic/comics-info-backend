@@ -1,5 +1,5 @@
 //
-//  DynamoDB+Database.swift
+//  AWSDynamoDBProvider.swift
 //  ComicsInfoCore
 //
 //  Created by Aleksandar Dinic on 27/08/2020.

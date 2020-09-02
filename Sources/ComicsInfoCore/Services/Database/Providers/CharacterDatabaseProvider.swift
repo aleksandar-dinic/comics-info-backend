@@ -1,5 +1,5 @@
 //
-//  CharacterService.swift
+//  CharacterDatabaseProvider.swift
 //  ComicsInfoCore
 //
 //  Created by Aleksandar Dinic on 26/08/2020.
@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-final class CharacterService {
+final class CharacterDatabaseProvider: CharacterAPIService {
 
     private let database: Database
     private let tableName: String
@@ -19,19 +19,15 @@ final class CharacterService {
         self.tableName = tableName
     }
 
-    func getAllCharacters() -> EventLoopFuture<[Character]> {
-        database.getAll(fromTable: .character).flatMapThrowing {
-            try $0?.compactMap { try Character(from: $0) } ?? []
-        }
+    func getAllCharacters(on eventLoop: EventLoop) -> EventLoopFuture<[[String: Any]]?> {
+        database.getAll(fromTable: .character)
     }
 
-    func getCharacter(forID characterID: String) -> EventLoopFuture<Character> {
-        database.get(fromTable: .character, forID: characterID).flatMapThrowing { items in
-            guard let items = items else {
-                throw APIError.characterNotFound
-            }
-            return try Character(from: items)
-        }
+    func getCharacter(
+        withID characterID: String,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<[String: Any]?> {
+        database.get(fromTable: .character, forID: characterID)
     }
 
 //    func createCharacter(_ character: Character) -> EventLoopFuture<Character> {

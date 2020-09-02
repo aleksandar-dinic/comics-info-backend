@@ -11,6 +11,8 @@ import Foundation
 
 public final class ComicsInfo {
 
+    static let characterCacheProvider = CharacterCacheProvider()
+
     public init() {
 
     }
