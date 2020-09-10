@@ -19,7 +19,7 @@ struct CharacterListResponseWrapper: ErrorResponseWrapper {
     }
 
     func handleList(on eventLoop: EventLoop) -> EventLoopFuture<Response> {
-        characterUseCase.getAllCharacters(fromDataSource: .database, on: eventLoop)
+        characterUseCase.getAllCharacters(fromDataSource: .memory, on: eventLoop)
             .map { Response(with: $0.map { Domain.Character(from: $0) }, statusCode: .ok) }
             .flatMapError { self.catchError(on: eventLoop, error: $0) }
     }

@@ -26,7 +26,7 @@ struct CharacterUseCaseLambdaFacade {
         event: APIGateway.V2.Request
     ) -> EventLoopFuture<APIGateway.V2.Response> {
         CharacterReadResponseWrapper(characterUseCase: characterUseCase)
-            .handleRead(on: eventLoop, event: event)
+            .handleRead(on: eventLoop, request: Request(from: event))
             .map { APIGateway.V2.Response(with: $0) }
     }
 

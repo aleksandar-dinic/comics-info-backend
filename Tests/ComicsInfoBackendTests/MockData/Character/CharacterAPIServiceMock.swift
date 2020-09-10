@@ -36,7 +36,7 @@ final class CharacterAPIServiceMock: CharacterAPIService {
         let promise = eventLoop.makePromise(of: [String: Any]?.self)
 
         eventLoop.execute { [weak self] in
-            guard let item = self?.items?.first else {
+            guard let item = self?.items?.first(where: { $0[.identifier] as? String == characterID }) else {
                 return promise.fail(APIError.characterNotFound)
             }
             promise.succeed(item)

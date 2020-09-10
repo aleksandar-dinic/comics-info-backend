@@ -38,13 +38,17 @@ struct CharacterDataProvider {
     }
 
     private func getAllCharactersFromMemory(on eventLoop: EventLoop) -> EventLoopFuture<[Character]> {
-        characterCacheService.getAllCharacters(on: eventLoop).flatMapError { _ in
+        characterCacheService.getAllCharacters(on: eventLoop).map {
+            $0.sorted(by: { $0.identifier < $1.identifier })
+        }.flatMapError { _ in
             getAllCharactersFromDatabase(on: eventLoop)
         }
     }
 
     private func getAllCharactersFromDatabase(on eventLoop: EventLoop) -> EventLoopFuture<[Character]> {
-        characterAPIWrapper.getAllCharacters(on: eventLoop).always { result in
+        characterAPIWrapper.getAllCharacters(on: eventLoop).map {
+            $0.sorted(by: { $0.identifier < $1.identifier })
+        }.always { result in
             guard let characters = try? result.get() else { return }
             characterCacheService.save(characters: characters)
         }
