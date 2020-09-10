@@ -13,6 +13,10 @@ public final class ComicsInfo {
 
     static let characterCacheProvider = CharacterCacheProvider()
 
+    static var isMocked: Bool {
+        ProcessInfo.processInfo.environment["LOCAL_LAMBDA_SERVER_ENABLED"] == "true"
+    }
+
     public init() {
 
     }

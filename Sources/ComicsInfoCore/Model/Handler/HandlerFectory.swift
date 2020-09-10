@@ -6,14 +6,13 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSLambdaEvents
 import Foundation
 
 struct HandlerFectory {
 
     private let mocked: Bool
 
-    init(mocked: Bool = ProcessInfo.processInfo.environment["LOCAL_LAMBDA_SERVER_ENABLED"] == "true") {
+    init(mocked: Bool = ComicsInfo.isMocked) {
         self.mocked = mocked
     }
 

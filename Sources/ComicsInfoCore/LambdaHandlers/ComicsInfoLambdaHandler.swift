@@ -6,11 +6,10 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AsyncHTTPClient
-import AWSDynamoDB
 import AWSLambdaEvents
 import AWSLambdaRuntime
 import Foundation
+import NIO
 
 struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
 
@@ -18,33 +17,33 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
     typealias Out = APIGateway.V2.Response
 
     private let database: Database
-    private let handlerFectory: HandlerFectory
 
     init(context: Lambda.InitializationContext) {
         database = DatabaseFectory().makeDatabase(eventLoop: context.eventLoop)
-        handlerFectory = HandlerFectory()
     }
 
     func handle(
         context: Lambda.Context,
         event: APIGateway.V2.Request
     ) -> EventLoopFuture<APIGateway.V2.Response> {
-        let handler = handlerFectory.makeHandler(
-            path: event.context.http.path,
-            method: event.context.http.method
-        )
+        let handler = getHandler(for: event.context.http)
+
         switch handler {
         case let .characters(action):
-            let characterLambdaHandler = CharacterLambdaHandler(
-                action: action,
-                characterAPIService: CharacterDatabaseProvider(database: database)
-            )
-            return characterLambdaHandler.handle(context: context, event: event)
+            let provider = CharacterLambdaProvider(database: database, action: action)
+            return provider.handle(on: context.eventLoop, event: event)
 
         case .series, .comics, .none:
             let response = APIGateway.V2.Response(statusCode: .notFound)
             return context.eventLoop.makeSucceededFuture(response)
         }
+    }
+
+    private func getHandler(for http: APIGateway.V2.Request.Context.HTTP) -> Handler? {
+        HandlerFectory().makeHandler(
+            path: http.path,
+            method: HTTPMethod(rawValue: http.method.rawValue)
+        )
     }
 
 }

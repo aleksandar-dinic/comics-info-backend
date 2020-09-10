@@ -7,40 +7,18 @@
 //
 
 import AWSLambdaEvents
-import class Foundation.JSONEncoder
+import Foundation
 
 extension APIGateway.V2.Response {
 
-    private static let encoder = JSONEncoder()
-
-    static let defaultHeaders = [
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Credentials": "true",
-    ]
-
-    init(with error: Error, statusCode: AWSLambdaEvents.HTTPResponseStatus) {
+    init(with response: Response) {
         self.init(
-            statusCode: statusCode,
-            headers: APIGateway.V2.Response.defaultHeaders,
-            multiValueHeaders: nil,
-            body: "{\"message\":\"\(String(describing: error))\"}",
-            isBase64Encoded: false
-        )
-    }
-
-    init<Out: Encodable>(with object: Out, statusCode: AWSLambdaEvents.HTTPResponseStatus) {
-        var body = "{}"
-        if let data = try? Self.encoder.encode(object) {
-            body = String(data: data, encoding: .utf8) ?? body
-        }
-        self.init(
-            statusCode: statusCode,
-            headers: APIGateway.V2.Response.defaultHeaders,
-            multiValueHeaders: nil,
-            body: body,
-            isBase64Encoded: false
+            statusCode: AWSLambdaEvents.HTTPResponseStatus(code: response.statusCode.code),
+            headers: response.headers,
+            multiValueHeaders: response.multiValueHeaders,
+            body: response.body,
+            isBase64Encoded: response.isBase64Encoded,
+            cookies: response.cookies
         )
     }
 
