@@ -1,0 +1,1 @@
+serverless deploy --stage production
