@@ -24,22 +24,7 @@ We will need a couple of services from Amazon:
 - **Swift**: https://swift.org/download/
 - **Docker**: https://docs.docker.com/docker-for-mac/install/
 - **Amazon Web Service** account: https://aws.amazon.com 
-- **Node.js**: https://nodejs.org/en/download/
-- **Serverless Framework**: https://www.serverless.com/framework/docs/getting-started/
-- **Credentials**: Ensure that Serverless Framework have access to AWS account https://www.serverless.com/framework/docs/providers/aws/guide/credentials/
-- **Make**: Check if you can run it
-``` bash
-$ make --version
-```
-``` bash
-GNU Make 3.81
-Copyright (C) 2006  Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.
-There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.
-
-This program built for i386-apple-darwin11.3.0
-```
+- **AWS CLI**: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html
 
 ## Getting started
 
@@ -124,7 +109,7 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
 }
 ```
 
-We can easily initialize `AWSDynamoDB` but we can't easily write tests and run code locally with `AWSDynamoDB`. Instead of initializing `AWSDynamoDB` we will delegate that job to `DatabaseFectory` and if we are testing our code `DatabaseFectory` will make `DatabaseMock` for us, otherwise it will make `AWSDynamoDB`.
+We can easily initialize `DynamoDB` but we can't easily write tests and run code locally with `DynamoDB`. Instead of initializing `DynamoDB` we will delegate that job to `DatabaseFectory` and if we are testing our code `DatabaseFectory` will make `DatabaseMock` for us, otherwise it will make `DynamoDB`.
 
 The same principle suits `Handler`. `Lambda.env("_HANDLER")` returns the handler variable, but when we run code locally or in testing, this variable is nil. `HandlerFectory` helps us that we always get the correct handler.
 
@@ -190,105 +175,36 @@ Lambda will be executed on the Amazon Linux operating system. Because of that, w
 This will use the Swift Nightly image for Amazon Linux 2 from the SwiftLang docker repository, then add the required dependencies to build and run Swift. With this set, we can build and package our lambda for deployment on AWS Lambda with the following script.
 
 ```bash
-$ Scripts/build.sh
+$ ./scripts/build-and-package.sh
 ```
 
 ⚠️ Don't forget to set the file as executable using:
 
 ``` bash
-$ sudo chmod +x Scripts/build.sh
+$ chmod +x scripts/build-and-package.sh
 ```
 
 More details about Swift on AWS Lambda you can find on the next link:
 
 > https://fabianfett.de/getting-started-with-swift-aws-lambda-runtime.
 
-### Deploy to AWS with Serverless Framework
+### Deploy Lambda using AWS CLI
 
-To install the Serverless Framework we need to run the next line:
+To install the AWS CLI we can run the next line:
 ``` bash
-$ sudo npm install -g serverless
+$ brew install awscli
 ```
 
-To use serverless we also need to setup the AWS credentials in user directory `~/.aws/credentials`. Now we just need to create a `serverless.yml` file:
-
-``` yaml
-service: comics-info
-
-package:
-    artifact: .build/lambda/ComicsInfoBackend/lambda.zip
-
-custom:
-    characterTableName: character-${self:provider.stage}
-
-provider:
-    name: aws
-    httpApi:
-        payload: '2.0'
-    runtime: provided
-    stage: ${opt:stage, 'dev'}
-    environment:
-        CHARACTER_TABLE_NAME: "${self:custom.characterTableName}"
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-        Resource: "*"
-      - Effect: Allow
-        Action:
-            - dynamodb:UpdateItem
-            - dynamodb:PutItem
-            - dynamodb:GetItem
-            - dynamodb:DeleteItem
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:DescribeTable
-        Resource:
-            - { Fn::GetAtt: [CharacterTable, Arn] }
-
-functions:
-    readCharacter:
-        handler: characters.read
-        events:
-        - httpApi:
-            method: GET
-            path: /characters/{identifier}
-    listCharacters:
-        handler: characters.list
-        events:
-        - httpApi:
-            method: GET
-            path: /characters
-
-resources:
-    Resources:
-        CharacterTable:
-            Type: AWS::DynamoDB::Table
-            Properties:
-                TableName: ${self:custom.characterTableName}
-                AttributeDefinitions:
-                  - AttributeName: identifier
-                    AttributeType: S
-                KeySchema:
-                  - AttributeName: identifier
-                    KeyType: HASH
-                BillingMode: PAY_PER_REQUEST
-```
-
-This is just a sneak peek of the `serverless.yml` file where we can see all the declaration that we need. In the functions section, we declare our Lambda functions. The first is `readCharacter` with method `GET` and path `/characters/{identifier}` and the second is `listCharacters` also with the `GET` method and path `/characters`. To go into details about all other components you can check out: https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-
-To deploy we can just type:
+To use the next script we also need to set up the AWS credentials in the user directory `~/.aws/credentials`. 
 ``` bash
-$ serverless deploy
+$ ./scripts/deploy.sh
 ```
 
-Wait until the deployment has completed. In the output we can expect endpoints:
-``` bash
-GET - https://{gatewayid}.execute-api.{region}.amazonaws.com/characters/{identifier}
-GET - https://{gatewayid}.execute-api.{region}.amazonaws.com/characters
-```
+This script will build and package your lambda first, upload our code to the S3 bucket and update Lambda. Lambda and the S3 bucket must exist on AWS before running this script.
+
+More information you can find on the next link:
+
+> https://github.com/swift-server/swift-aws-lambda-runtime/blob/main/Examples/LambdaFunctions/README.md#deployment-instructions-using-aws-cli
 
 To test `GET` request to `/characters/{identifier}` type:
 ``` bash
