@@ -6,7 +6,6 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSLambdaEvents
 import Foundation
 import NIO
 
@@ -22,17 +21,17 @@ struct CharacterLambdaHandler {
 
     func handle(
         on eventLoop: EventLoop,
-        event: APIGateway.V2.Request
-    ) -> EventLoopFuture<APIGateway.V2.Response> {
+        request: Request
+    ) -> EventLoopFuture<Response> {
         switch action {
         case .create, .update, .delete:
-            let response = APIGateway.V2.Response(statusCode: .notFound)
+            let response = Response(statusCode: .notFound)
             return eventLoop.makeSucceededFuture(response)
 
         case .read:
-            return characterUseCaseLambdaFacade.handleRead(on: eventLoop, event: event)
+            return characterUseCaseLambdaFacade.handleRead(on: eventLoop, request: request)
         case .list:
-            return characterUseCaseLambdaFacade.handleList(on: eventLoop, event: event)
+            return characterUseCaseLambdaFacade.handleList(on: eventLoop)
         }
     }
 

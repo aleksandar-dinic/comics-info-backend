@@ -42,6 +42,8 @@ struct Response {
 
 }
 
+extension Response: Codable { }
+
 extension Response {
 
     init<Out: Encodable>(

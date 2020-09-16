@@ -8,8 +8,18 @@
 
 import Foundation
 
-struct Request {
+struct Request: Codable {
 
     let pathParameters: [String: String]?
+    let context: Context
+
+}
+
+extension Request {
+
+    enum CodingKeys: String, CodingKey {
+        case pathParameters
+        case context = "requestContext"
+    }
 
 }

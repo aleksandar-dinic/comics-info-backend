@@ -64,8 +64,7 @@ After this, we also need to add the target’s dependencies:
 
 ``` swift
 .product(name: "AWSDynamoDB", package: "aws-sdk-swift"),
-.product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime"),
-.product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime")
+.product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
 ```
 
 ### Develop Lambda
@@ -80,14 +79,13 @@ Lambda.run(ComicsInfoLambdaHandler.init)
 `ComicsInfoLambdaHandler` is our dedicated struct who can handle all incoming requests.
 
 ``` swift
-import AWSLambdaEvents
 import AWSLambdaRuntime
 import NIO
 
 struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
 
-    typealias In = APIGateway.V2.Request
-    typealias Out = APIGateway.V2.Response
+    typealias In = Request
+    typealias Out = Response
 
     private let database: Database
 
@@ -97,8 +95,8 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
 
     func handle(
         context: Lambda.Context,
-        event: APIGateway.V2.Request
-    ) -> EventLoopFuture<APIGateway.V2.Response> {
+        event: Request
+    ) -> EventLoopFuture<Response> {
         let handler = getHandler(for: event.context.http)
 
         switch handler {
@@ -107,16 +105,16 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
             return provider.handle(on: context.eventLoop, event: event)
 
         case .series, .comics:
-            let response = APIGateway.V2.Response(statusCode: .notImplemented)
+            let response = Response(statusCode: .notImplemented)
             return context.eventLoop.makeSucceededFuture(response)
 
         case .none:
-            let response = APIGateway.V2.Response(statusCode: .notFound)
+            let response = Response(statusCode: .notFound)
             return context.eventLoop.makeSucceededFuture(response)
         }
     }
 
-    private func getHandler(for http: APIGateway.V2.Request.Context.HTTP) -> Handler? {
+    private func getHandler(for http: HTTP) -> Handler? {
         HandlerFectory().makeHandler(
             path: http.path,
             method: HTTPMethod(rawValue: http.method.rawValue)

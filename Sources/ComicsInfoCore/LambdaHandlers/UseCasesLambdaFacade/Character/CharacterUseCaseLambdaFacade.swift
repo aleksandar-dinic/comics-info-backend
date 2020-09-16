@@ -6,7 +6,6 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSLambdaEvents
 import Foundation
 import NIO
 
@@ -23,20 +22,15 @@ struct CharacterUseCaseLambdaFacade {
 
     func handleRead(
         on eventLoop: EventLoop,
-        event: APIGateway.V2.Request
-    ) -> EventLoopFuture<APIGateway.V2.Response> {
+        request: Request
+    ) -> EventLoopFuture<Response> {
         CharacterReadResponseWrapper(characterUseCase: characterUseCase)
-            .handleRead(on: eventLoop, request: Request(from: event))
-            .map { APIGateway.V2.Response(with: $0) }
+            .handleRead(on: eventLoop, request: request)
     }
 
-    func handleList(
-        on eventLoop: EventLoop,
-        event: APIGateway.V2.Request
-    ) -> EventLoopFuture<APIGateway.V2.Response> {
+    func handleList(on eventLoop: EventLoop) -> EventLoopFuture<Response> {
         CharacterListResponseWrapper(characterUseCase: characterUseCase)
             .handleList(on: eventLoop)
-            .map { APIGateway.V2.Response(with: $0) }
     }
 
 }

@@ -6,15 +6,14 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSLambdaEvents
 import AWSLambdaRuntime
 import Foundation
 import NIO
 
 struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
 
-    typealias In = APIGateway.V2.Request
-    typealias Out = APIGateway.V2.Response
+    typealias In = Request
+    typealias Out = Response
 
     private let database: Database
 
@@ -24,22 +23,25 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
 
     func handle(
         context: Lambda.Context,
-        event: APIGateway.V2.Request
-    ) -> EventLoopFuture<APIGateway.V2.Response> {
+        event: Request
+    ) -> EventLoopFuture<Response> {
+        if let data = try? JSONEncoder().encode(event) {
+            context.logger.log(level: .info, "\(String(data: data, encoding: .utf8) ?? "")")
+        }
         let handler = getHandler(for: event.context.http)
 
         switch handler {
         case let .characters(action):
             let provider = CharacterLambdaProvider(database: database, action: action)
-            return provider.handle(on: context.eventLoop, event: event)
+            return provider.handle(on: context.eventLoop, request: event)
 
         case .series, .comics, .none:
-            let response = APIGateway.V2.Response(statusCode: .notFound)
+            let response = Response(statusCode: .notFound)
             return context.eventLoop.makeSucceededFuture(response)
         }
     }
 
-    private func getHandler(for http: APIGateway.V2.Request.Context.HTTP) -> Handler? {
+    private func getHandler(for http: HTTP) -> Handler? {
         HandlerFectory().makeHandler(
             path: http.path,
             method: HTTPMethod(rawValue: http.method.rawValue)

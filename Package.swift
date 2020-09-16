@@ -42,8 +42,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
                 .product(name: "AWSDynamoDB", package: "aws-sdk-swift"),
-                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime"),
-                .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime")
+                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
             ]),
         .testTarget(
             name: "ComicsInfoBackendTests",

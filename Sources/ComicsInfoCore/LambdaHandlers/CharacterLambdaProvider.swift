@@ -6,7 +6,6 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSLambdaEvents
 import Foundation
 import NIO
 
@@ -21,9 +20,9 @@ struct CharacterLambdaProvider {
 
     func handle(
         on eventLoop: EventLoop,
-        event: APIGateway.V2.Request
-    ) -> EventLoopFuture<APIGateway.V2.Response> {
-        return characterLambdaHandler.handle(on: eventLoop, event: event)
+        request: Request
+    ) -> EventLoopFuture<Response> {
+        return characterLambdaHandler.handle(on: eventLoop, request: request)
     }
     
 }

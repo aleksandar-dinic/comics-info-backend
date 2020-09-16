@@ -16,13 +16,13 @@ struct DatabaseDecoder {
         self.items = items
     }
 
-    func decode<T>(_ type: T.Type, forKey key: String) throws -> T {
-        guard let item = items[key] else {
-            throw APIError.decodingError(.keyNotFound(key))
+    func decode<T>(_ type: T.Type, forKey key: CodingKey) throws -> T {
+        guard let item = items[key.stringValue] else {
+            throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: [], debugDescription: ""))
         }
 
         guard let decodeItem = item as? T else {
-            throw APIError.decodingError(.typeMismatch(forKey: key))
+            throw DecodingError.typeMismatch(T.self, DecodingError.Context(codingPath: [], debugDescription: ""))
         }
 
         return decodeItem

@@ -35,7 +35,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
         }
 
         // When
-        let responseFuture = sut.handleRead(on: eventLoop, request: Request(pathParameters: [.identifier: "1"]))
+        let responseFuture = sut.handleRead(on: eventLoop, request: makeRequest(pathParameters: [.identifier: "1"]))
 
         // Then
         let response = try responseFuture.wait()
@@ -48,7 +48,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
         let givenBody = "{\"message\":\"\(String(describing: givenError))\"}"
 
         // When
-        let responseFuture = sut.handleRead(on: eventLoop, request: Request(pathParameters: [.identifier: "-1"]))
+        let responseFuture = sut.handleRead(on: eventLoop, request: makeRequest(pathParameters: [.identifier: "-1"]))
 
         // Then
         let response = try responseFuture.wait()
@@ -60,11 +60,15 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
         let givenResponse = Response(statusCode: .notFound)
 
         // When
-        let responseFuture = sut.handleRead(on: eventLoop, request: Request(pathParameters: [:]))
+        let responseFuture = sut.handleRead(on: eventLoop, request: makeRequest(pathParameters: [:]))
 
         // Then
         let response = try responseFuture.wait()
         XCTAssertEqual(response.statusCode.code, givenResponse.statusCode.code)
+    }
+
+    private func makeRequest(pathParameters: [String: String]) -> Request {
+        Request(pathParameters: pathParameters, context: Context(http: HTTP(path: "", method: .GET)))
     }
 
 }
