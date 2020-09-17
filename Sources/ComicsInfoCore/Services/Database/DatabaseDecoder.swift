@@ -8,15 +8,15 @@
 
 import Foundation
 
-struct DatabaseDecoder {
+public struct DatabaseDecoder {
 
     private let items: [String: Any]
 
-    init(from items: [String: Any]) {
+    public init(from items: [String: Any]) {
         self.items = items
     }
 
-    func decode<T>(_ type: T.Type, forKey key: CodingKey) throws -> T {
+    public func decode<T>(_ type: T.Type, forKey key: CodingKey) throws -> T {
         guard let item = items[key.stringValue] else {
             throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: [], debugDescription: ""))
         }

@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct Response {
+public struct Response {
 
-    static let defaultHeaders = [
+    public static let defaultHeaders = [
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
@@ -24,7 +24,7 @@ struct Response {
     let isBase64Encoded: Bool?
     let cookies: [String]?
 
-    init(
+    public init(
         statusCode: HTTPResponseStatus,
         headers: [String: String]? = nil,
         multiValueHeaders: [String: [String]]? = nil,
@@ -46,7 +46,7 @@ extension Response: Codable { }
 
 extension Response {
 
-    init<Out: Encodable>(
+    public init<Out: Encodable>(
         with object: Out,
         statusCode: HTTPResponseStatus,
         headers: [String: String]? = Self.defaultHeaders,
@@ -73,7 +73,7 @@ extension Response {
 
 extension Response {
 
-    init(
+    public init(
         with error: Error,
         statusCode: HTTPResponseStatus,
         headers: [String: String]? = Self.defaultHeaders,

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-@testable import struct ComicsInfoCore.Character
+@testable import struct CharacterInfo.Character
 import Foundation
 
 struct CharactersMock {

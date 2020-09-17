@@ -7,6 +7,7 @@
 //
 
 @testable import ComicsInfoCore
+@testable import CharacterInfo
 import XCTest
 import NIO
 

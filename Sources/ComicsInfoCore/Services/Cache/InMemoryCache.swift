@@ -8,24 +8,24 @@
 
 import Foundation
 
-final class InMemoryCache<Key: Hashable, Value: Codable> {
+public final class InMemoryCache<Key: Hashable, Value: Codable> {
 
     private var storage: [Key: Value]
     private let queue: DispatchQueue
 
-    var isEmpty: Bool {
+    public var isEmpty: Bool {
         return queue.sync {
             storage.isEmpty
         }
     }
 
-    var values: [Value] {
+    public var values: [Value] {
         return queue.sync {
             Array(storage.values)
         }
     }
 
-    init(
+    public init(
         storage: [Key: Value] = [Key: Value](),
         queue: DispatchQueue = DispatchQueue(label: String(describing: InMemoryCache.self), attributes: .concurrent)
     ) {
@@ -33,7 +33,7 @@ final class InMemoryCache<Key: Hashable, Value: Codable> {
         self.queue = queue
     }
 
-    subscript(key: Key) -> Value? {
+    public subscript(key: Key) -> Value? {
         get {
             return queue.sync {
                 storage[key]

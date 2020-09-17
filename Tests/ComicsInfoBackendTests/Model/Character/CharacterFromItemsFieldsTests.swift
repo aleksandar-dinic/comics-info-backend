@@ -6,7 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-@testable import ComicsInfoCore
+@testable import CharacterInfo
 import XCTest
 
 final class CharacterFromItemsFieldsTests: XCTestCase {

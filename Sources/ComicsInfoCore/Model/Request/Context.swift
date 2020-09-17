@@ -8,8 +8,8 @@
 
 import Foundation
 
-struct Context: Codable {
+public struct Context: Codable {
 
-    let http: HTTP
+    public let http: HTTP
 
 }

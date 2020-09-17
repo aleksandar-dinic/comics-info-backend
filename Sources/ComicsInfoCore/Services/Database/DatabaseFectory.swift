@@ -10,15 +10,15 @@ import struct AWSDynamoDB.DynamoDB
 import Foundation
 import NIO
 
-struct DatabaseFectory {
+public struct DatabaseFectory {
 
     private let mocked: Bool
 
-    init(mocked: Bool = ComicsInfo.isMocked) {
+    public init(mocked: Bool) {
         self.mocked = mocked
     }
 
-    func makeDatabase(eventLoop: EventLoop) -> Database {
+    public func makeDatabase(eventLoop: EventLoop) -> Database {
         guard !mocked else {
             return DatabaseMock(eventLoop: eventLoop)
         }

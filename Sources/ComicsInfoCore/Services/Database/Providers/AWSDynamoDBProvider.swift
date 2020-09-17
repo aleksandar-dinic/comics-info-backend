@@ -22,18 +22,18 @@ extension DynamoDB: Database {
         self.init(client: client, region: .default)
     }
 
-    func getAll(fromTable table: DatabaseTable) -> EventLoopFuture<[[String: Any]]?> {
-        let input = DynamoDB.ScanInput(tableName: table.getName())
+    public func getAll(fromTable table: String) -> EventLoopFuture<[[String: Any]]?> {
+        let input = DynamoDB.ScanInput(tableName: table)
 
         return scan(input).flatMapThrowing { output in
             output.items?.compactMap { $0.compactMapValues { $0.value } }
         }
     }
 
-    func get(fromTable table: DatabaseTable, forID ID: String) -> EventLoopFuture<[String: Any]?> {
+    public func get(fromTable table: String, forID ID: String) -> EventLoopFuture<[String: Any]?> {
         let input = DynamoDB.GetItemInput(
-            key: [.identifier: .s(ID)],
-            tableName: table.getName()
+            key: ["identifier": .s(ID)],
+            tableName: table
         )
 
         return getItem(input).flatMapThrowing { output in

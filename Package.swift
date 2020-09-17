@@ -9,9 +9,9 @@ let package = Package(
         .macOS(.v10_14)
     ],
     products: [
-         .executable(
-            name: "ComicsInfoBackend",
-            targets: ["ComicsInfoBackend"])
+        .executable(name: "CharacterListHandler", targets: ["CharacterListHandler"]),
+        .executable(name: "CharacterReadHandler", targets: ["CharacterReadHandler"]),
+        .executable(name: "ComicListHandler", targets: ["ComicListHandler"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -34,9 +34,16 @@ let package = Package(
         // test suite.
         // Targets can depend on other targets in this package, and on products in packages
         // which this package depends on.
+        .target(name: "CharacterListHandler", dependencies: ["CharacterInfo", "ComicsInfoCore"]),
+        .target(name: "CharacterReadHandler", dependencies: ["CharacterInfo", "ComicsInfoCore"]),
+        .target(name: "ComicListHandler", dependencies: ["ComicsInfoCore"]),
         .target(
-            name: "ComicsInfoBackend",
-            dependencies: ["ComicsInfoCore"]),
+            name: "CharacterInfo",
+            dependencies: [
+                .product(name: "Domain", package: "Domain"),
+                .product(name: "AWSDynamoDB", package: "aws-sdk-swift"),
+                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
+            ]),
         .target(
             name: "ComicsInfoCore",
             dependencies: [
@@ -46,6 +53,9 @@ let package = Package(
             ]),
         .testTarget(
             name: "ComicsInfoBackendTests",
-            dependencies: ["ComicsInfoCore"])
+            dependencies: [
+                "CharacterInfo",
+                "ComicsInfoCore"
+            ])
     ]
 )

@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct HTTPMethod: Hashable {
+public struct HTTPMethod: Hashable {
 
     static var GET: HTTPMethod { HTTPMethod(rawValue: "GET") }
     static var POST: HTTPMethod { HTTPMethod(rawValue: "POST") }

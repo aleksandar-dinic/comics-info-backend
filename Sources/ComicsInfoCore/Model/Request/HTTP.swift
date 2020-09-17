@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct HTTP: Codable {
+public struct HTTP: Codable {
 
-    let path: String
-    let method: HTTPMethod
+    public let path: String
+    public let method: HTTPMethod
 
 }

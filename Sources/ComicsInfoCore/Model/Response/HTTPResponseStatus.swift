@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct HTTPResponseStatus: Codable {
+public struct HTTPResponseStatus: Codable {
 
     public let code: UInt
 

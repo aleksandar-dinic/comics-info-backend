@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum DataSourceLayer {
+public enum DataSourceLayer {
 
     case memory
     case database

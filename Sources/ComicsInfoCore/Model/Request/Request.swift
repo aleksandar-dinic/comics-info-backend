@@ -8,10 +8,10 @@
 
 import Foundation
 
-struct Request: Codable {
+public struct Request: Codable {
 
-    let pathParameters: [String: String]?
-    let context: Context
+    public let pathParameters: [String: String]?
+    public let context: Context
 
 }
 

@@ -9,10 +9,10 @@
 import Foundation
 import NIO
 
-protocol Database {
+public protocol Database {
 
-    func getAll(fromTable table: DatabaseTable) -> EventLoopFuture<[[String: Any]]?>
+    func getAll(fromTable table: String) -> EventLoopFuture<[[String: Any]]?>
 
-    func get(fromTable table: DatabaseTable, forID ID: String) -> EventLoopFuture<[String: Any]?>
+    func get(fromTable table: String, forID ID: String) -> EventLoopFuture<[String: Any]?>
 
 }
