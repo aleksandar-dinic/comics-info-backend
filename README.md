@@ -42,13 +42,13 @@ The first thing that we need to do is to add a dependency to [Swift AWS Lambda R
 
 ``` swift
 .package(url: "https://github.com/swift-server/swift-aws-lambda-runtime.git", .upToNextMajor(from:"0.2.0")),
-.package(url: "https://github.com/swift-aws/aws-sdk-swift.git", from: "5.0.0-alpha.4")
+.package(url: "https://github.com/soto-project/soto.git", .upToNextMinor(from: "5.0.0-beta.1"))
 ```
 
 After this, we also need to add the target’s dependencies:
 
 ``` swift
-.product(name: "AWSDynamoDB", package: "aws-sdk-swift"),
+.product(name: "SotoDynamoDB", package: "soto"),
 .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
 ```
 

@@ -69,7 +69,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
     }
 
     private func makeRequest(pathParameters: [String: String]) -> Request {
-        Request(pathParameters: pathParameters, context: Context(http: HTTP(path: "", method: .GET)))
+        Request(pathParameters: pathParameters)
     }
 
 }

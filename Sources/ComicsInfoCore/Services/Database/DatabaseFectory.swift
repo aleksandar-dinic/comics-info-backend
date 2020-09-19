@@ -6,7 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import struct AWSDynamoDB.DynamoDB
+import struct SotoDynamoDB.DynamoDB
 import Foundation
 import NIO
 
@@ -23,7 +23,7 @@ public struct DatabaseFectory {
             return DatabaseMock(eventLoop: eventLoop)
         }
 
-        return AWSDynamoDB.DynamoDB(eventLoop: eventLoop)
+        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop)
     }
 
 }

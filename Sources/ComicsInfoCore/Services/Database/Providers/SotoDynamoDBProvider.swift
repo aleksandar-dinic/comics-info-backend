@@ -1,14 +1,14 @@
 //
-//  AWSDynamoDBProvider.swift
+//  SotoDynamoDBProvider.swift
 //  ComicsInfoCore
 //
 //  Created by Aleksandar Dinic on 27/08/2020.
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSDynamoDB
 import AsyncHTTPClient
 import Foundation
+import SotoDynamoDB
 
 extension DynamoDB: Database {
 

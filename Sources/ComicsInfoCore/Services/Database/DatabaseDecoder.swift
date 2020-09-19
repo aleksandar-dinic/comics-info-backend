@@ -18,11 +18,23 @@ public struct DatabaseDecoder {
 
     public func decode<T>(_ type: T.Type, forKey key: CodingKey) throws -> T {
         guard let item = items[key.stringValue] else {
-            throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: [], debugDescription: ""))
+            throw DecodingError.keyNotFound(
+                key,
+                DecodingError.Context(
+                    codingPath: [key],
+                    debugDescription: "No value associated with key \(key)"
+                )
+            )
         }
 
         guard let decodeItem = item as? T else {
-            throw DecodingError.typeMismatch(T.self, DecodingError.Context(codingPath: [], debugDescription: ""))
+            throw DecodingError.typeMismatch(
+                T.self,
+                DecodingError.Context(
+                    codingPath: [key],
+                    debugDescription: "Expected to decode \(T.self) but found a \(Swift.type(of: item)) instead."
+                )
+            )
         }
 
         return decodeItem

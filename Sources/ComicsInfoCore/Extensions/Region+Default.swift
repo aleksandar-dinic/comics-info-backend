@@ -6,9 +6,9 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSDynamoDB
 import enum AWSLambdaRuntime.Lambda
 import Foundation
+import SotoDynamoDB
 
 extension Region {
 

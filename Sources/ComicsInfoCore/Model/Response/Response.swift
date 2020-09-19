@@ -17,12 +17,12 @@ public struct Response {
         "Access-Control-Allow-Credentials": "true",
     ]
 
-    let statusCode: HTTPResponseStatus
-    let headers: [String: String]?
-    let multiValueHeaders: [String: [String]]?
-    let body: String?
-    let isBase64Encoded: Bool?
-    let cookies: [String]?
+    public let statusCode: HTTPResponseStatus
+    public let headers: [String: String]?
+    public let multiValueHeaders: [String: [String]]?
+    public let body: String?
+    public let isBase64Encoded: Bool?
+    public let cookies: [String]?
 
     public init(
         statusCode: HTTPResponseStatus,
@@ -55,8 +55,8 @@ extension Response {
         cookies: [String]? = nil
     ) {
         var body = "{}"
-        if let data = try? JSONEncoder().encode(object) {
-            body = String(data: data, encoding: .utf8) ?? body
+        if let data = try? JSONEncoder().encode(object), let dataEncoded = String(data: data, encoding: .utf8) {
+            body = dataEncoded
         }
 
         self.init(

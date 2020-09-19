@@ -6,7 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSDynamoDB
+import SotoDynamoDB
 import Foundation
 
 extension DynamoDB.AttributeValue {
@@ -35,10 +35,10 @@ extension DynamoDB.AttributeValue {
             return valueInt
 
         case let .ns(value):
-            let valueInt = value.compactMap { Int($0) }
+            let valueInt = value.compactMap(Int.init)
 
             guard !valueInt.isEmpty else {
-                return value.compactMap { Double($0) }
+                return value.compactMap(Double.init)
             }
 
             return valueInt

@@ -9,8 +9,7 @@ let package = Package(
         .macOS(.v10_14)
     ],
     products: [
-        .executable(name: "CharacterListHandler", targets: ["CharacterListHandler"]),
-        .executable(name: "CharacterReadHandler", targets: ["CharacterReadHandler"]),
+        .executable(name: "CharacterHandler", targets: ["CharacterHandler"]),
         .executable(name: "ComicListHandler", targets: ["ComicListHandler"])
     ],
     dependencies: [
@@ -25,8 +24,8 @@ let package = Package(
             .upToNextMajor(from:"0.2.0")
         ),
         .package(
-            url: "https://github.com/swift-aws/aws-sdk-swift.git",
-            from: "5.0.0-alpha.4"
+            url: "https://github.com/soto-project/soto.git",
+            .upToNextMinor(from: "5.0.0-beta.1")
         )
     ],
     targets: [
@@ -34,28 +33,27 @@ let package = Package(
         // test suite.
         // Targets can depend on other targets in this package, and on products in packages
         // which this package depends on.
-        .target(name: "CharacterListHandler", dependencies: ["CharacterInfo", "ComicsInfoCore"]),
-        .target(name: "CharacterReadHandler", dependencies: ["CharacterInfo", "ComicsInfoCore"]),
+        .target(name: "CharacterHandler", dependencies: ["CharacterInfo", "ComicsInfoCore"]),
         .target(name: "ComicListHandler", dependencies: ["ComicsInfoCore"]),
         .target(
             name: "CharacterInfo",
             dependencies: [
+                .target(name: "ComicsInfoCore"),
                 .product(name: "Domain", package: "Domain"),
-                .product(name: "AWSDynamoDB", package: "aws-sdk-swift"),
+                .product(name: "SotoDynamoDB", package: "soto"),
+                .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime"),
                 .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
             ]),
         .target(
             name: "ComicsInfoCore",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
-                .product(name: "AWSDynamoDB", package: "aws-sdk-swift"),
+                .product(name: "SotoDynamoDB", package: "soto"),
+                .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime"),
                 .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
             ]),
         .testTarget(
             name: "ComicsInfoBackendTests",
-            dependencies: [
-                "CharacterInfo",
-                "ComicsInfoCore"
-            ])
+            dependencies: ["CharacterInfo", "ComicsInfoCore"])
     ]
 )
