@@ -18,6 +18,14 @@ final class CharacterRepository {
         self.characterDataProvider = characterDataProvider
     }
 
+    /// Create character.
+    ///
+    /// - Parameter character: The character.
+    /// - Returns: Future with Character value.
+    func create(_ character: Character) -> EventLoopFuture<Void> {
+        characterDataProvider.create(character)
+    }
+
     /// Gets all characters.
     ///
     /// - Parameter dataSource: Layer of data source.

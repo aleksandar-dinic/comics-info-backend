@@ -8,23 +8,30 @@
 
 @testable import CharacterInfo
 import Foundation
+import NIO
 
 struct CharacterRepositoryMockFactory {
 
-    static func makeWithCharacters() -> CharacterRepository {
-        let characterDataProvider = CharacterDataProviderMockFactory.makeWithCharactersFromMemory()
+    var characterDataProviderMockFactory: CharacterDataProviderMockFactory
+
+    init(on eventLoop: EventLoop) {
+        characterDataProviderMockFactory = CharacterDataProviderMockFactory(on: eventLoop)
+    }
+
+    mutating func makeWithCharacters() -> CharacterRepository {
+        let characterDataProvider = characterDataProviderMockFactory.makeWithCharactersFromMemory()
 
         return CharacterRepository(characterDataProvider: characterDataProvider)
     }
 
-    static func makeWithCharacter() -> CharacterRepository {
-        let characterDataProvider = CharacterDataProviderMockFactory.makeWithCharacterFromMemory()
+    mutating func makeWithCharacter() -> CharacterRepository {
+        let characterDataProvider = characterDataProviderMockFactory.makeWithCharacterFromMemory()
 
         return CharacterRepository(characterDataProvider: characterDataProvider)
     }
 
-    static func makeWithoutData() -> CharacterRepository {
-        let characterDataProvider = CharacterDataProviderMockFactory.makeWithoutData()
+    mutating func makeWithoutData() -> CharacterRepository {
+        let characterDataProvider = characterDataProviderMockFactory.makeWithoutData()
 
         return CharacterRepository(characterDataProvider: characterDataProvider)
     }

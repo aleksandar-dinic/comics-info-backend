@@ -13,15 +13,18 @@ import NIO
 final class CharacterAPIWrapperTests: XCTestCase {
 
     private var eventLoop: EventLoop!
+    private var characterAPIWrapperMockFactory: CharacterAPIWrapperMockFactory!
     private var characterID: String!
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
+        characterAPIWrapperMockFactory = CharacterAPIWrapperMockFactory(on: eventLoop)
         characterID = "1"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
+        characterAPIWrapperMockFactory = nil
         characterID = nil
     }
 
@@ -29,7 +32,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
     func test_whenGetAllCharacters_returns3Characters() throws {
         // Given
-        let sut = CharacterAPIWrapperMockFactory.makeWithCharacters()
+        let sut = characterAPIWrapperMockFactory.makeWithCharacters()
 
         // When
         let charactersFuture = sut.getAllCharacters(on: eventLoop)
@@ -41,7 +44,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
     func testWithoutData_whenGetAllCharacters_throwsCharactersNotFound() {
         // Given
-        let sut = CharacterAPIWrapperMockFactory.makeWithoutData()
+        let sut = characterAPIWrapperMockFactory.makeWithoutData()
 
         // When
         let charactersFuture = sut.getAllCharacters(on: eventLoop)
@@ -54,7 +57,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
     func testWithBadData_whenGetAllCharacters_throwsCharactersNotFound() {
         // Given
-        let sut = CharacterAPIWrapperMockFactory.makeWithCharactersBadData()
+        let sut = characterAPIWrapperMockFactory.makeWithCharactersBadData()
 
         // When
         let charactersFuture = sut.getAllCharacters(on: eventLoop)
@@ -69,7 +72,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
     func test_whenGetCharacter_returnsCharacter() throws {
         // Given
-        let sut = CharacterAPIWrapperMockFactory.makeWithCharacter()
+        let sut = characterAPIWrapperMockFactory.makeWithCharacter()
 
         // When
         let characterFuture = sut.getCharacter(withID: characterID, on: eventLoop)
@@ -81,7 +84,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
     func testWithoutData_whenGetCharacter_throwsCharacterNotFound() {
         // Given
-        let sut = CharacterAPIWrapperMockFactory.makeWithoutData()
+        let sut = characterAPIWrapperMockFactory.makeWithoutData()
 
         // When
         let characterFuture = sut.getCharacter(withID: characterID, on: eventLoop)
@@ -94,7 +97,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
     func testWithBadData_whenGetCharacter_throwsCharacterNotFound() {
         // Given
-        let sut = CharacterAPIWrapperMockFactory.makeWithCharacterBadData()
+        let sut = characterAPIWrapperMockFactory.makeWithCharacterBadData()
 
         // When
         let characterFuture = sut.getCharacter(withID: characterID, on: eventLoop)

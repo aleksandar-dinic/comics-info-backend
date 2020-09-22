@@ -12,9 +12,23 @@ import NIO
 struct DatabaseMock: Database {
 
     private let eventLoop: EventLoop
+    private var items: [String: [String: Any]]
 
     init(eventLoop: EventLoop) {
         self.eventLoop = eventLoop
+        items = [String: [String: Any]]()
+    }
+
+    mutating func create(_ item: [String: Any], tableName table: String) -> EventLoopFuture<Void> {
+        guard let identifier = item["identifier"] as? String else {
+            return eventLoop.makeFailedFuture(DatabaseError.identifierDoesNotExists)
+        }
+        guard !items.keys.contains(identifier) else {
+            return eventLoop.makeFailedFuture(DatabaseError.identifierExists)
+        }
+
+        items[identifier] = item
+        return eventLoop.makeSucceededFuture(())
     }
 
     func getAll(fromTable table: String) -> EventLoopFuture<[[String : Any]]?> {

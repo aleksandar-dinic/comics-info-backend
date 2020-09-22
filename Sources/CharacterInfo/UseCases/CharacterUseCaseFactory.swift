@@ -13,9 +13,17 @@ import NIO
 struct CharacterUseCaseFactory {
 
     private let eventLoop: EventLoop
+    private let isLocalServer: Bool
+    private let characterCacheService: CharacterCacheService
 
-    init(on eventLoop: EventLoop) {
+    init(
+        on eventLoop: EventLoop,
+        isLocalServer: Bool,
+        characterCacheService: CharacterCacheService = CharacterInfo.characterCacheProvider
+    ) {
         self.eventLoop = eventLoop
+        self.isLocalServer = isLocalServer
+        self.characterCacheService = characterCacheService
     }
 
     func makeCharacterUseCase() -> CharacterUseCase {
@@ -23,8 +31,10 @@ struct CharacterUseCaseFactory {
     }
 
     private func makeCharacterRepository() -> CharacterRepository {
-        CharacterRepositoryFactory(characterAPIService: makeCharacterAPIService())
-            .makeCharacterRepository()
+        CharacterRepositoryFactory(
+            characterAPIService: makeCharacterAPIService(),
+            characterCacheService: characterCacheService
+        ).makeCharacterRepository()
     }
 
     private func makeCharacterAPIService() -> CharacterAPIService {
@@ -32,7 +42,7 @@ struct CharacterUseCaseFactory {
     }
 
     private func makeDatabase() -> Database {
-        DatabaseFectory(mocked: CharacterInfo.isLocalServer)
+        DatabaseFectory(isLocalServer: isLocalServer)
             .makeDatabase(eventLoop: eventLoop)
     }
 

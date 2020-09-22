@@ -15,14 +15,17 @@ final class CharacterDataProviderTests: XCTestCase {
 
     private var eventLoop: EventLoop!
     private var characterID: String!
+    private var characterDataProviderMockFactory: CharacterDataProviderMockFactory!
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
+        characterDataProviderMockFactory = CharacterDataProviderMockFactory(on: eventLoop)
         characterID = "1"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
+        characterDataProviderMockFactory = nil
         characterID = nil
     }
 
@@ -30,7 +33,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func test_whenGetAllCharactersFromDatabase_returns3Characters() throws {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithCharactersFromDatabase()
+        let sut = characterDataProviderMockFactory.makeWithCharactersFromDatabase()
         let dataSourceLayer = DataSourceLayer.database
 
         // When
@@ -43,7 +46,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func test_whenGetAllCharactersFromMemory_returns3Characters() throws {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithCharactersFromMemory()
+        let sut = characterDataProviderMockFactory.makeWithCharactersFromMemory()
         let dataSourceLayer = DataSourceLayer.memory
 
         // When
@@ -56,7 +59,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func test_whenGetAllCharactersFromEmptyMemory_returns3CharactersFromDatabase() throws {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithCharactersFromDatabase()
+        let sut = characterDataProviderMockFactory.makeWithCharactersFromDatabase()
         let dataSourceLayer = DataSourceLayer.memory
 
         // When
@@ -69,7 +72,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func testWithoutData_whenGetAllCharacters_throwsNoCharacters() {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithoutData()
+        let sut = characterDataProviderMockFactory.makeWithoutData()
         let dataSourceLayer = DataSourceLayer.database
 
         // When
@@ -85,7 +88,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func test_whenGetCharacterFromDatabase_returnsCharacter() throws {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithCharacterFromDatabase()
+        let sut = characterDataProviderMockFactory.makeWithCharacterFromDatabase()
         let dataSourceLayer = DataSourceLayer.database
 
         // When
@@ -98,7 +101,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func test_whenGetCharacterFromMemory_returnsCharacter() throws {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithCharacterFromMemory()
+        let sut = characterDataProviderMockFactory.makeWithCharacterFromMemory()
         let dataSourceLayer = DataSourceLayer.memory
 
         // When
@@ -111,7 +114,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func test_whenGetCharacterFromEmptyMemory_returnsCharacterFromDatabase() throws {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithCharacterFromDatabase()
+        let sut = characterDataProviderMockFactory.makeWithCharacterFromDatabase()
         let dataSourceLayer = DataSourceLayer.memory
 
         // When
@@ -124,7 +127,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
     func testWithoutData_whenGetCharacter_throwsNoCharacter() {
         // Given
-        let sut = CharacterDataProviderMockFactory.makeWithoutData()
+        let sut = characterDataProviderMockFactory.makeWithoutData()
         let dataSourceLayer = DataSourceLayer.database
 
         // When

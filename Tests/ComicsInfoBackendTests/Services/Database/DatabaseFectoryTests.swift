@@ -24,7 +24,7 @@ final class DatabaseFectoryTests: XCTestCase {
 
     func testDatabaseFectoryMocked_whenMakeDatabase_databaseIsDatabaseMock() {
         // Given
-        let sut = DatabaseFectory(mocked: true)
+        let sut = DatabaseFectory(isLocalServer: true)
 
         // When
         let database = sut.makeDatabase(eventLoop: eventLoop)

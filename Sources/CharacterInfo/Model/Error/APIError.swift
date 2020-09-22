@@ -13,5 +13,6 @@ enum APIError: Error, Equatable {
     case requestError
     case charactersNotFound
     case characterNotFound
+    case handlerUnknown
 
 }

@@ -22,6 +22,10 @@ struct CharacterAPIWrapper {
         self.characterDecoderService = characterDecoderService
     }
 
+    func create(_ character: Character) -> EventLoopFuture<Void> {
+        characterAPIService.create(character)
+    }
+
     func getAllCharacters(on eventLoop: EventLoop) -> EventLoopFuture<[Character]> {
         characterAPIService.getAllCharacters(on: eventLoop).flatMapThrowing {
             try characterDecoderService.decodeAllCharacters(from: $0)

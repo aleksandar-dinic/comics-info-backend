@@ -13,18 +13,21 @@ import NIO
 final class CharacterUseCaseTests: XCTestCase {
 
     private var eventLoop: EventLoop!
+    private var characterRepositoryMockFactory: CharacterRepositoryMockFactory!
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
+        characterRepositoryMockFactory = CharacterRepositoryMockFactory(on: eventLoop)
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
+        characterRepositoryMockFactory = nil
     }
 
     func testUseCase_genGetAllCharacters_returns3Characters() throws {
         // Given
-        let characterRepository = CharacterRepositoryMockFactory.makeWithCharacters()
+        let characterRepository = characterRepositoryMockFactory.makeWithCharacters()
         let sut = CharacterUseCase(characterRepository: characterRepository)
 
         // When
@@ -37,7 +40,7 @@ final class CharacterUseCaseTests: XCTestCase {
 
     func testUseCase_whenGetCharacter_returnsCharacter() throws {
         // Given
-        let characterRepository = CharacterRepositoryMockFactory.makeWithCharacter()
+        let characterRepository = characterRepositoryMockFactory.makeWithCharacter()
         let sut = CharacterUseCase(characterRepository: characterRepository)
         let characterID = "1"
 

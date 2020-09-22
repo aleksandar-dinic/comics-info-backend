@@ -11,17 +11,22 @@ import NIO
 
 public protocol ErrorResponseWrapper {
 
-    func catchError(on eventLoop: EventLoop, error: Error) -> EventLoopFuture<Response>
+    func `catch`(
+        _ error: Error,
+        on eventLoop: EventLoop,
+        statusCode: HTTPResponseStatus
+    ) -> EventLoopFuture<Response>
 
 }
 
 extension ErrorResponseWrapper {
 
-    public func catchError(
+    public func `catch`(
+        _ error: Error,
         on eventLoop: EventLoop,
-        error: Error
+        statusCode: HTTPResponseStatus = .notFound
     ) -> EventLoopFuture<Response> {
-        let response = Response(with: error, statusCode: .notFound)
+        let response = Response(with: error, statusCode: statusCode)
 
         return eventLoop.makeSucceededFuture(response)
     }

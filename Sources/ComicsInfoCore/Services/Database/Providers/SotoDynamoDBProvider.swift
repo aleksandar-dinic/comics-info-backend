@@ -22,22 +22,32 @@ extension DynamoDB: Database {
         self.init(client: client, region: .default)
     }
 
-    public func getAll(fromTable table: String) -> EventLoopFuture<[[String: Any]]?> {
-        let input = DynamoDB.ScanInput(tableName: table)
+    public func create(_ item: [String: Any], tableName table: String) -> EventLoopFuture<Void> {
+        let input = PutItemInput(
+            conditionExpression: "attribute_not_exists(identifier)",
+            item: item.compactMapValues { ($0 as? AttributeValueMapper)?.attributeValue },
+            tableName: table
+        )
 
-        return scan(input).flatMapThrowing { output in
-            output.items?.compactMap { $0.compactMapValues { $0.value } }
+        return putItem(input).flatMapThrowing { _ in }
+    }
+
+    public func getAll(fromTable table: String) -> EventLoopFuture<[[String: Any]]?> {
+        let input = ScanInput(tableName: table)
+
+        return scan(input).flatMapThrowing {
+            $0.items?.compactMap { $0.compactMapValues { $0.value } }
         }
     }
 
     public func get(fromTable table: String, forID ID: String) -> EventLoopFuture<[String: Any]?> {
-        let input = DynamoDB.GetItemInput(
+        let input = GetItemInput(
             key: ["identifier": .s(ID)],
             tableName: table
         )
 
-        return getItem(input).flatMapThrowing { output in
-            output.item?.compactMapValues { $0.value }
+        return getItem(input).flatMapThrowing {
+            $0.item?.compactMapValues { $0.value }
         }
     }
 

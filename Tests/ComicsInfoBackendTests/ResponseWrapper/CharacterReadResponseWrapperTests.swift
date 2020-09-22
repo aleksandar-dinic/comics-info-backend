@@ -18,7 +18,8 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let characterRepository = CharacterRepositoryMockFactory.makeWithCharacter()
+        var characterRepositoryMockFactory = CharacterRepositoryMockFactory(on: eventLoop)
+        let characterRepository = characterRepositoryMockFactory.makeWithCharacter()
         let characterUseCase = CharacterUseCase(characterRepository: characterRepository)
         sut = CharacterReadResponseWrapper(characterUseCase: characterUseCase)
     }
@@ -69,7 +70,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
     }
 
     private func makeRequest(pathParameters: [String: String]) -> Request {
-        Request(pathParameters: pathParameters)
+        Request(pathParameters: pathParameters, body: nil)
     }
 
 }

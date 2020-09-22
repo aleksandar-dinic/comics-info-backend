@@ -18,6 +18,10 @@ final class CharacterUseCase {
         self.characterRepository = characterRepository
     }
 
+    func create(_ character: Character) -> EventLoopFuture<Void> {
+        characterRepository.create(character)
+    }
+
     func getAllCharacters(
         fromDataSource dataSource: DataSourceLayer,
         on eventLoop: EventLoop

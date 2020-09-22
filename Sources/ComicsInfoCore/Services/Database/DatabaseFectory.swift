@@ -12,14 +12,14 @@ import NIO
 
 public struct DatabaseFectory {
 
-    private let mocked: Bool
+    private let isLocalServer: Bool
 
-    public init(mocked: Bool) {
-        self.mocked = mocked
+    public init(isLocalServer: Bool) {
+        self.isLocalServer = isLocalServer
     }
 
     public func makeDatabase(eventLoop: EventLoop) -> Database {
-        guard !mocked else {
+        guard !isLocalServer else {
             return DatabaseMock(eventLoop: eventLoop)
         }
 

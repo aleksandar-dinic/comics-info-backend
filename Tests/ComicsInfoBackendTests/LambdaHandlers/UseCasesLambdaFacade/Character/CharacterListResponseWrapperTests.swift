@@ -14,18 +14,21 @@ import NIO
 final class CharacterListResponseWrapperTests: XCTestCase {
 
     private var eventLoop: EventLoop!
+    private var characterRepositoryMockFactory: CharacterRepositoryMockFactory!
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
+        characterRepositoryMockFactory = CharacterRepositoryMockFactory(on: eventLoop)
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
+        characterRepositoryMockFactory = nil
     }
 
     func test_whenHandleList_returnsResponseWithCharacters() throws {
         // Given
-        let characterRepository = CharacterRepositoryMockFactory.makeWithCharacters()
+        let characterRepository = characterRepositoryMockFactory.makeWithCharacters()
         let characterUseCase = CharacterUseCase(characterRepository: characterRepository)
         let sut = CharacterListResponseWrapper(characterUseCase: characterUseCase)
 
@@ -44,7 +47,7 @@ final class CharacterListResponseWrapperTests: XCTestCase {
 
     func testListNonExistingCharacters_whenHandleList_returnsResponseWithErrorCharactersNotFound() throws {
         // Given
-        let characterRepository = CharacterRepositoryMockFactory.makeWithoutData()
+        let characterRepository = characterRepositoryMockFactory.makeWithoutData()
         let characterUseCase = CharacterUseCase(characterRepository: characterRepository)
         let sut = CharacterListResponseWrapper(characterUseCase: characterUseCase)
 

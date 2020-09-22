@@ -9,14 +9,14 @@
 import enum AWSLambdaRuntime.Lambda
 import Foundation
 
-extension Lambda {
+public extension Lambda {
 
     static var region: String? {
         Lambda.env("AWS_REGION")
     }
 
-    static var handler: String? {
-        Lambda.env("_HANDLER")
+    static var handler: String {
+        Lambda.env("_HANDLER") ?? ""
     }
 
     static var seriesTableName: String? {

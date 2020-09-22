@@ -36,7 +36,7 @@ final class ErrorResponseWrapperTests: XCTestCase {
         // Given
 
         // When
-        let response = try sut.catchError(on: eventLoop, error: error).wait()
+        let response = try sut.catch(error, on: eventLoop).wait()
 
         // Then
         XCTAssertEqual(response.statusCode.code, givenResponse.statusCode.code)

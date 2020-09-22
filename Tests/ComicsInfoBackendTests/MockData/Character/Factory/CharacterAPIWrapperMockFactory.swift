@@ -8,57 +8,57 @@
 
 @testable import CharacterInfo
 import Foundation
+import NIO
 
-struct CharacterAPIWrapperMockFactory {
+struct CharacterAPIWrapperMockFactory: CharacterAPIWrapperFactory {
 
-    static func makeWithCharacters() -> CharacterAPIWrapper {
-        let characterAPIServiceMock = CharacterAPIServiceMock(CharactersMock.charactersItems)
-        let characterDecoderService = CharacterDecoderMock(CharactersMock.characters)
+    let eventLoop: EventLoop
+    var characterAPIService: CharacterAPIService
+    var characterDecoderService: CharacterDecoderService
 
-        return CharacterAPIWrapper(
-            characterAPIService: characterAPIServiceMock,
-            characterDecoderService: characterDecoderService
-        )
+    init(
+        on eventLoop: EventLoop,
+        characterAPIService: CharacterAPIService = CharacterAPIServiceMock(),
+        characterDecoderService: CharacterDecoderService = CharacterDecoderMock()
+    ) {
+        self.eventLoop = eventLoop
+        self.characterAPIService = characterAPIService
+        self.characterDecoderService = characterDecoderService
     }
 
-    static func makeWithoutData() -> CharacterAPIWrapper {
-        let characterAPIServiceMock = CharacterAPIServiceMock()
-        let characterDecoderService = CharacterDecoderMock()
+    mutating func makeWithCharacters() -> CharacterAPIWrapper {
+        characterAPIService = CharacterAPIServiceMock(on: eventLoop, items: CharactersMock.charactersItems)
+        characterDecoderService = CharacterDecoderMock(CharactersMock.characters)
 
-        return CharacterAPIWrapper(
-            characterAPIService: characterAPIServiceMock,
-            characterDecoderService: characterDecoderService
-        )
+        return makeCharacterAPIWrapper()
     }
 
-    static func makeWithCharactersBadData() -> CharacterAPIWrapper {
-        let characterAPIServiceMock = CharacterAPIServiceMock(CharactersMock.charactersBadData)
-        let characterDecoderService = CharacterDecoderMock()
+    mutating func makeWithoutData() -> CharacterAPIWrapper {
+        characterAPIService = CharacterAPIServiceMock(on: eventLoop)
+        characterDecoderService = CharacterDecoderMock()
 
-        return CharacterAPIWrapper(
-            characterAPIService: characterAPIServiceMock,
-            characterDecoderService: characterDecoderService
-        )
+        return makeCharacterAPIWrapper()
     }
 
-    static func makeWithCharacter() -> CharacterAPIWrapper {
-        let characterAPIServiceMock = CharacterAPIServiceMock([CharactersMock.characterData])
-        let characterDecoderService = CharacterDecoderMock([CharactersMock.character])
+    mutating func makeWithCharactersBadData() -> CharacterAPIWrapper {
+        characterAPIService = CharacterAPIServiceMock(on: eventLoop, items: CharactersMock.charactersBadData)
+        characterDecoderService = CharacterDecoderMock()
 
-        return CharacterAPIWrapper(
-            characterAPIService: characterAPIServiceMock,
-            characterDecoderService: characterDecoderService
-        )
+        return makeCharacterAPIWrapper()
     }
 
-    static func makeWithCharacterBadData() -> CharacterAPIWrapper {
-        let characterAPIServiceMock = CharacterAPIServiceMock([CharactersMock.characterBadData])
-        let characterDecoderService = CharacterDecoderMock()
+    mutating func makeWithCharacter() -> CharacterAPIWrapper {
+        characterAPIService = CharacterAPIServiceMock(on: eventLoop, items: [CharactersMock.characterData])
+        characterDecoderService = CharacterDecoderMock([CharactersMock.character])
 
-        return CharacterAPIWrapper(
-            characterAPIService: characterAPIServiceMock,
-            characterDecoderService: characterDecoderService
-        )
+        return makeCharacterAPIWrapper()
+    }
+
+    mutating func makeWithCharacterBadData() -> CharacterAPIWrapper {
+        characterAPIService = CharacterAPIServiceMock(on: eventLoop, items: [CharactersMock.characterBadData])
+        characterDecoderService = CharacterDecoderMock()
+
+        return makeCharacterAPIWrapper()
     }
 
 }

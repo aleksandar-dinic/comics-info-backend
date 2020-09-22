@@ -30,7 +30,7 @@ struct CharacterReadResponseWrapper: ErrorResponseWrapper {
 
         return characterUseCase.getCharacter(withID: identifier, fromDataSource: .memory, on: eventLoop)
             .map { Response(with: Domain.Character(from: $0), statusCode: .ok) }
-            .flatMapError { self.catchError(on: eventLoop, error: $0) }
+            .flatMapError { self.catch($0, on: eventLoop) }
     }
 
 }

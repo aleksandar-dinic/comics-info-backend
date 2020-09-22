@@ -8,59 +8,64 @@
 
 @testable import CharacterInfo
 import Foundation
+import NIO
 
-struct CharacterDataProviderMockFactory {
+struct CharacterDataProviderMockFactory: CharacterDataProviderFactory {
 
-    static func makeWithCharactersFromDatabase() -> CharacterDataProvider {
-        let characterAPIWrapper = CharacterAPIWrapperMockFactory.makeWithCharacters()
-        let characterCacheService = CharacterCacheServiceMock()
+    let eventLoop: EventLoop
+    var characterCacheService: CharacterCacheService
+    var characterAPIService: CharacterAPIService
+    var characterDecoderService: CharacterDecoderService
+    var characterAPIWrapperMockFactory: CharacterAPIWrapperMockFactory
 
-        return CharacterDataProvider(
-            characterAPIWrapper: characterAPIWrapper,
-            characterCacheService: characterCacheService
-        )
+    init(
+        on eventLoop: EventLoop,
+        characterCacheService: CharacterCacheService = CharacterCacheServiceMock(),
+        characterAPIService: CharacterAPIService = CharacterAPIServiceMock(),
+        characterDecoderService: CharacterDecoderService = CharacterDecoderMock()
+    ) {
+        self.eventLoop = eventLoop
+        self.characterCacheService = characterCacheService
+        self.characterAPIService = characterAPIService
+        self.characterDecoderService = characterDecoderService
+        self.characterAPIWrapperMockFactory = CharacterAPIWrapperMockFactory(on: eventLoop)
     }
 
-    static func makeWithCharactersFromMemory() -> CharacterDataProvider {
-        let characterAPIWrapper = CharacterAPIWrapperMockFactory.makeWithoutData()
-        let characterCacheService = CharacterCacheServiceMock()
-        characterCacheService.setCharacters(CharactersMock.characters)
+    mutating func makeWithCharactersFromDatabase() -> CharacterDataProvider {
+        _ = characterAPIWrapperMockFactory.makeWithCharacters()
+        characterAPIService = characterAPIWrapperMockFactory.characterAPIService
+        characterDecoderService = characterAPIWrapperMockFactory.characterDecoderService
 
-        return CharacterDataProvider(
-            characterAPIWrapper: characterAPIWrapper,
-            characterCacheService: characterCacheService
-        )
+        return makeCharacterDataProvider()
     }
 
-    static func makeWithoutData() -> CharacterDataProvider {
-        let characterAPIWrapper = CharacterAPIWrapperMockFactory.makeWithoutData()
-        let characterCacheService = CharacterCacheServiceMock()
+    mutating func makeWithCharactersFromMemory() -> CharacterDataProvider {
+        _ = characterAPIWrapperMockFactory.makeWithoutData()
+        (characterCacheService as? CharacterCacheServiceMock)?.setCharacters(CharactersMock.characters)
 
-        return CharacterDataProvider(
-            characterAPIWrapper: characterAPIWrapper,
-            characterCacheService: characterCacheService
-        )
+        return makeCharacterDataProvider()
     }
 
-    static func makeWithCharacterFromDatabase() -> CharacterDataProvider {
-        let characterAPIWrapper = CharacterAPIWrapperMockFactory.makeWithCharacter()
-        let characterCacheService = CharacterCacheServiceMock()
+    mutating func makeWithoutData() -> CharacterDataProvider {
+        _ = characterAPIWrapperMockFactory.makeWithoutData()
+        characterCacheService = CharacterCacheServiceMock()
 
-        return CharacterDataProvider(
-            characterAPIWrapper: characterAPIWrapper,
-            characterCacheService: characterCacheService
-        )
+        return makeCharacterDataProvider()
     }
 
-    static func makeWithCharacterFromMemory() -> CharacterDataProvider {
-        let characterAPIWrapper = CharacterAPIWrapperMockFactory.makeWithoutData()
-        let characterCacheService = CharacterCacheServiceMock()
-        characterCacheService.setCharacter(CharactersMock.character)
+    mutating func makeWithCharacterFromDatabase() -> CharacterDataProvider {
+        _ = characterAPIWrapperMockFactory.makeWithCharacter()
+        characterAPIService = characterAPIWrapperMockFactory.characterAPIService
+        characterDecoderService = characterAPIWrapperMockFactory.characterDecoderService
 
-        return CharacterDataProvider(
-            characterAPIWrapper: characterAPIWrapper,
-            characterCacheService: characterCacheService
-        )
+        return makeCharacterDataProvider()
+    }
+
+    mutating func makeWithCharacterFromMemory() -> CharacterDataProvider {
+        _ = characterAPIWrapperMockFactory.makeWithoutData()
+        (characterCacheService as? CharacterCacheServiceMock)?.setCharacter(CharactersMock.character)
+
+        return makeCharacterDataProvider()
     }
 
 }

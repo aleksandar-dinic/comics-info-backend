@@ -20,7 +20,11 @@ struct CharacterReadLambdaHandler: EventLoopLambdaHandler, LoggerProvider {
     private let characterReadResponseWrapper: CharacterReadResponseWrapper
 
     init(context: Lambda.InitializationContext) {
-        let characterUseCaseFactory = CharacterUseCaseFactory(on: context.eventLoop)
+        self.init(on: context.eventLoop, isLocalServer: LocalServer.isEnabled)
+    }
+
+    private init(on eventLoop: EventLoop, isLocalServer: Bool) {
+        let characterUseCaseFactory = CharacterUseCaseFactory(on: eventLoop, isLocalServer: isLocalServer)
         characterReadResponseWrapper = CharacterReadResponseWrapper(characterUseCase: characterUseCaseFactory.makeCharacterUseCase())
     }
 

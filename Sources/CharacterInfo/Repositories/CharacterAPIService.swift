@@ -11,6 +11,8 @@ import NIO
 
 protocol CharacterAPIService {
 
+    func create(_ character: Character) -> EventLoopFuture<Void>
+
     func getAllCharacters(on eventLoop: EventLoop) -> EventLoopFuture<[[String: Any]]?>
 
     func getCharacter(

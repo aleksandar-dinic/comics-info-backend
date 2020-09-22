@@ -12,7 +12,7 @@ import NIO
 
 final class CharacterDatabaseProvider: CharacterAPIService {
 
-    private let database: Database
+    private var database: Database
     private let tableName: String
 
     init(database: Database, tableName: String = DatabaseTable().name) {
@@ -20,20 +20,30 @@ final class CharacterDatabaseProvider: CharacterAPIService {
         self.tableName = tableName
     }
 
+    func create(_ character: Character) -> EventLoopFuture<Void> {
+        let mirror = Mirror(reflecting: character)
+        var item = [String: Any]()
+
+        for child in mirror.children {
+            guard let label = child.label else { continue }
+            if case Optional<Any>.none = child.value { continue }
+            item[label] = child.value
+        }
+
+        return database.create(item, tableName: tableName)
+    }
+
     func getAllCharacters(on eventLoop: EventLoop) -> EventLoopFuture<[[String: Any]]?> {
-        database.getAll(fromTable: DatabaseTable().name)
+        database.getAll(fromTable: tableName)
     }
 
     func getCharacter(
         withID characterID: String,
         on eventLoop: EventLoop
     ) -> EventLoopFuture<[String: Any]?> {
-        database.get(fromTable: DatabaseTable().name, forID: characterID)
+        database.get(fromTable: tableName, forID: characterID)
     }
 
-//    func createCharacter(_ character: Character) -> EventLoopFuture<Character> {
-//    }
-//
 //    func updateCharacter(_ character: Character) -> EventLoopFuture<Character> {
 //    }
 //

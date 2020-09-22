@@ -11,6 +11,8 @@ import NIO
 
 public protocol Database {
 
+    mutating func create(_ item: [String: Any], tableName table: String) -> EventLoopFuture<Void>
+
     func getAll(fromTable table: String) -> EventLoopFuture<[[String: Any]]?>
 
     func get(fromTable table: String, forID ID: String) -> EventLoopFuture<[String: Any]?>

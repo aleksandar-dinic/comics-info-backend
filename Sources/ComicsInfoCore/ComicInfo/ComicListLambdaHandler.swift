@@ -18,7 +18,7 @@ struct ComicListLambdaHandler: EventLoopLambdaHandler {
     private let database: Database
 
     init(context: Lambda.InitializationContext) {
-        database = DatabaseFectory(mocked: ComicInfo.isMocked).makeDatabase(eventLoop: context.eventLoop)
+        database = DatabaseFectory(isLocalServer: ComicInfo.isMocked).makeDatabase(eventLoop: context.eventLoop)
     }
 
     func handle(

@@ -14,15 +14,18 @@ import NIO
 final class CharacterRepositoryTests: XCTestCase {
 
     private var eventLoop: EventLoop!
+    private var characterDataProviderMockFactory: CharacterDataProviderMockFactory!
     private var dataSourceLayer: DataSourceLayer!
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
+        characterDataProviderMockFactory = CharacterDataProviderMockFactory(on: eventLoop)
         dataSourceLayer = .database
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
+        characterDataProviderMockFactory = nil
         dataSourceLayer = nil
     }
 
@@ -30,7 +33,7 @@ final class CharacterRepositoryTests: XCTestCase {
 
     func test_whenGetAllCharacters_returns3Characters() throws {
         // Given
-        let characterDataProvider = CharacterDataProviderMockFactory.makeWithCharactersFromDatabase()
+        let characterDataProvider = characterDataProviderMockFactory.makeWithCharactersFromDatabase()
         let sut = CharacterRepository(characterDataProvider: characterDataProvider)
 
         // When
@@ -45,7 +48,7 @@ final class CharacterRepositoryTests: XCTestCase {
 
     func test_whenGetCharacter_returnsCharacter() throws {
         // Given
-        let characterDataProvider = CharacterDataProviderMockFactory.makeWithCharacterFromDatabase()
+        let characterDataProvider = characterDataProviderMockFactory.makeWithCharacterFromDatabase()
         let sut = CharacterRepository(characterDataProvider: characterDataProvider)
         let characterID = "1"
 

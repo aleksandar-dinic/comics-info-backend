@@ -23,6 +23,12 @@ struct CharacterDataProvider {
         self.characterCacheService = characterCacheService
     }
 
+    // Create character.
+
+    func create(_ character: Character) -> EventLoopFuture<Void> {
+        characterAPIWrapper.create(character)
+    }
+
     // Get all characters
 
     func getAllCharacters(

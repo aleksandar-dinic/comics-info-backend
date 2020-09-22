@@ -11,5 +11,6 @@ import Foundation
 public struct Request: Codable {
 
     public let pathParameters: [String: String]?
+    public let body: String?
 
 }

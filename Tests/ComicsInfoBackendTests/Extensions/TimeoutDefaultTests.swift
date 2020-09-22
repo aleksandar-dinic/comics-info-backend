@@ -3,6 +3,7 @@
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 19/09/2020.
+//  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
 @testable import ComicsInfoCore

@@ -1,5 +1,5 @@
 //
-//  AttributeValue+AnyObject.swift
+//  AttributeValue+Any.swift
 //  ComicsInfoCore
 //
 //  Created by Aleksandar Dinic on 27/08/2020.
@@ -51,7 +51,6 @@ extension DynamoDB.AttributeValue {
 
         case let .ss(value):
             return value
-
         }
     }
 

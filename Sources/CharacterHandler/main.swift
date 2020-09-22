@@ -11,4 +11,8 @@ import CharacterInfo
 
 let characterInfo = CharacterInfo()
 
-characterInfo.run()
+do {
+    try characterInfo.run()
+} catch {
+    print("😱 An error occurred: \(error)")
+}
