@@ -7,6 +7,7 @@
 //
 
 @testable import CharacterInfo
+@testable import ComicsInfoCore
 import AWSLambdaRuntime
 import XCTest
 

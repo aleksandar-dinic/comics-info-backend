@@ -1,22 +1,22 @@
 //
-//  CharacterCreateResponseWrapper.swift
-//  CharacterInfo
+//  SeriesCreateResponseWrapper.swift
+//  SeriesInfo
 //
-//  Created by Aleksandar Dinic on 19/09/2020.
+//  Created by Aleksandar Dinic on 23/09/2020.
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import struct Domain.Character
+import struct Domain.Series
 import ComicsInfoCore
 import Foundation
 import NIO
 
-struct CharacterCreateResponseWrapper: ErrorResponseWrapper {
+struct SeriesCreateResponseWrapper: ErrorResponseWrapper {
 
-    private let characterUseCase: CharacterUseCase
+    private let seriesUseCase: SeriesUseCase
 
-    init(characterUseCase: CharacterUseCase) {
-        self.characterUseCase = characterUseCase
+    init(seriesUseCase: SeriesUseCase) {
+        self.seriesUseCase = seriesUseCase
     }
 
     func handleCreate(
@@ -29,9 +29,9 @@ struct CharacterCreateResponseWrapper: ErrorResponseWrapper {
         }
 
         do {
-            let character = try JSONDecoder().decode(Character.self, from: data)
-            return characterUseCase.create(character)
-                .map { Response(with: ResponseMessage("Character created"), statusCode: .created) }
+            let series = try JSONDecoder().decode(Series.self, from: data)
+            return seriesUseCase.create(series)
+                .map { Response(with: ResponseMessage("Series created"), statusCode: .created) }
                 .flatMapError { self.catch($0, on: eventLoop, statusCode: .forbidden) }
 
         } catch {
