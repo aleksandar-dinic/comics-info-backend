@@ -98,23 +98,33 @@ extension Array where Element: AttributeValueMapper {
 extension Optional: AttributeValueMapper {
 
     var attributeValue: DynamoDB.AttributeValue {
-        .null(self == nil)
+        switch self {
+        case let .some(value):
+            guard let attributeValue = (value as? AttributeValueMapper)?.attributeValue else {
+                return .null(false)
+            }
+            return attributeValue
+        case .none:
+            return .null(true)
+        }
     }
 
 }
 
-extension Set: AttributeValueMapper where Element == Int {
+extension Set: AttributeValueMapper {
 
     var attributeValue: DynamoDB.AttributeValue {
-        .ns(self.map(String.init))
-    }
+        if let value = self as? Set<String> {
+            return .ss(Array(value).sorted())
 
-}
+        } else if let value = self as? Set<Int> {
+            return .ns(value.map(String.init).sorted())
 
-extension Set where Element == Double {
+        } else if let value = self as? Set<Double> {
+            return .ns(value.map { String($0) }.sorted())
+        }
 
-    var attributeValue: DynamoDB.AttributeValue {
-        .ns(self.map { String($0) })
+        return .null(true)
     }
 
 }

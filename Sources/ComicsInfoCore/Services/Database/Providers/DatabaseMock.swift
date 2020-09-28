@@ -39,7 +39,7 @@ struct DatabaseMock: Database {
         ])
     }
 
-    func get(fromTable table: String, forID ID: String) -> EventLoopFuture<[String : Any]?> {
+    func get<ID: Hashable>(fromTable table: String, forID identifier: ID) -> EventLoopFuture<[String : Any]?> {
         eventLoop.makeSucceededFuture([
             "identifier": "1",
             "popularity": 0,

@@ -15,6 +15,6 @@ public protocol Database {
 
     func getAll(fromTable table: String) -> EventLoopFuture<[[String: Any]]?>
 
-    func get(fromTable table: String, forID ID: String) -> EventLoopFuture<[String: Any]?>
+    func get<ID: Hashable>(fromTable table: String, forID identifier: ID) -> EventLoopFuture<[String: Any]?>
 
 }

@@ -45,13 +45,13 @@ final class CharacterListResponseWrapperTests: XCTestCase {
         XCTAssertEqual(response.body, givenBody)
     }
 
-    func testListNonExistingCharacters_whenHandleList_returnsResponseWithErrorCharactersNotFound() throws {
+    func testListNonExistingCharacters_whenHandleList_returnsResponseWithErrorItemsNotFound() throws {
         // Given
         let characterRepository = characterRepositoryMockFactory.makeWithoutData()
         let characterUseCase = CharacterUseCase(characterRepository: characterRepository)
         let sut = CharacterListResponseWrapper(characterUseCase: characterUseCase)
 
-        let givenError = APIError.charactersNotFound
+        let givenError = APIError.itemsNotFound
         let givenBody = "{\"message\":\"\(String(describing: givenError))\"}"
 
         // When

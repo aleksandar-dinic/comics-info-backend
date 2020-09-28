@@ -18,7 +18,7 @@ final class LocalServerTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
-    func test_isEnabledIsTrue() {
+    func test_isEnabledIsFalse() {
         // When
         _ = LocalServer()
 
@@ -26,7 +26,7 @@ final class LocalServerTests: XCTestCase {
         XCTAssertFalse(LocalServer.isEnabled)
     }
 
-    func test_isEnabledIsFalse() {
+    func test_isEnabledIsTrue() {
         // When
         _ = LocalServer(enabled: true)
 

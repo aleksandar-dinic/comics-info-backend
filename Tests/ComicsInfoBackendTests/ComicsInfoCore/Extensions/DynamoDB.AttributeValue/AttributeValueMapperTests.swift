@@ -107,7 +107,7 @@ final class AttributeValueMapperTests: XCTestCase {
 
     func testIntSet_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
         // Given
-        let givenIntSet: Set = [1, 2, 3, 4, 5]
+        let givenIntSet: Set = [1]
         let givenAttributeValue = DynamoDB.AttributeValue.ns(givenIntSet.map(String.init))
 
         // When
@@ -119,23 +119,11 @@ final class AttributeValueMapperTests: XCTestCase {
 
     func testDoubleSet_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
         // Given
-        let givenDoubleSet: Set = [1.1, 2.2, 3.3, 4.4, 5.5]
+        let givenDoubleSet: Set = [1.1]
         let givenAttributeValue = DynamoDB.AttributeValue.ns(givenDoubleSet.map { String($0) })
 
         // When
         let attributeValue = givenDoubleSet.attributeValue
-
-        // Then
-        XCTAssertEqual(attributeValue, givenAttributeValue)
-    }
-
-    func testIsNotNull_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
-        // Given
-        let givenNil: Int? = 1
-        let givenAttributeValue = DynamoDB.AttributeValue.null(false)
-
-        // When
-        let attributeValue = givenNil.attributeValue
 
         // Then
         XCTAssertEqual(attributeValue, givenAttributeValue)

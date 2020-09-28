@@ -9,10 +9,11 @@
 import AWSLambdaRuntime
 import ComicsInfoCore
 import Foundation
+import NIO
 
 public final class SeriesInfo {
 
-    static let seriesCacheProvider = SeriesCacheProvider()
+    static let seriesInMemoryCache = InMemoryCacheProvider<Series>()
 
     private let localServer: LocalServer
 
@@ -23,13 +24,19 @@ public final class SeriesInfo {
     public func run(handler: Handler? = Handler(rawValue: Lambda.handler)) throws {
         switch handler {
         case .read:
-            Lambda.run(SeriesReadLambdaHandler.init)
+            Lambda.run {
+                LambdaHandlerFactory.makeReadLambdaHandler($0)
+            }
 
         case .list:
-            Lambda.run(SeriesListLambdaHandler.init)
+            Lambda.run {
+                LambdaHandlerFactory.makeListLambdaHandler($0)
+            }
 
         case .create:
-            Lambda.run(SeriesCreateLambdaHandler.init)
+            Lambda.run {
+                LambdaHandlerFactory.makeCreateLambdaHandler($0)
+            }
 
         case .update, .delete, .none:
             throw APIError.handlerUnknown
@@ -37,4 +44,3 @@ public final class SeriesInfo {
     }
 
 }
-

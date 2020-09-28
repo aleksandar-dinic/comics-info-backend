@@ -45,7 +45,7 @@ final class CharacterCacheProviderTests: XCTestCase {
         XCTAssertEqual(characters.count, givenCharacters.count)
     }
 
-    func testGetCharacters_whenCacheIsEmpty_throwsCharactersNotFound() throws {
+    func testGetCharacters_whenCacheIsEmpty_throwsItemsNotFound() throws {
         // Given
         let sut = CharacterCacheProvider()
 
@@ -54,7 +54,7 @@ final class CharacterCacheProviderTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try charactersFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .charactersNotFound)
+            XCTAssertEqual($0 as? APIError, .itemsNotFound)
         }
     }
 
@@ -71,7 +71,7 @@ final class CharacterCacheProviderTests: XCTestCase {
         XCTAssertEqual(character.identifier, "1")
     }
 
-    func testGetCharacterWithID_whenIDNotExist_throwsCharacterNotFound() throws {
+    func testGetCharacterWithID_whenIDNotExist_throwsItemNotFound() throws {
         // Given
         let sut = CharacterCacheProvider()
 
@@ -80,7 +80,7 @@ final class CharacterCacheProviderTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try charactersFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .characterNotFound)
+            XCTAssertEqual($0 as? APIError, .itemNotFound)
         }
     }
 

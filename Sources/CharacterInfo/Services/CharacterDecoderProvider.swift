@@ -6,13 +6,14 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import ComicsInfoCore
 import Foundation
 
 struct CharacterDecoderProvider: CharacterDecoderService {
     
     func decodeAllCharacters(from items: [[String : Any]]?) throws -> [Character] {
         guard let items = items else {
-            throw APIError.charactersNotFound
+            throw APIError.itemsNotFound
         }
         
         return try items.compactMap { try Character(from: $0) }
@@ -20,7 +21,7 @@ struct CharacterDecoderProvider: CharacterDecoderService {
 
     func decodeCharacter(from items: [String : Any]?) throws -> Character {
         guard let items = items else {
-            throw APIError.characterNotFound
+            throw APIError.itemNotFound
         }
         return try Character(from: items)
     }

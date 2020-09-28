@@ -44,9 +44,9 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
         XCTAssertEqual(response.body, givenBody)
     }
 
-    func testReadNonExistingCharacter_whenHandleRead_returnsResponseWithErrorCharacterNotFound() throws {
+    func testReadNonExistingCharacter_whenHandleRead_returnsResponseWithErrorItemNotFound() throws {
         // Given
-        let givenError = APIError.characterNotFound
+        let givenError = APIError.itemNotFound
         let givenBody = "{\"message\":\"\(String(describing: givenError))\"}"
 
         // When

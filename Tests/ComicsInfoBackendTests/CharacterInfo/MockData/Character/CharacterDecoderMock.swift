@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+@testable import ComicsInfoCore
 @testable import CharacterInfo
 import Foundation
 
@@ -19,7 +20,7 @@ final class CharacterDecoderMock: CharacterDecoderService {
 
     func decodeAllCharacters(from items: [[String: Any]]?) throws -> [Character] {
         guard !characters.isEmpty else {
-            throw APIError.charactersNotFound
+            throw APIError.itemsNotFound
         }
 
         return characters
@@ -27,7 +28,7 @@ final class CharacterDecoderMock: CharacterDecoderService {
 
     func decodeCharacter(from items: [String: Any]?) throws -> Character {
         guard let character = characters.first else {
-            throw APIError.characterNotFound
+            throw APIError.itemNotFound
         }
         return character
     }

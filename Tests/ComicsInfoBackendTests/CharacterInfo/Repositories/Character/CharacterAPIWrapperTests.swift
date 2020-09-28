@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+@testable import ComicsInfoCore
 @testable import CharacterInfo
 import XCTest
 import NIO
@@ -42,7 +43,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
         XCTAssertEqual(characters.count, 3)
     }
 
-    func testWithoutData_whenGetAllCharacters_throwsCharactersNotFound() {
+    func testWithoutData_whenGetAllCharacters_throwsItemsNotFound() {
         // Given
         let sut = characterAPIWrapperMockFactory.makeWithoutData()
 
@@ -51,11 +52,11 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try charactersFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .charactersNotFound)
+            XCTAssertEqual($0 as? APIError, .itemsNotFound)
         }
     }
 
-    func testWithBadData_whenGetAllCharacters_throwsCharactersNotFound() {
+    func testWithBadData_whenGetAllCharacters_throwsItemsNotFound() {
         // Given
         let sut = characterAPIWrapperMockFactory.makeWithCharactersBadData()
 
@@ -64,7 +65,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try charactersFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .charactersNotFound)
+            XCTAssertEqual($0 as? APIError, .itemsNotFound)
         }
     }
 
@@ -82,7 +83,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
         XCTAssertEqual(character.identifier, characterID)
     }
 
-    func testWithoutData_whenGetCharacter_throwsCharacterNotFound() {
+    func testWithoutData_whenGetCharacter_throwsItemNotFound() {
         // Given
         let sut = characterAPIWrapperMockFactory.makeWithoutData()
 
@@ -91,11 +92,11 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try characterFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .characterNotFound)
+            XCTAssertEqual($0 as? APIError, .itemNotFound)
         }
     }
 
-    func testWithBadData_whenGetCharacter_throwsCharacterNotFound() {
+    func testWithBadData_whenGetCharacter_throwsItemNotFound() {
         // Given
         let sut = characterAPIWrapperMockFactory.makeWithCharacterBadData()
 
@@ -104,7 +105,7 @@ final class CharacterAPIWrapperTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try characterFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .characterNotFound)
+            XCTAssertEqual($0 as? APIError, .itemNotFound)
         }
     }
 

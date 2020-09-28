@@ -70,7 +70,7 @@ final class CharacterDataProviderTests: XCTestCase {
         XCTAssertEqual(characters.count, 3)
     }
 
-    func testWithoutData_whenGetAllCharacters_throwsNoCharacters() {
+    func testWithoutData_whenGetAllCharacters_throwsNoItem() {
         // Given
         let sut = characterDataProviderMockFactory.makeWithoutData()
         let dataSourceLayer = DataSourceLayer.database
@@ -80,7 +80,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try charactersFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .charactersNotFound)
+            XCTAssertEqual($0 as? APIError, .itemsNotFound)
         }
     }
 
@@ -125,7 +125,7 @@ final class CharacterDataProviderTests: XCTestCase {
         XCTAssertEqual(character.identifier, characterID)
     }
 
-    func testWithoutData_whenGetCharacter_throwsNoCharacter() {
+    func testWithoutData_whenGetCharacter_throwsNoItem() {
         // Given
         let sut = characterDataProviderMockFactory.makeWithoutData()
         let dataSourceLayer = DataSourceLayer.database
@@ -135,7 +135,7 @@ final class CharacterDataProviderTests: XCTestCase {
 
         // Then
         XCTAssertThrowsError(try characterFuture.wait()) {
-            XCTAssertEqual($0 as? APIError, .characterNotFound)
+            XCTAssertEqual($0 as? APIError, .itemNotFound)
         }
     }
 

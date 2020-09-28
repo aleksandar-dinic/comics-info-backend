@@ -23,7 +23,7 @@ struct CharacterCacheProvider: CharacterCacheService {
 
         eventLoop.execute {
             guard !inMemoryCache.isEmpty else {
-                return promise.fail(APIError.charactersNotFound)
+                return promise.fail(APIError.itemsNotFound)
             }
 
             promise.succeed(inMemoryCache.values)
@@ -40,7 +40,7 @@ struct CharacterCacheProvider: CharacterCacheService {
 
         eventLoop.execute {
             guard let character = inMemoryCache[characterID] else {
-                return promise.fail(APIError.characterNotFound)
+                return promise.fail(APIError.itemNotFound)
             }
             promise.succeed(character)
         }

@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+@testable import ComicsInfoCore
 @testable import CharacterInfo
 import XCTest
 
@@ -29,9 +30,9 @@ final class CharacterDecoderProviderTests: XCTestCase {
         XCTAssertEqual(characters.count, 3)
     }
 
-    func testDecodeAllCharacters_whenItemsIsNil_throwsCharactersNotFound() {
+    func testDecodeAllCharacters_whenItemsIsNil_throwsItemsNotFound() {
         XCTAssertThrowsError(try sut.decodeAllCharacters(from: nil)) {
-            XCTAssertEqual($0 as? APIError, .charactersNotFound)
+            XCTAssertEqual($0 as? APIError, .itemsNotFound)
         }
     }
 
@@ -39,9 +40,9 @@ final class CharacterDecoderProviderTests: XCTestCase {
         XCTAssertNoThrow(try sut.decodeCharacter(from: CharactersMock.characterData))
     }
 
-    func testDecodeCharacter_whenItemsIsNil_throwsCharacterNotFound() {
+    func testDecodeCharacter_whenItemsIsNil_throwsItemNotFound() {
         XCTAssertThrowsError(try sut.decodeCharacter(from: nil)) {
-            XCTAssertEqual($0 as? APIError, .characterNotFound)
+            XCTAssertEqual($0 as? APIError, .itemNotFound)
         }
     }
 

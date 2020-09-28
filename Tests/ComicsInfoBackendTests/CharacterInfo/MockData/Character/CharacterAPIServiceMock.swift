@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+@testable import ComicsInfoCore
 @testable import CharacterInfo
 import Foundation
 import NIO
@@ -49,7 +50,7 @@ final class CharacterAPIServiceMock: CharacterAPIService {
 
         eventLoop.execute { [weak self] in
             guard let items = self?.items else {
-                return promise.fail(APIError.charactersNotFound)
+                return promise.fail(APIError.itemsNotFound)
             }
 
             promise.succeed(items)
@@ -63,7 +64,7 @@ final class CharacterAPIServiceMock: CharacterAPIService {
 
         eventLoop.execute { [weak self] in
             guard let item = self?.items?.first(where: { $0[.identifier] as? String == characterID }) else {
-                return promise.fail(APIError.characterNotFound)
+                return promise.fail(APIError.itemNotFound)
             }
             promise.succeed(item)
         }

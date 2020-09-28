@@ -22,6 +22,7 @@ extension DynamoDB: Database {
         self.init(client: client, region: .default)
     }
 
+    // FIXME: - Find a better way of setting a value `conditionExpression`
     public func create(_ item: [String: Any], tableName table: String) -> EventLoopFuture<Void> {
         let input = PutItemInput(
             conditionExpression: "attribute_not_exists(identifier)",
@@ -40,9 +41,10 @@ extension DynamoDB: Database {
         }
     }
 
-    public func get(fromTable table: String, forID ID: String) -> EventLoopFuture<[String: Any]?> {
+    // FIXME: - Map ID to DynamoDB.AttributeValue
+    public func get<ID: Hashable>(fromTable table: String, forID identifier: ID) -> EventLoopFuture<[String: Any]?> {
         let input = GetItemInput(
-            key: ["identifier": .s(ID)],
+            key: ["identifier": .s(identifier as! String)],
             tableName: table
         )
 

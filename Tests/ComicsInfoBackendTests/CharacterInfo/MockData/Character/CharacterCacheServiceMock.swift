@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+@testable import ComicsInfoCore
 @testable import CharacterInfo
 import Foundation
 import NIO
@@ -23,7 +24,7 @@ final class CharacterCacheServiceMock: CharacterCacheService {
 
         eventLoop.execute { [weak self] in
             guard let characters = self?.characters, !characters.isEmpty else {
-                return promise.fail(APIError.charactersNotFound)
+                return promise.fail(APIError.itemsNotFound)
             }
 
             promise.succeed(Array(characters.values))
@@ -37,7 +38,7 @@ final class CharacterCacheServiceMock: CharacterCacheService {
 
         eventLoop.execute { [weak self] in
             guard let character = self?.characters[characterID] else {
-                return promise.fail(APIError.characterNotFound)
+                return promise.fail(APIError.itemNotFound)
             }
             promise.succeed(character)
         }
