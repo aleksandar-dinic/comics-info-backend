@@ -19,6 +19,10 @@ public extension Lambda {
         Lambda.env("_HANDLER") ?? ""
     }
 
+    static var characterTableName: String? {
+        Lambda.env("CHARACTER_TABLE_NAME")
+    }
+
     static var seriesTableName: String? {
         Lambda.env("SERIES_TABLE_NAME")
     }

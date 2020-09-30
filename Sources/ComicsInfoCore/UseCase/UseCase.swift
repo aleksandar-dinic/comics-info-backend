@@ -15,15 +15,23 @@ public protocol UseCase {
 
     func create(_ item: Item) -> EventLoopFuture<Void>
 
-    func getAll(
-        fromDataSource dataSource: DataSourceLayer,
-        on eventLoop: EventLoop
+    func getItem(
+        withID itemID: String,
+        fromDataSource dataSource: DataSourceLayer
+    ) -> EventLoopFuture<Item>
+
+    func getAllItems(
+        fromDataSource dataSource: DataSourceLayer
     ) -> EventLoopFuture<[Item]>
 
-    func get(
-        withID identifier: String,
-        fromDataSource dataSource: DataSourceLayer,
-        on eventLoop: EventLoop
+    func getMetadata(
+        withID id: String,
+        fromDataSource dataSource: DataSourceLayer
     ) -> EventLoopFuture<Item>
+
+    func getAllMetadata(
+        withIDs ids: Set<String>,
+        fromDataSource dataSource: DataSourceLayer
+    ) -> EventLoopFuture<[Item]>
 
 }

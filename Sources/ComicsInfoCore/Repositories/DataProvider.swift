@@ -13,13 +13,16 @@ struct DataProvider<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable> 
 
     typealias Item = CacheProvider.Item
 
+    private let eventLoop: EventLoop
     private let repositoryAPIWrapper: APIWrapper
     private let cacheProvider: CacheProvider
 
     init(
+        on eventLoop: EventLoop,
         repositoryAPIWrapper: APIWrapper,
         cacheProvider: CacheProvider
     ) {
+        self.eventLoop = eventLoop
         self.repositoryAPIWrapper = repositoryAPIWrapper
         self.cacheProvider = cacheProvider
     }
@@ -32,64 +35,110 @@ struct DataProvider<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable> 
 
     // Get all items
 
-    func getAll(
-        fromDataSource dataSource: DataSourceLayer,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[Item]> {
+    func getAll(fromDataSource dataSource: DataSourceLayer) -> EventLoopFuture<[Item]> {
         switch dataSource {
         case .memory:
-            return getAllItemsFromMemory(on: eventLoop)
+            return getAllItemsFromMemory()
 
         case .database:
-            return getAllItemsFromDatabase(on: eventLoop)
+            return getAllItemsFromDatabase()
         }
     }
 
-    private func getAllItemsFromMemory(on eventLoop: EventLoop) -> EventLoopFuture<[Item]> {
-        cacheProvider.getAll(on: eventLoop).flatMapError { _ in
-            getAllItemsFromDatabase(on: eventLoop)
+    private func getAllItemsFromMemory() -> EventLoopFuture<[Item]> {
+        cacheProvider.getAllItems(on: eventLoop).flatMapError { _ in
+            getAllItemsFromDatabase()
         }
     }
 
-    private func getAllItemsFromDatabase(on eventLoop: EventLoop) -> EventLoopFuture<[Item]> {
-        repositoryAPIWrapper.getAll(on: eventLoop).always { result in
+    private func getAllItemsFromDatabase() -> EventLoopFuture<[Item]> {
+        repositoryAPIWrapper.getAllItems().always { result in
             guard let items = try? result.get() else { return }
             cacheProvider.save(items: items)
         }
     }
 
-    // Get item
+    // Get item.
 
-    func get(
-        withID identifier: Item.ID,
-        fromDataSource dataSource: DataSourceLayer,
-        on eventLoop: EventLoop
+    public func getItem(
+        withID itemID: Item.ID,
+        fromDataSource dataSource: DataSourceLayer
     ) -> EventLoopFuture<Item> {
         switch dataSource {
         case .memory:
-            return getItemFromMemory(withID: identifier, on: eventLoop)
+            return getItemFromMemory(withID: itemID)
 
         case .database:
-            return getItemFromDatabase(withID: identifier, on: eventLoop)
+            return getItemFromDatabase(withID: itemID)
         }
     }
 
-    private func getItemFromMemory(
-        withID identifier: Item.ID,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<Item>  {
-        cacheProvider.get(withID: identifier, on: eventLoop).flatMapError { _ in
-            getItemFromDatabase(withID: identifier, on: eventLoop)
+    private func getItemFromMemory(withID itemID: Item.ID) -> EventLoopFuture<Item>  {
+        cacheProvider.getItem(withID: itemID, on: eventLoop).flatMapError { _ in
+            getItemFromDatabase(withID: itemID)
         }
     }
 
-    private func getItemFromDatabase(
-        withID identifier: Item.ID,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<Item> {
-        repositoryAPIWrapper.get(withID: identifier, on: eventLoop).always { result in
+    private func getItemFromDatabase(withID itemID: Item.ID) -> EventLoopFuture<Item> {
+        repositoryAPIWrapper.getItem(withID: itemID).always { result in
             guard let item = try? result.get() else { return }
             cacheProvider.save(items: [item])
+        }
+    }
+
+    // Get item metadata
+
+    func getMetadata(
+        withID id: Item.ID,
+        fromDataSource dataSource: DataSourceLayer
+    ) -> EventLoopFuture<Item> {
+        switch dataSource {
+        case .memory:
+            return getMetadataFromMemory(withID: id)
+
+        case .database:
+            return getMetadataFromDatabase(withID: id)
+        }
+    }
+
+    private func getMetadataFromMemory(withID id: Item.ID) -> EventLoopFuture<Item>  {
+        cacheProvider.getMetadata(withID: id, on: eventLoop).flatMapError { _ in
+            getMetadataFromDatabase(withID: id)
+        }
+    }
+
+    private func getMetadataFromDatabase(withID id: Item.ID) -> EventLoopFuture<Item> {
+        repositoryAPIWrapper.getMetadata(id: id).always { result in
+            guard let item = try? result.get() else { return }
+            cacheProvider.save(items: [item])
+        }
+    }
+
+    // Get list of items metadata
+
+    func getAllMetadata(
+        withIDs ids: Set<Item.ID>,
+        fromDataSource dataSource: DataSourceLayer
+    ) -> EventLoopFuture<[Item]> {
+        switch dataSource {
+        case .memory:
+            return getAllMetadataFromMemory(withIDs: ids)
+
+        case .database:
+            return getAllMetadataFromDatabase(withIDs: ids)
+        }
+    }
+
+    private func getAllMetadataFromMemory(withIDs ids: Set<Item.ID>) -> EventLoopFuture<[Item]>  {
+        cacheProvider.getAllMetadata(withIDs: ids, on: eventLoop).flatMapError { _ in
+            getAllMetadataFromDatabase(withIDs: ids)
+        }
+    }
+
+    private func getAllMetadataFromDatabase(withIDs ids: Set<Item.ID>) -> EventLoopFuture<[Item]> {
+        repositoryAPIWrapper.getAllMetadata(ids: ids).always { result in
+            guard let item = try? result.get() else { return }
+            cacheProvider.save(items: item)
         }
     }
 

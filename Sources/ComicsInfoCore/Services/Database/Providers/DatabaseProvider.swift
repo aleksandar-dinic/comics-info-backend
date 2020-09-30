@@ -19,25 +19,38 @@ public final class DatabaseProvider: RepositoryAPIService {
         self.tableName = tableName
     }
 
+    // Create
+
     public func create(_ item: [String: Any]) -> EventLoopFuture<Void> {
         database.create(item, tableName: tableName)
     }
 
-    public func getAll(on eventLoop: EventLoop) -> EventLoopFuture<[[String: Any]]?> {
-        database.getAll(fromTable: tableName)
+    public func createAll(_ items: [String: [[String: Any]]]) -> EventLoopFuture<Void> {
+        database.createAll(items)
     }
 
-    public func get<ID: Hashable>(
-        withID identifier: ID,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[String: Any]?> {
-        database.get(fromTable: tableName, forID: identifier)
+    // Read
+
+    public func getItem(withID itemID: String) -> EventLoopFuture<[[String: Any]]?> {
+        database.getItem(fromTable: tableName, itemID: itemID)
     }
 
-//    func updateSeries(_ series: Series) -> EventLoopFuture<Series> {
+    public func getAllItems() -> EventLoopFuture<[[String: Any]]?> {
+        database.getAllItems(fromTable: tableName)
+    }
+
+    public func getMetadata(id: String) -> EventLoopFuture<[String: Any]?> {
+        database.getMetadata(fromTable: tableName, id: id)
+    }
+
+    public func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[[String: Any]]?> {
+        database.getAllMetadata(fromTable: tableName, ids: ids)
+    }
+
+//    func update(_ item: [String: Any]) -> EventLoopFuture<[String: Any]> {
 //    }
 //
-//    func deleteSeries(forID seriesID: String) -> EventLoopFuture<Series> {
+//    func delete(forID identifier: String) -> EventLoopFuture<[String: Any]> {
 //    }
 
 }

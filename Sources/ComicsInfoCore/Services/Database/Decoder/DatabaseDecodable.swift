@@ -10,9 +10,8 @@ import Foundation
 
 public protocol DatabaseDecodable {
 
-    associatedtype ID: Hashable
-
-    var identifier: Self.ID { get }
+    var itemID: String { get }
+    var summaryID: String { get }
 
     init(from items: [String: Any]) throws
 

@@ -8,12 +8,16 @@
 
 import Foundation
 
-public enum APIError: Error, Equatable {
+public enum APIError: Error {
 
     case requestError
     case itemNotFound
     case itemsNotFound
+    case invalidItemID(_ description: String)
+    case invalidSummaryID(_ description: String)
     case handlerUnknown
+
+
 
 }
 

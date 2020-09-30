@@ -10,6 +10,9 @@ import Foundation
 
 public struct LocalServer {
 
+    // FIXME: -
+    static let characterInMemoryCache = InMemoryCacheProvider<Character>()
+
     public static var isEnabled = false
 
     public init(enabled: Bool = ProcessInfo.isLocalServerEnabled) {

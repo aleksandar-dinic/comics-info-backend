@@ -10,8 +10,8 @@ import Foundation
 
 public protocol DecoderService {
 
-    func decodeAll<Item: DatabaseDecodable>(from items: [[String : Any]]?) throws -> [Item]
+    func decodeAll<Item: DatabaseDecodable>(from items: [[String: Any]]?) throws -> [Item]
 
-    func decode<Item: DatabaseDecodable>(from items: [String : Any]?) throws -> Item
+    func decode<Item: DatabaseDecodable>(from items: [String: Any]?) throws -> Item
 
 }

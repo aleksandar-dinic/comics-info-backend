@@ -12,9 +12,12 @@ import NIO
 public protocol Database {
 
     mutating func create(_ item: [String: Any], tableName table: String) -> EventLoopFuture<Void>
+    mutating func createAll(_ items: [String: [[String: Any]]]) -> EventLoopFuture<Void>
 
-    func getAll(fromTable table: String) -> EventLoopFuture<[[String: Any]]?>
+    func getItem(fromTable table: String, itemID: String) -> EventLoopFuture<[[String: Any]]?>
+    func getAllItems(fromTable table: String) -> EventLoopFuture<[[String: Any]]?>
 
-    func get<ID: Hashable>(fromTable table: String, forID identifier: ID) -> EventLoopFuture<[String: Any]?>
+    func getMetadata(fromTable table: String, id: String) -> EventLoopFuture<[String: Any]?>
+    func getAllMetadata(fromTable table: String, ids: Set<String>) -> EventLoopFuture<[[String: Any]]?>
 
 }

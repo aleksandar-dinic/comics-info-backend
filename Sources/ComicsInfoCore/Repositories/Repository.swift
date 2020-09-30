@@ -31,28 +31,55 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
     ///
     /// - Parameter dataSource: Layer of data source.
     /// - Returns: Future with Items value.
-    public func getAll(
-        fromDataSource dataSource: DataSourceLayer,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[Item]> {
-        dataProvider.getAll(fromDataSource: dataSource, on: eventLoop)
+    public func getAll(fromDataSource dataSource: DataSourceLayer) -> EventLoopFuture<[Item]> {
+        dataProvider.getAll(fromDataSource: dataSource)
     }
 
     /// Gets item.
     ///
     /// - Parameters:
-    ///   - identifier: Item ID.
-    ///   - dataSource: Layer of data source
+    ///   - itemID: Item ID.
+    ///   - dataSource: Layer of data source.
     /// - Returns: Future with Item value.
-    public func get(
-        withID identifier: Item.ID,
-        fromDataSource dataSource: DataSourceLayer,
-        on eventLoop: EventLoop
+    public func getItem(
+        withID itemID: Item.ID,
+        fromDataSource dataSource: DataSourceLayer
     ) -> EventLoopFuture<Item> {
-        dataProvider.get(
-            withID: identifier,
-            fromDataSource: dataSource,
-            on: eventLoop
+        dataProvider.getItem(
+            withID: itemID,
+            fromDataSource: dataSource
+        )
+    }
+
+    /// Gets item metadata.
+    ///
+    /// - Parameters:
+    ///   - id: Item ID.
+    ///   - dataSource: Layer of data source
+    /// - Returns: Future with Item metadata.
+    public func getMetadata(
+        withID id: Item.ID,
+        fromDataSource dataSource: DataSourceLayer
+    ) -> EventLoopFuture<Item> {
+        dataProvider.getMetadata(
+            withID: id,
+            fromDataSource: dataSource
+        )
+    }
+
+    /// Gets items metadata.
+    ///
+    /// - Parameters:
+    ///   - ids: List of items ID.
+    ///   - dataSource: Layer of data source
+    /// - Returns: Future with Items metadata.
+    public func getAllMetadata(
+        withIDs ids: Set<Item.ID>,
+        fromDataSource dataSource: DataSourceLayer
+    ) -> EventLoopFuture<[Item]> {
+        dataProvider.getAllMetadata(
+            withIDs: ids,
+            fromDataSource: dataSource
         )
     }
 

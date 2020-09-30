@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-public struct InMemoryCacheProvider<Item: Codable & DatabaseDecodable>: Cacheable {
+public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
     private let inMemoryCache: InMemoryCache<Item.ID, Item>
 
@@ -17,7 +17,25 @@ public struct InMemoryCacheProvider<Item: Codable & DatabaseDecodable>: Cacheabl
         self.inMemoryCache = inMemoryCache
     }
 
-    public func getAll(on eventLoop: EventLoop) -> EventLoopFuture<[Item]> {
+    // FIXME: - Logic between get Item and get ItemMetadata
+    public func getItem(
+        withID itemID: Item.ID,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<Item> {
+        let promise = eventLoop.makePromise(of: Item.self)
+
+        eventLoop.execute {
+            guard let item = inMemoryCache[itemID] else {
+                return promise.fail(APIError.itemNotFound)
+            }
+            promise.succeed(item)
+        }
+
+        return promise.futureResult
+    }
+
+    // FIXME: - Logic between get AllItems and get AllMetadata
+    public func getAllItems(on eventLoop: EventLoop) -> EventLoopFuture<[Item]> {
         let promise = eventLoop.makePromise(of: [Item].self)
 
         eventLoop.execute {
@@ -31,14 +49,14 @@ public struct InMemoryCacheProvider<Item: Codable & DatabaseDecodable>: Cacheabl
         return promise.futureResult
     }
 
-    public func get(
-        withID identifier: Item.ID,
+    public func getMetadata(
+        withID id: Item.ID,
         on eventLoop: EventLoop
     ) -> EventLoopFuture<Item> {
         let promise = eventLoop.makePromise(of: Item.self)
 
         eventLoop.execute {
-            guard let item = inMemoryCache[identifier] else {
+            guard let item = inMemoryCache[id] else {
                 return promise.fail(APIError.itemNotFound)
             }
             promise.succeed(item)
@@ -47,9 +65,29 @@ public struct InMemoryCacheProvider<Item: Codable & DatabaseDecodable>: Cacheabl
         return promise.futureResult
     }
 
+    public func getAllMetadata(
+        withIDs ids: Set<Item.ID>,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<[Item]> {
+        let promise = eventLoop.makePromise(of: [Item].self)
+
+        eventLoop.execute {
+            var items = [Item]()
+            for id in ids {
+                guard let item = inMemoryCache[id] else { continue }
+                items.append(item)
+            }
+
+            // FIXME: -
+            return items.count != ids.count ? promise.fail(APIError.itemsNotFound) : promise.succeed(items)
+        }
+
+        return promise.futureResult
+    }
+
     public func save(items: [Item]) {
         for item in items {
-            inMemoryCache[item.identifier] = item
+            inMemoryCache[item.id] = item
         }
     }
 

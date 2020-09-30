@@ -12,12 +12,12 @@ import NIO
 public protocol RepositoryAPIService {
 
     func create(_ item: [String: Any]) -> EventLoopFuture<Void>
+    func createAll(_ items: [String: [[String: Any]]]) -> EventLoopFuture<Void>
 
-    func getAll(on eventLoop: EventLoop) -> EventLoopFuture<[[String: Any]]?>
+    func getItem(withID itemID: String) -> EventLoopFuture<[[String: Any]]?>
+    func getAllItems() -> EventLoopFuture<[[String: Any]]?>
 
-    func get<ID: Hashable>(
-        withID identifier: ID,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[String: Any]?>
+    func getMetadata(id: String) -> EventLoopFuture<[String: Any]?>
+    func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[[String: Any]]?>
 
 }

@@ -11,10 +11,14 @@ import NIO
 
 public protocol Cacheable {
 
-    associatedtype Item: Codable & DatabaseDecodable
+    associatedtype Item: Codable & Identifiable
 
-    func getAll(on eventLoop: EventLoop) -> EventLoopFuture<[Item]>
-    func get(withID identifier: Item.ID, on eventLoop: EventLoop) -> EventLoopFuture<Item>
+    func getItem(withID itemID: Item.ID, on eventLoop: EventLoop) -> EventLoopFuture<Item>
+    func getAllItems(on eventLoop: EventLoop) -> EventLoopFuture<[Item]>
+
+    func getMetadata(withID id: Item.ID, on eventLoop: EventLoop) -> EventLoopFuture<Item>
+    func getAllMetadata(withIDs ids: Set<Item.ID>, on eventLoop: EventLoop) -> EventLoopFuture<[Item]>
+
     func save(items: [Item])
 
 }
