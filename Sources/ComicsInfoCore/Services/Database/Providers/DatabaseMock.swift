@@ -13,84 +13,78 @@ struct DatabaseMock: Database {
 
     struct Table {
         let name: String
-        var items: [String: [String: Any]]
+        var items: [String: DatabaseItem]
 
         init(name: String) {
             self.name = name
-            items = [String: [String: Any]]()
+            items = [String: DatabaseItem]()
         }
 
     }
 
     private let eventLoop: EventLoop
+    private let tableName: String
     private var tables: [String: Table]
 
-    init(eventLoop: EventLoop) {
+    init(eventLoop: EventLoop, tableName: String) {
         self.eventLoop = eventLoop
+        self.tableName = tableName
         tables = [String: Table]()
     }
 
-    mutating func create(_ item: [String: Any], tableName table: String) -> EventLoopFuture<Void> {
-        guard let identifier = item["identifier"] as? String else {
-            return eventLoop.makeFailedFuture(DatabaseError.identifierDoesNotExists)
+    mutating func create(_ item: DatabaseItem) -> EventLoopFuture<Void> {
+        guard let id = item["id"] as? String else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveID)
         }
 
-        guard !tables[table, default: Table(name: table)].items.keys.contains(identifier) else {
-            return eventLoop.makeFailedFuture(DatabaseError.identifierExists)
+        guard !tables[item.table, default: Table(name: item.table)].items.keys.contains(id) else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
         }
 
-        tables[table]?.items[identifier] = item
+        tables[item.table]?.items[id] = item
         return eventLoop.makeSucceededFuture(())
     }
 
-    mutating func createAll(_ items: [String: [[String: Any]]]) -> EventLoopFuture<Void> {
-        for (_, el) in items.enumerated() {
-            for value in el.value {
-                guard let identifier = value["identifier"] as? String else {
-                    return eventLoop.makeFailedFuture(DatabaseError.identifierDoesNotExists)
-                }
-
-                guard !tables[el.key, default: Table(name: el.key)].items.keys.contains(identifier) else {
-                    return eventLoop.makeFailedFuture(DatabaseError.identifierExists)
-                }
-
-                tables[el.key, default: Table(name: el.key)].items[identifier] = value
+    mutating func createAll(_ items: [DatabaseItem]) -> EventLoopFuture<Void> {
+        for item in items {
+            guard let id = item["id"] as? String else {
+                return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveID)
             }
+
+            guard !tables[item.table, default: Table(name: item.table)].items.keys.contains(id) else {
+                return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
+            }
+
+            tables[item.table, default: Table(name: item.table)].items[id] = item
         }
 
         return eventLoop.makeSucceededFuture(())
     }
 
-    func getItem(fromTable table: String, itemID: String) -> EventLoopFuture<[[String: Any]]?> {
-        eventLoop.makeSucceededFuture([
-            ["identifier": "1",
-             "popularity": 0,
-             "name": "Name"]
-        ])
+    func getItem(withID itemID: String) -> EventLoopFuture<[DatabaseItem]> {
+        let items = [
+            DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+        ]
+        return eventLoop.makeSucceededFuture(items)
     }
 
-    func getAllItems(fromTable table: String) -> EventLoopFuture<[[String: Any]]?> {
-        eventLoop.makeSucceededFuture([
-            ["identifier": "1",
-             "popularity": 0,
-             "name": "Name"]
-        ])
+    func getAll(_ items: String) -> EventLoopFuture<[DatabaseItem]> {
+        let items = [
+            DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+        ]
+        return eventLoop.makeSucceededFuture(items)
     }
 
-    func getMetadata(fromTable table: String, id: String) -> EventLoopFuture<[String: Any]?> {
-        eventLoop.makeSucceededFuture([
-            "identifier": "1",
-            "popularity": 0,
-            "name": "Name"
-        ])
+    func getMetadata(withID id: String) -> EventLoopFuture<DatabaseItem> {
+        let item = DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+        return eventLoop.makeSucceededFuture(item)
     }
 
-    func getAllMetadata(fromTable table: String, ids: Set<String>) -> EventLoopFuture<[[String: Any]]?> {
-        eventLoop.makeSucceededFuture([[
-            "identifier": "1",
-            "popularity": 0,
-            "name": "Name"
-        ]])
+    func getAllMetadata(withIDs ids: Set<String>) -> EventLoopFuture<[DatabaseItem]> {
+        let items = [
+            DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+        ]
+        return eventLoop.makeSucceededFuture(items)
     }
 
 }

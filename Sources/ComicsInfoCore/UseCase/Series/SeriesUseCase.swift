@@ -34,7 +34,7 @@ public final class SeriesUseCase<APIWrapper: RepositoryAPIWrapper, CacheService:
     public func getAllItems(
         fromDataSource dataSource: DataSourceLayer
     ) -> EventLoopFuture<[Series]> {
-        seriesRepository.getAll(fromDataSource: dataSource)
+        seriesRepository.getAllItems(fromDataSource: dataSource)
     }
 
     public func getMetadata(

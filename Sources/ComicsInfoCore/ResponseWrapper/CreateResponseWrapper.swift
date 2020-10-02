@@ -29,11 +29,11 @@ struct CreateResponseWrapper<UseCaseType: UseCase>: ErrorResponseWrapper {
         do {
             let item = try JSONDecoder().decode(UseCaseType.Item.self, from: data)
             return useCase.create(item)
-                .map { Response(with: ResponseMessage("\(String(describing: type(of: item))) created"), statusCode: .created) }
+                .map { Response(with: ResponseStatus("\(String(describing: type(of: item))) created"), statusCode: .created) }
                 .flatMapError { self.catch($0, on: eventLoop, statusCode: .forbidden) }
 
         } catch {
-            let response = Response(with: error, statusCode: .badRequest)
+            let response = Response(with: ResponseStatus(error.localizedDescription), statusCode: .badRequest)
             return eventLoop.makeSucceededFuture(response)
         }
     }

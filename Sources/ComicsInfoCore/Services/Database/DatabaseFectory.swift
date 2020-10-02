@@ -13,17 +13,19 @@ import NIO
 public struct DatabaseFectory {
 
     private let isLocalServer: Bool
+    private let tableName: String
 
-    public init(isLocalServer: Bool) {
+    public init(isLocalServer: Bool, tableName: String) {
         self.isLocalServer = isLocalServer
+        self.tableName = tableName
     }
 
     public func makeDatabase(eventLoop: EventLoop) -> Database {
         guard !isLocalServer else {
-            return DatabaseMock(eventLoop: eventLoop)
+            return DatabaseMock(eventLoop: eventLoop, tableName: tableName)
         }
 
-        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop)
+        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, tableName: tableName)
     }
 
 }

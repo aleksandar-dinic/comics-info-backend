@@ -10,6 +10,6 @@ import Foundation
 
 public protocol EncoderService {
 
-    func encode<Item>(_ item: Item) -> [String: Any]
+    func encode<Item>(_ item: Item, table: String) -> DatabaseItem
 
 }

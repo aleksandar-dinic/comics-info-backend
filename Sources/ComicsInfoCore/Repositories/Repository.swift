@@ -27,14 +27,6 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
         dataProvider.create(item)
     }
 
-    /// Gets all items.
-    ///
-    /// - Parameter dataSource: Layer of data source.
-    /// - Returns: Future with Items value.
-    public func getAll(fromDataSource dataSource: DataSourceLayer) -> EventLoopFuture<[Item]> {
-        dataProvider.getAll(fromDataSource: dataSource)
-    }
-
     /// Gets item.
     ///
     /// - Parameters:
@@ -49,6 +41,14 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
             withID: itemID,
             fromDataSource: dataSource
         )
+    }
+
+    /// Gets all items.
+    ///
+    /// - Parameter dataSource: Layer of data source.
+    /// - Returns: Future with Items value.
+    public func getAllItems(fromDataSource dataSource: DataSourceLayer) -> EventLoopFuture<[Item]> {
+        dataProvider.getAllItems(fromDataSource: dataSource)
     }
 
     /// Gets item metadata.

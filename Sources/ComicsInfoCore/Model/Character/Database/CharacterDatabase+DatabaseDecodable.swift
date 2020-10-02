@@ -20,17 +20,17 @@ extension CharacterDatabase: DatabaseDecodable {
         case description
     }
 
-    public init(from items: [String: Any]) throws {
-        let decoder = DatabaseDecoder(from: items)
+    public init(from item: DatabaseItem) throws {
+        let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
         guard itemID.starts(with: "\(String.characterType)#") else {
-            throw APIError.invalidItemID("Expected to decode \(String.characterType)# but found a \(itemID) instead.")
+            throw APIError.invalidItemID(itemID, itemType: .characterType)
         }
 
         summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
         guard summaryID.starts(with: "\(String.characterType)#") else {
-            throw APIError.invalidSummaryID("Expected to decode \(String.characterType)# but found a \(summaryID) instead.")
+            throw APIError.invalidSummaryID(summaryID, itemType: .characterType)
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)

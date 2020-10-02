@@ -35,7 +35,7 @@ struct DataProvider<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable> 
 
     // Get all items
 
-    func getAll(fromDataSource dataSource: DataSourceLayer) -> EventLoopFuture<[Item]> {
+    func getAllItems(fromDataSource dataSource: DataSourceLayer) -> EventLoopFuture<[Item]> {
         switch dataSource {
         case .memory:
             return getAllItemsFromMemory()

@@ -13,6 +13,6 @@ public protocol DatabaseDecodable {
     var itemID: String { get }
     var summaryID: String { get }
 
-    init(from items: [String: Any]) throws
+    init(from item: DatabaseItem) throws
 
 }

@@ -31,16 +31,16 @@ struct SeriesCreateAPIWrapper {
 
     func create(_ item: Series) -> EventLoopFuture<Void> {
         getCharacters(item.charactersID).flatMap { characters in
-            var items = [String: [[String: Any]]]()
+            var items = [DatabaseItem]()
 
             let seriesSummary = createSeriesSummary(item, characters: characters)
-            items[.seriesTableName, default: []].append(contentsOf: seriesSummary.map { encoderService.encode($0) })
+            items.append(contentsOf: seriesSummary.map { encoderService.encode($0, table: .seriesTableName) })
 
             let charactersSummary = createCharactersSummary(characters, series: item)
-            items[.characterTableName, default: []].append(contentsOf: charactersSummary.map { encoderService.encode($0) })
+            items.append(contentsOf: charactersSummary.map { encoderService.encode($0, table: .characterTableName) })
 
-            let seriesDatabase = encoderService.encode(SeriesDatabase(series: item))
-            items[.seriesTableName, default: []].append(seriesDatabase)
+            let seriesDatabase = encoderService.encode(SeriesDatabase(series: item), table: .seriesTableName)
+            items.append(seriesDatabase)
 
             return repositoryAPIService.createAll(items)
         }
@@ -48,6 +48,16 @@ struct SeriesCreateAPIWrapper {
 
     private func getCharacters(_ charactersID: Set<String>) -> EventLoopFuture<[Character]> {
         characterUseCase.getAllMetadata(withIDs: charactersID, fromDataSource: .memory)
+            .flatMapThrowing { try handleCharacters($0, charactersID: charactersID) }
+    }
+
+    private func handleCharacters(_ characters: [Character], charactersID: Set<String>) throws -> [Character] {
+        let ids = Set(characters.map { $0.id })
+        for id in charactersID {
+            guard !ids.contains(id) else { continue }
+            throw APIError.itemNotFound(withID: id, itemType: Character.self)
+        }
+        return characters
     }
 
     private func createCharactersSummary(_ characters: [Character], series: Series) -> [CharacterSummary] {

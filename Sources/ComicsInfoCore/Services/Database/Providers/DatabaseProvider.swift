@@ -12,39 +12,37 @@ import NIO
 public final class DatabaseProvider: RepositoryAPIService {
 
     private var database: Database
-    private let tableName: String
 
-    public init(database: Database, tableName: String) {
+    public init(database: Database) {
         self.database = database
-        self.tableName = tableName
     }
 
     // Create
 
-    public func create(_ item: [String: Any]) -> EventLoopFuture<Void> {
-        database.create(item, tableName: tableName)
+    public func create(_ item: DatabaseItem) -> EventLoopFuture<Void> {
+        database.create(item)
     }
 
-    public func createAll(_ items: [String: [[String: Any]]]) -> EventLoopFuture<Void> {
+    public func createAll(_ items: [DatabaseItem]) -> EventLoopFuture<Void> {
         database.createAll(items)
     }
 
     // Read
 
-    public func getItem(withID itemID: String) -> EventLoopFuture<[[String: Any]]?> {
-        database.getItem(fromTable: tableName, itemID: itemID)
+    public func getItem(withID itemID: String) -> EventLoopFuture<[DatabaseItem]> {
+        database.getItem(withID: itemID)
     }
 
-    public func getAllItems() -> EventLoopFuture<[[String: Any]]?> {
-        database.getAllItems(fromTable: tableName)
+    public func getAll(_ items: String) -> EventLoopFuture<[DatabaseItem]> {
+        database.getAll(items)
     }
 
-    public func getMetadata(id: String) -> EventLoopFuture<[String: Any]?> {
-        database.getMetadata(fromTable: tableName, id: id)
+    public func getMetadata(withID id: String) -> EventLoopFuture<DatabaseItem> {
+        database.getMetadata(withID: id)
     }
 
-    public func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[[String: Any]]?> {
-        database.getAllMetadata(fromTable: tableName, ids: ids)
+    public func getAllMetadata(withIDs ids: Set<String>) -> EventLoopFuture<[DatabaseItem]> {
+        database.getAllMetadata(withIDs: ids)
     }
 
 //    func update(_ item: [String: Any]) -> EventLoopFuture<[String: Any]> {

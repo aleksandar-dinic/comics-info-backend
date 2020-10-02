@@ -26,7 +26,7 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
         eventLoop.execute {
             guard let item = inMemoryCache[itemID] else {
-                return promise.fail(APIError.itemNotFound)
+                return promise.fail(CacheError.itemNotFound(withID: itemID, itemType: Item.self))
             }
             promise.succeed(item)
         }
@@ -40,7 +40,7 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
         eventLoop.execute {
             guard !inMemoryCache.isEmpty else {
-                return promise.fail(APIError.itemsNotFound)
+                return promise.fail(CacheError.itemsNotFound(itemType: Item.self))
             }
 
             promise.succeed(inMemoryCache.values)
@@ -57,7 +57,7 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
         eventLoop.execute {
             guard let item = inMemoryCache[id] else {
-                return promise.fail(APIError.itemNotFound)
+                return promise.fail(CacheError.itemNotFound(withID: id, itemType: Item.self))
             }
             promise.succeed(item)
         }
@@ -79,7 +79,7 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
             }
 
             // FIXME: -
-            return items.count != ids.count ? promise.fail(APIError.itemsNotFound) : promise.succeed(items)
+            return items.count != ids.count ? promise.fail(CacheError.itemsNotFound(itemType: Item.self)) : promise.succeed(items)
         }
 
         return promise.futureResult

@@ -23,17 +23,17 @@ extension SeriesDatabase: DatabaseDecodable {
         case nextIdentifier
     }
 
-    public init(from items: [String: Any]) throws {
-        let decoder = DatabaseDecoder(from: items)
+    public init(from item: DatabaseItem) throws {
+        let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
         guard itemID.starts(with: "\(String.seriesType)#") else {
-            throw APIError.invalidItemID("Expected to decode \(String.seriesType)# but found a \(itemID) instead.")
+            throw APIError.invalidItemID(itemID, itemType: .seriesType)
         }
 
         summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
         guard summaryID.starts(with: "\(String.seriesType)#") else {
-            throw APIError.invalidSummaryID("Expected to decode \(String.seriesType)# but found a \(summaryID) instead.")
+            throw APIError.invalidSummaryID(summaryID, itemType: .seriesType)
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)

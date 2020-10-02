@@ -28,37 +28,52 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
         self.encoderService = encoderService
     }
 
+    // MARK: - Create item
+
     public func create(_ item: Character) -> EventLoopFuture<Void> {
-        let item = encoderService.encode(item)
+        let item = encoderService.encode(item, table: .characterTableName)
         return repositoryAPIService.create(item)
     }
 
+    // MARK: - Get item
+
     public func getItem(withID itemID: String) -> EventLoopFuture<Character> {
-        CharacterQueryAPIWrapper(
+        CharacterGetItemAPIWrapper(
             repositoryAPIService: repositoryAPIService,
             decoderService: decoderService
         ).getItem(withID: itemID)
     }
 
     public func getAllItems() -> EventLoopFuture<[Character]> {
-        repositoryAPIService.getAllItems().flatMapThrowing {
-            let charactersDatabase: [CharacterDatabase] = try decoderService.decodeAll(from: $0)
-            return charactersDatabase.map { Character(from: $0) }
-        }
+        CharacterGetAllAPIWrapper(
+            repositoryAPIService: repositoryAPIService,
+            decoderService: decoderService
+        ).getAllCharacters()
     }
 
+    // MARK: - Get metadata
+
     public func getMetadata(id: String) -> EventLoopFuture<Character> {
-        return repositoryAPIService.getMetadata(id: id).flatMapThrowing {
-            return Character(from: try decoderService.decode(from: $0))
+        return repositoryAPIService.getMetadata(withID: id).flatMapThrowing {
+            Character(from: try decoderService.decode(from: $0))
         }
     }
 
     public func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[Character]> {
         let ids = Set(ids.map { "\(String.characterType)#\($0)" })
-        return repositoryAPIService.getAllMetadata(ids: ids).flatMapThrowing {
-            let charactersDatabase: [CharacterDatabase] = try decoderService.decodeAll(from: $0)
-            return charactersDatabase.map { Character(from: $0) }
+        return repositoryAPIService.getAllMetadata(withIDs: ids).flatMapThrowing { items in
+            var characters = [Character]()
+            for item in items {
+                guard let character: CharacterDatabase = try? decoderService.decode(from: item) else { continue }
+                characters.append(Character(from: character))
+            }
+
+            guard !characters.isEmpty else { throw APIError.itemsNotFound(withIDs: ids, itemType: Series.self) }
+
+            return characters
         }
     }
+
+//    guard let items = items else { throw APIError.itemsNotFound(withIDs: ids, itemType: Character.self) }
 
 }

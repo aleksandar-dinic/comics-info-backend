@@ -10,14 +10,14 @@ import Foundation
 
 public struct DatabaseDecoder {
 
-    private let items: [String: Any]
+    private let item: DatabaseItem
 
-    public init(from items: [String: Any]) {
-        self.items = items
+    public init(from item: DatabaseItem) {
+        self.item = item
     }
 
     public func decode<T>(_ type: T.Type, forKey key: CodingKey) throws -> T {
-        guard let item = items[key.stringValue] else {
+        guard let item = item[key.stringValue] else {
             throw DecodingError.keyNotFound(
                 key,
                 DecodingError.Context(

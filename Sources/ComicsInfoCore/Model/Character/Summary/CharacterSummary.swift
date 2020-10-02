@@ -8,14 +8,14 @@
 
 import Foundation
 
-public struct CharacterSummary: Codable {
+struct CharacterSummary {
 
     var id: String {
         String(summaryID.dropFirst("\(String.characterType)#".count))
     }
 
-    public let itemID: String
-    public let summaryID: String
+    let itemID: String
+    let summaryID: String
     let itemName: String
 
     let popularity: Int
@@ -51,13 +51,13 @@ extension CharacterSummary: DatabaseDecodable {
         case description
     }
 
-    public init(from items: [String: Any]) throws {
-        let decoder = DatabaseDecoder(from: items)
+    public init(from item: DatabaseItem) throws {
+        let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
         summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
         guard summaryID.starts(with: "\(String.characterType)#") else {
-            throw APIError.invalidSummaryID("Expected to decode \(String.characterType)# but found a \(summaryID) instead.")
+            throw APIError.invalidSummaryID(summaryID, itemType: .characterType)
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)

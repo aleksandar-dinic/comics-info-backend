@@ -12,7 +12,7 @@ extension Series {
 
     init(fromSummary series: SeriesSummary) {
         self.init(
-            id: series.summaryID,
+            id: series.id,
             popularity: series.popularity,
             title: series.title,
             thumbnail: series.thumbnail,

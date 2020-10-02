@@ -70,25 +70,3 @@ extension Response {
     }
 
 }
-
-extension Response {
-
-    public init(
-        with error: Error,
-        statusCode: HTTPResponseStatus,
-        headers: [String: String]? = Self.defaultHeaders,
-        multiValueHeaders: [String: [String]]? = nil,
-        isBase64Encoded: Bool? = nil,
-        cookies: [String]? = nil
-    ) {
-        self.init(
-            statusCode: statusCode,
-            headers: headers,
-            multiValueHeaders: multiValueHeaders,
-            body: "{\"message\":\"\(String(describing: error))\"}",
-            isBase64Encoded: isBase64Encoded,
-            cookies: cookies
-        )
-    }
-
-}

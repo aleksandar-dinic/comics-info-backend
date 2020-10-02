@@ -26,7 +26,7 @@ extension ErrorResponseWrapper {
         on eventLoop: EventLoop,
         statusCode: HTTPResponseStatus = .notFound
     ) -> EventLoopFuture<Response> {
-        let response = Response(with: error, statusCode: statusCode)
+        let response = Response(with: ResponseStatus(error.localizedDescription), statusCode: statusCode)
 
         return eventLoop.makeSucceededFuture(response)
     }

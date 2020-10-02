@@ -21,12 +21,6 @@ public final class CharacterUseCase<APIWrapper: RepositoryAPIWrapper, CacheServi
         characterRepository.create(character)
     }
 
-    public func getAllItems(
-        fromDataSource dataSource: DataSourceLayer
-    ) -> EventLoopFuture<[Character]> {
-        characterRepository.getAll(fromDataSource: dataSource)
-    }
-
     public func getItem(
         withID itemID: String,
         fromDataSource dataSource: DataSourceLayer
@@ -35,6 +29,12 @@ public final class CharacterUseCase<APIWrapper: RepositoryAPIWrapper, CacheServi
             withID: itemID,
             fromDataSource: dataSource
         )
+    }
+
+    public func getAllItems(
+        fromDataSource dataSource: DataSourceLayer
+    ) -> EventLoopFuture<[Character]> {
+        characterRepository.getAllItems(fromDataSource: dataSource)
     }
 
     public func getMetadata(

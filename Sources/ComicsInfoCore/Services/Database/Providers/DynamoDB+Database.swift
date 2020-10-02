@@ -12,7 +12,9 @@ import SotoDynamoDB
 
 extension DynamoDB: Database {
 
-    init(eventLoop: EventLoop) {
+    private static var tableName = ""
+
+    init(eventLoop: EventLoop, tableName: String) {
         let httpClient = HTTPClient(
             eventLoopGroupProvider: .shared(eventLoop),
             configuration: HTTPClient.Configuration(timeout: .default)
@@ -20,6 +22,7 @@ extension DynamoDB: Database {
 
         let client = AWSClient(httpClientProvider: .shared(httpClient))
         self.init(client: client, region: .default)
+        DynamoDB.tableName = tableName
     }
 
 }
@@ -27,31 +30,30 @@ extension DynamoDB: Database {
 // Create item.
 extension DynamoDB {
 
-    // FIXME: - Find a better way of setting a value `conditionExpression`
-    public func create(_ item: [String: Any], tableName table: String) -> EventLoopFuture<Void> {
+    public func create(_ item: DatabaseItem) -> EventLoopFuture<Void> {
         let input = PutItemInput(
-            conditionExpression: "attribute_not_exists(itemID) AND attribute_not_exists(summaryID)",
-            item: item.compactMapValues { ($0 as? AttributeValueMapper)?.attributeValue },
-            tableName: table
+            conditionExpression: item.conditionExpression,
+            item: item.attributeValues,
+            tableName: item.table
         )
 
         return putItem(input).flatMapThrowing { _ in }
     }
 
-    public func createAll(_ items: [String: [[String: Any]]]) -> EventLoopFuture<Void> {
+    public func createAll(_ items: [DatabaseItem]) -> EventLoopFuture<Void> {
         var transactItems = [TransactWriteItem]()
-        for item in items {
-            for value in item.value {
-                let put = Put(
-                    conditionExpression: "attribute_not_exists(itemID) AND attribute_not_exists(summaryID)",
-                    item: value.compactMapValues { ($0 as? AttributeValueMapper)?.attributeValue },
-                    tableName: item.key
-                )
 
-                let transactWriteItem = TransactWriteItem(put: put)
-                transactItems.append(transactWriteItem)
-            }
+        for item in items {
+            let put = Put(
+                conditionExpression: item.conditionExpression,
+                item: item.attributeValues,
+                tableName: item.table
+            )
+
+            let transactWriteItem = TransactWriteItem(put: put)
+            transactItems.append(transactWriteItem)
         }
+
         let input = TransactWriteItemsInput(transactItems: transactItems)
         return transactWriteItems(input).flatMapThrowing { _ in }
     }
@@ -61,23 +63,34 @@ extension DynamoDB {
 // Read item.
 extension DynamoDB {
 
-    public func getItem(fromTable table: String, itemID: String) -> EventLoopFuture<[[String: Any]]?> {
+    public func getItem(withID itemID: String) -> EventLoopFuture<[DatabaseItem]> {
         let input = QueryInput(
-            expressionAttributeValues: [":itemID": itemID.attributeValue],
+            expressionAttributeValues: [":itemID": .s(itemID)],
             keyConditionExpression: "itemID = :itemID",
-            tableName: table
+            tableName: DynamoDB.tableName
         )
 
         return query(input).flatMapThrowing {
-            $0.items?.compactMap { $0.compactMapValues { $0.value } }
+            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
+                throw DatabaseError.itemNotFound(withID: itemID)
+            }
+            return items.map { DatabaseItem($0, table: DynamoDB.tableName) }
         }
     }
 
-    public func getAllItems(fromTable table: String) -> EventLoopFuture<[[String: Any]]?> {
-        let input = ScanInput(tableName: table)
+    public func getAll(_ items: String) -> EventLoopFuture<[DatabaseItem]> {
+        let input = QueryInput(
+            expressionAttributeValues: [":itemName": .s(items)],
+            indexName: "itemName-summaryID-index",
+            keyConditionExpression: "itemName = :itemName",
+            tableName: DynamoDB.tableName
+        )
 
-        return scan(input).flatMapThrowing {
-            $0.items?.compactMap { $0.compactMapValues { $0.value } }
+        return query(input).flatMapThrowing {
+            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
+                throw DatabaseError.itemsNotFound(withIDs: nil)
+            }
+            return items.map { DatabaseItem($0, table: DynamoDB.tableName) }
         }
     }
 
@@ -86,18 +99,21 @@ extension DynamoDB {
 // Read item metadata.
 extension DynamoDB {
 
-    public func getMetadata(fromTable table: String, id: String) -> EventLoopFuture<[String: Any]?> {
+    public func getMetadata(withID id: String) -> EventLoopFuture<DatabaseItem> {
         let input = GetItemInput(
             key: ["itemID": .s(id), "summaryID": .s(id)],
-            tableName: table
+            tableName: DynamoDB.tableName
         )
 
         return getItem(input).flatMapThrowing {
-            $0.item?.compactMapValues { $0.value }
+            guard let item = $0.item?.compactMapValues({ $0.value }) else {
+                throw DatabaseError.itemNotFound(withID: id)
+            }
+            return DatabaseItem(item, table: DynamoDB.tableName)
         }
     }
 
-    public func getAllMetadata(fromTable table: String, ids: Set<String>) -> EventLoopFuture<[[String: Any]]?> {
+    public func getAllMetadata(withIDs ids: Set<String>) -> EventLoopFuture<[DatabaseItem]> {
         var keys = [[String: AttributeValue]]()
 
         for id in ids {
@@ -107,11 +123,15 @@ extension DynamoDB {
         let keysAndAttributes = KeysAndAttributes(keys: keys)
 
         let input = BatchGetItemInput(
-            requestItems: [table: keysAndAttributes]
+            requestItems: [DynamoDB.tableName: keysAndAttributes]
         )
 
-        return batchGetItem(input).flatMapThrowing { [table] in
-            return $0.responses?[table]?.compactMap { $0.compactMapValues { $0.value } }
+        return batchGetItem(input).flatMapThrowing {
+            guard let items = $0.responses?[DynamoDB.tableName]?.compactMap({ $0.compactMapValues { $0.value } }),
+                  !items.isEmpty else {
+                throw DatabaseError.itemsNotFound(withIDs: ids)
+            }
+            return items.map { DatabaseItem($0, table: DynamoDB.tableName) }
         }
     }
 

@@ -1,5 +1,5 @@
 //
-//  ResponseMessage.swift
+//  ResponseStatus.swift
 //  ComicsInfoCore
 //
 //  Created by Aleksandar Dinic on 23/09/2020.
@@ -8,12 +8,12 @@
 
 import Foundation
 
-public struct ResponseMessage: Codable {
+public struct ResponseStatus: Codable {
 
-    let message: String
+    let status: String
 
-    public init(_ message: String) {
-        self.message = message
+    public init(_ status: String) {
+        self.status = status
     }
 
 }

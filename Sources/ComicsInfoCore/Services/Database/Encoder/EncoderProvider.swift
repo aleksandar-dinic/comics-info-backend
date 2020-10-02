@@ -12,17 +12,17 @@ public struct EncoderProvider: EncoderService {
 
     public init() {}
 
-    public func encode<Item>(_ item: Item) -> [String: Any] {
+    public func encode<Item>(_ item: Item, table: String) -> DatabaseItem {
         let mirror = Mirror(reflecting: item)
-        var itemDict = [String: Any]()
+        var databaseItem = DatabaseItem(table: table)
 
         for child in mirror.children {
             guard let label = child.label else { continue }
             if case Optional<Any>.none = child.value { continue }
-            itemDict[label] = child.value
+            databaseItem[label] = child.value
         }
 
-        return itemDict
+        return databaseItem
     }
 
 }

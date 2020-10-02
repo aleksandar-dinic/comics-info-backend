@@ -45,11 +45,11 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable> where CacheProvider
     }
 
     private func makeRepositoryAPIService() -> RepositoryAPIService {
-        DatabaseProvider(database: makeDatabase(), tableName: .seriesTableName)
+        DatabaseProvider(database: makeDatabase())
     }
 
     private func makeDatabase() -> Database {
-        DatabaseFectory(isLocalServer: isLocalServer)
+        DatabaseFectory(isLocalServer: isLocalServer, tableName: .seriesTableName)
             .makeDatabase(eventLoop: eventLoop)
     }
 
