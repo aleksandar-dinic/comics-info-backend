@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import Logging
 import Foundation
 import NIO
 
@@ -13,91 +14,64 @@ public struct SeriesRepositoryAPIWrapper: RepositoryAPIWrapper {
 
     public let eventLoop: EventLoop
     public let repositoryAPIService: RepositoryAPIService
+    public let logger: Logger
     public let decoderService: DecoderService
     public let encoderService: EncoderService
 
     public init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
+        logger: Logger,
         decoderService: DecoderService = DecoderProvider(),
         encoderService: EncoderService = EncoderProvider()
     ) {
         self.eventLoop = eventLoop
         self.repositoryAPIService = repositoryAPIService
+        self.logger = logger
         self.decoderService = decoderService
         self.encoderService = encoderService
     }
+
+    // MARK: - Create item
 
     public func create(_ item: Series) -> EventLoopFuture<Void> {
         SeriesCreateAPIWrapper(
             on: eventLoop,
             repositoryAPIService: repositoryAPIService,
-            encoderService: encoderService
+            encoderService: encoderService,
+            logger: logger
         ).create(item)
     }
 
-    // FIXME: - Change getMetadata when implement getItem
+    // MARK: - Get item
+
     public func getItem(withID itemID: String) -> EventLoopFuture<Series> {
-        repositoryAPIService.getMetadata(withID: itemID).flatMapThrowing {
-            Series(from: try decoderService.decode(from: $0))
-        }
+        SeriesGetAPIWrapper(
+            repositoryAPIService: repositoryAPIService,
+            decoderService: decoderService
+        ).get(withID: itemID)
     }
 
     public func getAllItems() -> EventLoopFuture<[Series]> {
-        repositoryAPIService.getAll(.seriesType)
-            .flatMapThrowing { items in
-                var series = [Series]()
-                for item in items {
-                    guard let seriesDatabase: SeriesDatabase = try? decoderService.decode(from: item) else { continue }
-                    series.append(Series(from: seriesDatabase))
-                }
-
-                guard !series.isEmpty else {
-                    throw APIError.itemsNotFound(withIDs: nil, itemType: Series.self)
-                }
-
-                return series
-            }.flatMapErrorThrowing { throw handleError($0) }
+        SeriesGetAllAPIWrapper(
+            repositoryAPIService: repositoryAPIService,
+            decoderService: decoderService
+        ).getAll()
     }
 
+    // MARK: - Get metadata
+    
     public func getMetadata(id: String) -> EventLoopFuture<Series> {
-        repositoryAPIService.getMetadata(withID: id).flatMapThrowing {
-            Series(from: try decoderService.decode(from: $0))
-        }
+        repositoryAPIService.getMetadata(withID: id)
+            .flatMapThrowing { Series(from: try decoderService.decode(from: $0)) }
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Series.self) }
     }
 
     public func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[Series]> {
-        repositoryAPIService.getAllMetadata(withIDs: ids).flatMapThrowing { items in
-            var series = [Series]()
-            for item in items {
-                guard let seriesDatabase: SeriesDatabase = try? decoderService.decode(from: item) else { continue }
-                series.append(Series(from: seriesDatabase))
-            }
-
-            guard !series.isEmpty else {
-                throw APIError.itemsNotFound(withIDs: ids, itemType: Series.self)
-            }
-
-            return series
-        }.flatMapErrorThrowing { throw handleError($0) }
-    }
-
-    private func handleError(_ error: Error) -> Error {
-        guard let dbError = error as? DatabaseError else { return error }
-
-        switch dbError {
-        case .itemDoesNotHaveID:
-            return APIError.requestError
-
-        case let .itemAlreadyExists(withID: id):
-            return APIError.itemAlreadyExists(withID: id, itemType: Series.self)
-
-        case let .itemNotFound(withID: id):
-            return APIError.itemNotFound(withID: id, itemType: Series.self)
-
-        case let .itemsNotFound(withIDs: ids):
-            return APIError.itemsNotFound(withIDs: ids, itemType: Series.self)
-        }
+        SeriesGetAllMetadataAPIWrapper(
+            repositoryAPIService: repositoryAPIService,
+            decoderService: decoderService
+        ).getAllMetadata(ids: ids)
     }
 
 }

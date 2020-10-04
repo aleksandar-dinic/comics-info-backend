@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import Logging
 import Foundation
 import NIO
 
@@ -13,17 +14,20 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
 
     public let eventLoop: EventLoop
     public let repositoryAPIService: RepositoryAPIService
+    public let logger: Logger
     public let decoderService: DecoderService
     public let encoderService: EncoderService
 
     public init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
+        logger: Logger,
         decoderService: DecoderService = DecoderProvider(),
         encoderService: EncoderService = EncoderProvider()
     ) {
         self.eventLoop = eventLoop
         self.repositoryAPIService = repositoryAPIService
+        self.logger = logger
         self.decoderService = decoderService
         self.encoderService = encoderService
     }
@@ -31,49 +35,43 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
     // MARK: - Create item
 
     public func create(_ item: Character) -> EventLoopFuture<Void> {
-        let item = encoderService.encode(item, table: .characterTableName)
-        return repositoryAPIService.create(item)
+        CharacterCreateAPIWrapper(
+            on: eventLoop,
+            repositoryAPIService: repositoryAPIService,
+            encoderService: encoderService,
+            logger: logger
+        ).create(item)
     }
 
     // MARK: - Get item
 
     public func getItem(withID itemID: String) -> EventLoopFuture<Character> {
-        CharacterGetItemAPIWrapper(
+        CharacterGetAPIWrapper(
             repositoryAPIService: repositoryAPIService,
             decoderService: decoderService
-        ).getItem(withID: itemID)
+        ).get(withID: itemID)
     }
 
     public func getAllItems() -> EventLoopFuture<[Character]> {
         CharacterGetAllAPIWrapper(
             repositoryAPIService: repositoryAPIService,
             decoderService: decoderService
-        ).getAllCharacters()
+        ).getAll()
     }
 
     // MARK: - Get metadata
 
     public func getMetadata(id: String) -> EventLoopFuture<Character> {
-        return repositoryAPIService.getMetadata(withID: id).flatMapThrowing {
-            Character(from: try decoderService.decode(from: $0))
-        }
+        repositoryAPIService.getMetadata(withID: id)
+            .flatMapThrowing { Character(from: try decoderService.decode(from: $0)) }
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Character.self) }
     }
 
     public func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[Character]> {
-        let ids = Set(ids.map { "\(String.characterType)#\($0)" })
-        return repositoryAPIService.getAllMetadata(withIDs: ids).flatMapThrowing { items in
-            var characters = [Character]()
-            for item in items {
-                guard let character: CharacterDatabase = try? decoderService.decode(from: item) else { continue }
-                characters.append(Character(from: character))
-            }
-
-            guard !characters.isEmpty else { throw APIError.itemsNotFound(withIDs: ids, itemType: Series.self) }
-
-            return characters
-        }
+        CharacterGetAllMetadataAPIWrapper(
+            repositoryAPIService: repositoryAPIService,
+            decoderService: decoderService
+        ).getAllMetadata(ids: ids)
     }
-
-//    guard let items = items else { throw APIError.itemsNotFound(withIDs: ids, itemType: Character.self) }
 
 }

@@ -12,13 +12,15 @@ import Foundation
 extension Domain.Character {
 
     init(from character: Character) {
+        let series = character.series?.compactMap { Domain.Series(from: $0) }
+
         self.init(
             identifier: character.id,
             popularity: character.popularity,
             name: character.name,
             thumbnail: character.thumbnail,
             description: character.description,
-            series: character.series.map { $0.map { Domain.Series(from: $0) } },
+            series: series?.sorted(by: { $0.popularity < $1.popularity }),
             comics: nil // TODO: - character.comics
         )
     }

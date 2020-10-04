@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SeriesSummary {
+struct SeriesSummary: Identifiable {
 
     var id: String {
         String(summaryID.dropFirst("\(String.seriesType)#".count))

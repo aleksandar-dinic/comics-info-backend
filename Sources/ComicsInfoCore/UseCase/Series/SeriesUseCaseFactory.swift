@@ -6,23 +6,27 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import Logging
 import Foundation
 import NIO
 
 public struct SeriesUseCaseFactory<CacheProvider: Cacheable> where CacheProvider.Item == Series {
 
-    let eventLoop: EventLoop
-    let isLocalServer: Bool
-    var cacheProvider: CacheProvider
+    private let eventLoop: EventLoop
+    private let isLocalServer: Bool
+    private let cacheProvider: CacheProvider
+    private let logger: Logger
 
     public init(
         on eventLoop: EventLoop,
         isLocalServer: Bool,
-        cacheProvider: CacheProvider
+        cacheProvider: CacheProvider,
+        logger: Logger
     ) {
         self.eventLoop = eventLoop
         self.isLocalServer = isLocalServer
         self.cacheProvider = cacheProvider
+        self.logger = logger
     }
 
     public func makeUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, CacheProvider> {
@@ -40,7 +44,8 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable> where CacheProvider
     private func makeRepositoryAPIWrapper() -> SeriesRepositoryAPIWrapper {
         SeriesRepositoryAPIWrapper(
             on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService()
+            repositoryAPIService: makeRepositoryAPIService(),
+            logger: logger
         )
     }
 
@@ -50,7 +55,7 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable> where CacheProvider
 
     private func makeDatabase() -> Database {
         DatabaseFectory(isLocalServer: isLocalServer, tableName: .seriesTableName)
-            .makeDatabase(eventLoop: eventLoop)
+            .makeDatabase(eventLoop: eventLoop, logger: logger)
     }
 
 }

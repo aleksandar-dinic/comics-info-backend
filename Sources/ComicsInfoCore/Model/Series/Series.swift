@@ -35,7 +35,7 @@ public struct Series: Codable, Identifiable {
     let nextIdentifier: String?
 
     /// A resource list containing charactersID which appear in comics in this series.
-    let charactersID: Set<String>
+    let charactersID: Set<String>?
 
     /// A resource list containing characters which appear in comics in this series.
     let characters: [Character]?

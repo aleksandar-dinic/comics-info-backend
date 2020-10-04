@@ -7,6 +7,7 @@
 //
 
 import struct SotoDynamoDB.DynamoDB
+import Logging
 import Foundation
 import NIO
 
@@ -20,12 +21,15 @@ public struct DatabaseFectory {
         self.tableName = tableName
     }
 
-    public func makeDatabase(eventLoop: EventLoop) -> Database {
+    public func makeDatabase(
+        eventLoop: EventLoop,
+        logger: Logger
+    ) -> Database {
         guard !isLocalServer else {
-            return DatabaseMock(eventLoop: eventLoop, tableName: tableName)
+            return DatabaseMock(eventLoop: eventLoop, tableName: tableName, logger: logger)
         }
 
-        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, tableName: tableName)
+        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, tableName: tableName, logger: logger)
     }
 
 }

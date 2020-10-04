@@ -6,66 +6,69 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import Logging
 import Foundation
 import NIO
 
-struct SeriesCreateAPIWrapper {
+struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharactersMetadataHandler {
 
-    private let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
-    private let repositoryAPIService: RepositoryAPIService
-    private let encoderService: EncoderService
+    let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
+    let repositoryAPIService: RepositoryAPIService
+    let encoderService: EncoderService
+    let eventLoop: EventLoop
 
     init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
-        encoderService: EncoderService
+        encoderService: EncoderService,
+        logger: Logger
     ) {
         self.repositoryAPIService = repositoryAPIService
         self.encoderService = encoderService
+        self.eventLoop = eventLoop
         characterUseCase = CharacterUseCaseFactory<InMemoryCacheProvider<Character>>(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.characterInMemoryCache
+            cacheProvider: LocalServer.characterInMemoryCache,
+            logger: logger
         ).makeUseCase()
     }
 
     func create(_ item: Series) -> EventLoopFuture<Void> {
-        getCharacters(item.charactersID).flatMap { characters in
-            var items = [DatabaseItem]()
+        getCharacters(item.charactersID)
+            .flatMapThrowing { createCharactersSummary($0, series: item) }
+            .flatMapThrowing { appendSeriesDatabase($0, series: item) }
+            .flatMap { repositoryAPIService.createAll($0) }
+    }
 
-            let seriesSummary = createSeriesSummary(item, characters: characters)
-            items.append(contentsOf: seriesSummary.map { encoderService.encode($0, table: .seriesTableName) })
+    private func createCharactersSummary(_ characters: [Character], series: Series) -> [DatabaseItem] {
+        guard !characters.isEmpty else { return [] }
 
-            let charactersSummary = createCharactersSummary(characters, series: item)
-            items.append(contentsOf: charactersSummary.map { encoderService.encode($0, table: .characterTableName) })
+        var dbItems = appendCharactersSummary(characters, item: series)
+        return appendSeriesSummary(characters, series: series, dbItems: &dbItems)
+    }
 
-            let seriesDatabase = encoderService.encode(SeriesDatabase(series: item), table: .seriesTableName)
-            items.append(seriesDatabase)
+    private func appendSeriesSummary<Item: Identifiable>(
+        _ items: [Item],
+        series: Series,
+        dbItems: inout [DatabaseItem]
+    ) -> [DatabaseItem] where Item.ID == String {
 
-            return repositoryAPIService.createAll(items)
+        for item in items {
+            let seriesSummary = SeriesSummary(series, id: item.id, itemName: .getType(from: Item.self))
+            dbItems.append(encoderService.encode(seriesSummary, table: .seriesTableName))
         }
+
+        return dbItems
     }
 
-    private func getCharacters(_ charactersID: Set<String>) -> EventLoopFuture<[Character]> {
-        characterUseCase.getAllMetadata(withIDs: charactersID, fromDataSource: .memory)
-            .flatMapThrowing { try handleCharacters($0, charactersID: charactersID) }
-    }
+    private func appendSeriesDatabase(_ items: [DatabaseItem], series: Series) -> [DatabaseItem] {
+        var items = items
 
-    private func handleCharacters(_ characters: [Character], charactersID: Set<String>) throws -> [Character] {
-        let ids = Set(characters.map { $0.id })
-        for id in charactersID {
-            guard !ids.contains(id) else { continue }
-            throw APIError.itemNotFound(withID: id, itemType: Character.self)
-        }
-        return characters
-    }
+        let seriesDatabase = SeriesDatabase(series: series)
+        items.append(encoderService.encode(seriesDatabase, table: .seriesTableName))
 
-    private func createCharactersSummary(_ characters: [Character], series: Series) -> [CharacterSummary] {
-        characters.map { CharacterSummary($0, id: series.id, itemName: .seriesType) }
-    }
-
-    private func createSeriesSummary(_ series: Series, characters: [Character]) -> [SeriesSummary] {
-        characters.map { SeriesSummary(series, id: $0.id, itemName: .characterType) }
+        return items
     }
 
 }

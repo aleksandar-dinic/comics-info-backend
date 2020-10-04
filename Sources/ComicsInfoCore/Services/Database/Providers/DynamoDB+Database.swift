@@ -13,8 +13,9 @@ import SotoDynamoDB
 extension DynamoDB: Database {
 
     private static var tableName = ""
+    private static var logger = AWSClient.loggingDisabled
 
-    init(eventLoop: EventLoop, tableName: String) {
+    init(eventLoop: EventLoop, tableName: String, logger: Logger) {
         let httpClient = HTTPClient(
             eventLoopGroupProvider: .shared(eventLoop),
             configuration: HTTPClient.Configuration(timeout: .default)
@@ -23,6 +24,7 @@ extension DynamoDB: Database {
         let client = AWSClient(httpClientProvider: .shared(httpClient))
         self.init(client: client, region: .default)
         DynamoDB.tableName = tableName
+        DynamoDB.logger = logger
     }
 
 }
@@ -37,6 +39,7 @@ extension DynamoDB {
             tableName: item.table
         )
 
+        DynamoDB.logger.log(level: .info, "\(input)")
         return putItem(input).flatMapThrowing { _ in }
     }
 
@@ -55,6 +58,7 @@ extension DynamoDB {
         }
 
         let input = TransactWriteItemsInput(transactItems: transactItems)
+        DynamoDB.logger.log(level: .info, "\(input)")
         return transactWriteItems(input).flatMapThrowing { _ in }
     }
 
@@ -70,6 +74,7 @@ extension DynamoDB {
             tableName: DynamoDB.tableName
         )
 
+        DynamoDB.logger.log(level: .info, "\(input)")
         return query(input).flatMapThrowing {
             guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
                 throw DatabaseError.itemNotFound(withID: itemID)
@@ -86,6 +91,7 @@ extension DynamoDB {
             tableName: DynamoDB.tableName
         )
 
+        DynamoDB.logger.log(level: .info, "\(input)")
         return query(input).flatMapThrowing {
             guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
                 throw DatabaseError.itemsNotFound(withIDs: nil)
@@ -105,6 +111,7 @@ extension DynamoDB {
             tableName: DynamoDB.tableName
         )
 
+        DynamoDB.logger.log(level: .info, "\(input)")
         return getItem(input).flatMapThrowing {
             guard let item = $0.item?.compactMapValues({ $0.value }) else {
                 throw DatabaseError.itemNotFound(withID: id)
@@ -126,9 +133,11 @@ extension DynamoDB {
             requestItems: [DynamoDB.tableName: keysAndAttributes]
         )
 
+        DynamoDB.logger.log(level: .info, "\(input)")
         return batchGetItem(input).flatMapThrowing {
             guard let items = $0.responses?[DynamoDB.tableName]?.compactMap({ $0.compactMapValues { $0.value } }),
                   !items.isEmpty else {
+                let ids = Set(ids.compactMap({ $0.split(separator: "#").last }).map { String($0) })
                 throw DatabaseError.itemsNotFound(withIDs: ids)
             }
             return items.map { DatabaseItem($0, table: DynamoDB.tableName) }

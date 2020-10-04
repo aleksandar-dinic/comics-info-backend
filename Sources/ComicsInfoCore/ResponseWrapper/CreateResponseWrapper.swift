@@ -29,7 +29,7 @@ struct CreateResponseWrapper<UseCaseType: UseCase>: ErrorResponseWrapper {
         do {
             let item = try JSONDecoder().decode(UseCaseType.Item.self, from: data)
             return useCase.create(item)
-                .map { Response(with: ResponseStatus("\(String(describing: type(of: item))) created"), statusCode: .created) }
+                .map { Response(with: ResponseStatus("\(type(of: item.self)) created"), statusCode: .created) }
                 .flatMapError { self.catch($0, on: eventLoop, statusCode: .forbidden) }
 
         } catch {

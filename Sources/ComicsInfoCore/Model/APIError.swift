@@ -28,13 +28,13 @@ extension APIError: LocalizedError {
             return "Request Error"
 
         case let .itemAlreadyExists(withID: id, itemType: itemType):
-            return "\(String(describing: type(of: itemType.self))) already exists with id: \(id)"
+            return "\(itemType) already exists with id: \(id)"
 
         case let .itemNotFound(id, itemType):
-            return "We couldn't find \(String(describing: type(of: itemType.self))) with id: \(id)"
+            return "We couldn't find \(itemType) with id: \(id)"
 
         case let .itemsNotFound(ids, itemType):
-            let desc = "We couldn't find \(String(describing: type(of: itemType.self)))"
+            let desc = "We couldn't find \(itemType)"
             guard let ids = ids, !ids.isEmpty else {
                 return desc
             }

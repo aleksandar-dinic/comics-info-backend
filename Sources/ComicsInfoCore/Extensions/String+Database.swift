@@ -27,4 +27,8 @@ public extension String {
         "series"
     }
 
+    static func getType(from item: Any.Type) -> String {
+        "\(item.self)".lowercased()
+    }
+
 }

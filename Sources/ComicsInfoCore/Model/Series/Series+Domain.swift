@@ -12,6 +12,8 @@ import Foundation
 extension Domain.Series {
 
     init(from series: Series) {
+        let characters = series.characters?.compactMap { Domain.Character(from: $0) }
+
         self.init(
             identifier: series.id,
             popularity: series.popularity,
@@ -21,7 +23,7 @@ extension Domain.Series {
             startYear: series.startYear,
             endYear: series.endYear,
             nextIdentifier: series.nextIdentifier,
-            characters: series.characters.map { $0.map { Domain.Character(from: $0) } },
+            characters: characters?.sorted(by: { $0.popularity < $1.popularity }),
             comics: nil // TODO: - series.comics
         )
     }

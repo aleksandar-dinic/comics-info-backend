@@ -6,23 +6,27 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import Logging
 import Foundation
 import NIO
 
 public struct CharacterUseCaseFactory<CacheProvider: Cacheable> where CacheProvider.Item == Character  {
 
-    let eventLoop: EventLoop
-    let isLocalServer: Bool
-    let cacheProvider: CacheProvider
+    private let eventLoop: EventLoop
+    private let isLocalServer: Bool
+    private let cacheProvider: CacheProvider
+    private let logger: Logger
 
     public init(
         on eventLoop: EventLoop,
         isLocalServer: Bool,
-        cacheProvider: CacheProvider
+        cacheProvider: CacheProvider,
+        logger: Logger
     ) {
         self.eventLoop = eventLoop
         self.isLocalServer = isLocalServer
         self.cacheProvider = cacheProvider
+        self.logger = logger
     }
 
     public func makeUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, CacheProvider> {
@@ -40,7 +44,8 @@ public struct CharacterUseCaseFactory<CacheProvider: Cacheable> where CacheProvi
     private func makeRepositoryAPIWrapper() -> CharacterRepositoryAPIWrapper {
         CharacterRepositoryAPIWrapper(
             on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService()
+            repositoryAPIService: makeRepositoryAPIService(),
+            logger: logger
         )
     }
 
@@ -50,7 +55,7 @@ public struct CharacterUseCaseFactory<CacheProvider: Cacheable> where CacheProvi
 
     private func makeDatabase() -> Database {
         DatabaseFectory(isLocalServer: isLocalServer, tableName: .characterTableName)
-            .makeDatabase(eventLoop: eventLoop)
+            .makeDatabase(eventLoop: eventLoop, logger: logger)
     }
 
 }

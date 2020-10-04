@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct CharacterSummary {
+struct CharacterSummary: Identifiable {
 
     var id: String {
         String(summaryID.dropFirst("\(String.characterType)#".count))

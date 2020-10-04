@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import Logging
 import Foundation
 import NIO
 
@@ -15,12 +16,14 @@ public protocol RepositoryAPIWrapper {
 
     var eventLoop: EventLoop { get }
     var repositoryAPIService: RepositoryAPIService { get }
+    var logger: Logger { get }
     var decoderService: DecoderService { get }
     var encoderService: EncoderService { get }
 
     init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
+        logger: Logger,
         decoderService: DecoderService,
         encoderService: EncoderService
     )
