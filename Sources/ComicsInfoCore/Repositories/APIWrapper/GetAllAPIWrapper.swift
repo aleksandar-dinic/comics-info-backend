@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-protocol GetAllAPIWrapper: CharactersSummaryHandler, SeriesSummaryHandler {
+protocol GetAllAPIWrapper: CharactersSummaryHandler, SeriesSummaryHandler, ComicsSummaryHandler {
 
     associatedtype Item: Identifiable
 

@@ -43,7 +43,7 @@ public struct Series: Codable, Identifiable {
     /// A resource list containing comicsID in this series.
     let comicsID: Set<String>?
 
-//    /// A resource list containing comics in this series.
-//    let comics: [Comic]?
+    /// A resource list containing comics in this series.
+    let comics: [Comic]?
 
 }

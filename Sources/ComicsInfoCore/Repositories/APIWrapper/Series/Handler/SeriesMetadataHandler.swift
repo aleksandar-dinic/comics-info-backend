@@ -9,10 +9,9 @@
 import Foundation
 import NIO
 
-protocol SeriesMetadataHandler {
+protocol SeriesMetadataHandler: EmptyItemsHandler {
 
     var seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> { get }
-    var eventLoop: EventLoop { get }
 
     func getSeries(_ seriesIDs: Set<String>?) -> EventLoopFuture<[Series]>
 
@@ -27,12 +26,6 @@ extension SeriesMetadataHandler {
 
         return seriesUseCase.getAllMetadata(withIDs: seriesIDs, fromDataSource: .memory)
                 .flatMapThrowing { try handleItems($0, itemsID: seriesIDs) }
-    }
-
-    private func handleEmptyItems<Item>() -> EventLoopFuture<[Item]> {
-        let promise = eventLoop.makePromise(of: [Item].self)
-        eventLoop.execute { promise.succeed([]) }
-        return promise.futureResult
     }
 
     // FIXME: - itemNotFound id needs to be Item.ID

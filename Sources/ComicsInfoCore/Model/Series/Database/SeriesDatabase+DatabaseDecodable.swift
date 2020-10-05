@@ -27,13 +27,13 @@ extension SeriesDatabase: DatabaseDecodable {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
-        guard itemID.starts(with: "\(String.seriesType)#") else {
-            throw APIError.invalidItemID(itemID, itemType: .seriesType)
+        guard itemID.starts(with: "\(String.getType(from: Series.self))#") else {
+            throw APIError.invalidItemID(itemID, itemType: .getType(from: Series.self))
         }
 
         summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
-        guard summaryID.starts(with: "\(String.seriesType)#") else {
-            throw APIError.invalidSummaryID(summaryID, itemType: .seriesType)
+        guard summaryID.starts(with: "\(String.getType(from: Series.self))#") else {
+            throw APIError.invalidSummaryID(summaryID, itemType: .getType(from: Series.self))
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)

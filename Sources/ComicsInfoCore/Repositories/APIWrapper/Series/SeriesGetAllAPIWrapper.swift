@@ -18,6 +18,7 @@ struct SeriesGetAllAPIWrapper: GetAllAPIWrapper {
         var series: [String: SeriesDatabase] = try handleDatabaseItems(items)
 
         appendCharactersSummary(items, series: &series)
+        appendComicsSummary(items, series: &series)
 
         return Array(series.mapValues { Series(from: $0) }.values)
     }
@@ -33,6 +34,20 @@ struct SeriesGetAllAPIWrapper: GetAllAPIWrapper {
             }
 
             series[character.itemID]?.charactersSummary?.append(character)
+        }
+    }
+
+    private func appendComicsSummary(_ items: [DatabaseItem], series: inout [String: SeriesDatabase]) {
+        let comicsSummary = handleComicsSummary(items)
+
+        guard let comics = comicsSummary, !comics.isEmpty else { return }
+
+        for comic in comics {
+            if series[comic.itemID]?.comicsSummary == nil {
+                series[comic.itemID]?.comicsSummary = []
+            }
+
+            series[comic.itemID]?.comicsSummary?.append(comic)
         }
     }
 

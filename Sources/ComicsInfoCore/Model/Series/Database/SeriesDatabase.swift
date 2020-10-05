@@ -11,7 +11,7 @@ import Foundation
 struct SeriesDatabase: Identifiable {
 
     var id: String {
-        String(summaryID.dropFirst("\(String.seriesType)#".count))
+        String(summaryID.dropFirst("\(String.getType(from: Series.self))#".count))
     }
 
     let itemID: String
@@ -26,6 +26,7 @@ struct SeriesDatabase: Identifiable {
     let endYear: Int?
     let nextIdentifier: String?
     var charactersSummary: [CharacterSummary]?
+    var comicsSummary: [ComicSummary]?
 
     func getCharactersID() -> Set<String> {
         guard let charactersSummary = charactersSummary else { return [] }
@@ -34,7 +35,9 @@ struct SeriesDatabase: Identifiable {
     }
 
     func getComicsID() -> Set<String>? {
-        nil // TODO:
+        guard let comicsSummary = comicsSummary else { return nil }
+
+        return Set(comicsSummary.compactMap { $0.id })
     }
 
 }
@@ -42,9 +45,9 @@ struct SeriesDatabase: Identifiable {
 extension SeriesDatabase {
 
     init(series: Series) {
-        itemID = "\(String.seriesType)#\(series.id)"
-        summaryID = "\(String.seriesType)#\(series.id)"
-        itemName = .seriesType
+        itemID = "\(String.getType(from: Series.self))#\(series.id)"
+        summaryID = "\(String.getType(from: Series.self))#\(series.id)"
+        itemName = .getType(from: Series.self)
         popularity = series.popularity
         title = series.title
         description = series.description
@@ -52,7 +55,12 @@ extension SeriesDatabase {
         startYear = series.startYear
         endYear = series.endYear
         nextIdentifier = series.nextIdentifier
-        charactersSummary = series.characters?.compactMap { CharacterSummary($0, id: series.id, itemName: .seriesType) }
+        charactersSummary = series.characters?.compactMap {
+            CharacterSummary($0, id: series.id, itemName: .getType(from: Series.self))
+        }
+        comicsSummary = series.comics?.compactMap {
+            ComicSummary($0, id: series.id, itemName: .getType(from: Series.self))
+        }
     }
 
 }

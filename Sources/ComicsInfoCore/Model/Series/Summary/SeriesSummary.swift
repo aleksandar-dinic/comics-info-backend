@@ -11,7 +11,7 @@ import Foundation
 struct SeriesSummary: Identifiable {
 
     var id: String {
-        String(summaryID.dropFirst("\(String.seriesType)#".count))
+        String(summaryID.dropFirst("\(String.getType(from: Series.self))#".count))
     }
 
     let itemID: String
@@ -29,7 +29,7 @@ extension SeriesSummary {
 
     init(_ series: Series, id: String, itemName: String) {
         itemID = "\(itemName)#\(id)"
-        summaryID = "\(String.seriesType)#\(series.id)"
+        summaryID = "\(String.getType(from: Series.self))#\(series.id)"
         self.itemName = itemName
         popularity = series.popularity
         title = series.title
@@ -56,8 +56,8 @@ extension SeriesSummary: DatabaseDecodable {
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
         summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
-        guard summaryID.starts(with: "\(String.seriesType)#") else {
-            throw APIError.invalidSummaryID(summaryID, itemType: .seriesType)
+        guard summaryID.starts(with: "\(String.getType(from: Series.self))#") else {
+            throw APIError.invalidSummaryID(summaryID, itemType: .getType(from: Series.self))
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)

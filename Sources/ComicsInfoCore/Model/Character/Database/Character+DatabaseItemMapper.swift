@@ -19,7 +19,8 @@ extension Character: DatabaseItemMapper {
             description: item.description,
             seriesID: item.getSeriesID(),
             series: item.seriesSummary?.compactMap { Series(fromSummary: $0) },
-            comicsID: item.getComicsID()
+            comicsID: item.getComicsID(),
+            comics: item.comicsSummary?.compactMap { Comic(fromSummary: $0) }
         )
     }
 

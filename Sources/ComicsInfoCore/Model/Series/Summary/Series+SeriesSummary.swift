@@ -20,9 +20,10 @@ extension Series {
             startYear: nil,
             endYear: nil,
             nextIdentifier: nil,
-            charactersID: [],
+            charactersID: nil,
             characters: nil,
-            comicsID: nil
+            comicsID: nil,
+            comics: nil
         )
     }
 

@@ -10,9 +10,10 @@ import Logging
 import Foundation
 import NIO
 
-struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharactersMetadataHandler {
+struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharactersMetadataHandler, ComicsMetadataHandler {
 
     let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
+    let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
     let repositoryAPIService: RepositoryAPIService
     let encoderService: EncoderService
     let eventLoop: EventLoop
@@ -32,21 +33,57 @@ struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharactersMetadataHandler {
             cacheProvider: LocalServer.characterInMemoryCache,
             logger: logger
         ).makeUseCase()
+        comicUseCase = ComicUseCaseFactory<InMemoryCacheProvider<Comic>>(
+            on: eventLoop,
+            isLocalServer: LocalServer.isEnabled,
+            cacheProvider: LocalServer.comicInMemoryCache,
+            logger: logger
+        ).makeUseCase()
     }
 
     func create(_ item: Series) -> EventLoopFuture<Void> {
-        getCharacters(item.charactersID)
-            .flatMapThrowing { createCharactersSummary($0, series: item) }
-            .flatMapThrowing { appendSeriesDatabase($0, series: item) }
+        createSummaries(for: item)
             .flatMap { repositoryAPIService.createAll($0) }
     }
 
-    private func createCharactersSummary(_ characters: [Character], series: Series) -> [DatabaseItem] {
+    private func createSummaries(for series: Series) -> EventLoopFuture<[DatabaseItem]> {
+        .reduce(
+            [createSeriesDatabase(series: series)],
+            [
+                getCharactersSummary(forIDs: series.charactersID, series: series),
+                getComicsSummary(forIDs: series.comicsID, series: series)
+            ],
+            on: eventLoop
+        ) { $0 + $1 }
+    }
+
+    // MARK: CharactersSummary
+
+    private func getCharactersSummary(forIDs charactersID: Set<String>?, series: Series) -> EventLoopFuture<[DatabaseItem]> {
+        getCharacters(charactersID).flatMapThrowing { appendCharactersSummary($0, series: series) }
+    }
+
+    private func appendCharactersSummary(_ characters: [Character], series: Series) -> [DatabaseItem] {
         guard !characters.isEmpty else { return [] }
 
-        var dbItems = appendCharactersSummary(characters, item: series)
+        var dbItems = createCharactersSummary(characters, item: series)
         return appendSeriesSummary(characters, series: series, dbItems: &dbItems)
     }
+
+    // MARK: ComicsSummary
+
+    private func getComicsSummary(forIDs comicsId: Set<String>?, series: Series) -> EventLoopFuture<[DatabaseItem]> {
+        getComics(comicsId).flatMapThrowing { appendComicsSummary($0, series: series) }
+    }
+
+    private func appendComicsSummary(_ comics: [Comic], series: Series) -> [DatabaseItem] {
+        guard !comics.isEmpty else { return [] }
+
+        var dbItems = createComicsSummary(comics, item: series)
+        return appendSeriesSummary(comics, series: series, dbItems: &dbItems)
+    }
+
+    // MARK: SeriesSummary
 
     private func appendSeriesSummary<Item: Identifiable>(
         _ items: [Item],
@@ -62,13 +99,11 @@ struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharactersMetadataHandler {
         return dbItems
     }
 
-    private func appendSeriesDatabase(_ items: [DatabaseItem], series: Series) -> [DatabaseItem] {
-        var items = items
+    // MARK: SeriesDatabase
 
+    private func createSeriesDatabase(series: Series) -> DatabaseItem {
         let seriesDatabase = SeriesDatabase(series: series)
-        items.append(encoderService.encode(seriesDatabase, table: .seriesTableName))
-
-        return items
+        return encoderService.encode(seriesDatabase, table: .seriesTableName)
     }
 
 }

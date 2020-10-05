@@ -30,7 +30,7 @@ public struct CharacterUseCaseFactory<CacheProvider: Cacheable> where CacheProvi
     }
 
     public func makeUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, CacheProvider> {
-        CharacterUseCase(characterRepository: makeCharacterRepository())
+        CharacterUseCase(repository: makeCharacterRepository())
     }
 
     private func makeCharacterRepository() -> Repository<CharacterRepositoryAPIWrapper, CacheProvider> {

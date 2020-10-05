@@ -9,10 +9,9 @@
 import Foundation
 import NIO
 
-protocol CharactersMetadataHandler {
+protocol CharactersMetadataHandler: EmptyItemsHandler {
 
     var characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> { get }
-    var eventLoop: EventLoop { get }
 
     func getCharacters(_ charactersID: Set<String>?) -> EventLoopFuture<[Character]>
 
@@ -27,12 +26,6 @@ extension CharactersMetadataHandler {
 
         return characterUseCase.getAllMetadata(withIDs: charactersID, fromDataSource: .memory)
                 .flatMapThrowing { try handleItems($0, itemsID: charactersID) }
-    }
-
-    private func handleEmptyItems<Item>() -> EventLoopFuture<[Item]> {
-        let promise = eventLoop.makePromise(of: [Item].self)
-        eventLoop.execute { promise.succeed([]) }
-        return promise.futureResult
     }
 
     // FIXME: - itemNotFound id needs to be Item.ID

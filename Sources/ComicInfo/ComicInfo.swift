@@ -12,6 +12,8 @@ import Foundation
 
 public final class ComicInfo {
 
+    static let comicInMemoryCache = InMemoryCacheProvider<Comic>()
+
     private let localServer: LocalServer
 
     public init(localServer: LocalServer = LocalServer()) {
@@ -20,7 +22,22 @@ public final class ComicInfo {
 
     public func run(handler: Handler? = Handler(rawValue: Lambda.handler)) throws {
         switch handler {
-        case .read, .list, .create, .update, .delete, .none:
+        case .read:
+            Lambda.run {
+                LambdaHandlerFactory.makeReadLambdaHandler($0)
+            }
+
+        case .list:
+            Lambda.run {
+                LambdaHandlerFactory.makeListLambdaHandler($0)
+            }
+
+        case .create:
+            Lambda.run {
+                LambdaHandlerFactory.makeCreateLambdaHandler($0)
+            }
+
+        case .update, .delete, .none:
             throw APIError.handlerUnknown
         }
     }

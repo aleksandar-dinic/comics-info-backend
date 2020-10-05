@@ -30,7 +30,7 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable> where CacheProvider
     }
 
     public func makeUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, CacheProvider> {
-        SeriesUseCase(seriesRepository: makeSeriesRepository())
+        SeriesUseCase(repository: makeSeriesRepository())
     }
 
     private func makeSeriesRepository() -> Repository<SeriesRepositoryAPIWrapper, CacheProvider> {

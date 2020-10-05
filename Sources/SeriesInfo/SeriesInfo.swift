@@ -9,7 +9,6 @@
 import AWSLambdaRuntime
 import ComicsInfoCore
 import Foundation
-import NIO
 
 public final class SeriesInfo {
 

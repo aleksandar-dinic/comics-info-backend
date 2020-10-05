@@ -22,7 +22,8 @@ extension Series: DatabaseItemMapper  {
             nextIdentifier: item.nextIdentifier,
             charactersID: item.getCharactersID(),
             characters: item.charactersSummary?.compactMap { Character(fromSummary: $0) },
-            comicsID: item.getComicsID()
+            comicsID: item.getComicsID(),
+            comics: item.comicsSummary?.compactMap { Comic(fromSummary: $0) }
         )
     }
 

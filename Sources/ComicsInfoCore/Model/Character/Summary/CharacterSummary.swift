@@ -11,7 +11,7 @@ import Foundation
 struct CharacterSummary: Identifiable {
 
     var id: String {
-        String(summaryID.dropFirst("\(String.characterType)#".count))
+        String(summaryID.dropFirst("\(String.getType(from: Character.self))#".count))
     }
 
     let itemID: String
@@ -29,7 +29,7 @@ extension CharacterSummary {
 
     init(_ character: Character, id: String, itemName: String) {
         itemID = "\(itemName)#\(id)"
-        summaryID = "\(String.characterType)#\(character.id)"
+        summaryID = "\(String.getType(from: Character.self))#\(character.id)"
         self.itemName = itemName
         popularity = character.popularity
         name = character.name
@@ -56,8 +56,8 @@ extension CharacterSummary: DatabaseDecodable {
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
         summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
-        guard summaryID.starts(with: "\(String.characterType)#") else {
-            throw APIError.invalidSummaryID(summaryID, itemType: .characterType)
+        guard summaryID.starts(with: "\(String.getType(from: Character.self))#") else {
+            throw APIError.invalidSummaryID(summaryID, itemType: .getType(from: Character.self))
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)

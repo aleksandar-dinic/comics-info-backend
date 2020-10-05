@@ -13,6 +13,7 @@ public struct LocalServer {
     // FIXME: -
     static let characterInMemoryCache = InMemoryCacheProvider<Character>()
     static let seriesInMemoryCache = InMemoryCacheProvider<Series>()
+    static let comicInMemoryCache = InMemoryCacheProvider<Comic>()
 
     public static var isEnabled = false
 

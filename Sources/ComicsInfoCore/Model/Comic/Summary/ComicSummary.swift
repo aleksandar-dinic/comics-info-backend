@@ -1,0 +1,70 @@
+//
+//  ComicSummary.swift
+//  ComicsInfoCore
+//
+//  Created by Aleksandar Dinic on 04/10/2020.
+//  Copyright © 2020 Aleksandar Dinic. All rights reserved.
+//
+
+import Foundation
+
+struct ComicSummary: Identifiable {
+
+    var id: String {
+        String(summaryID.dropFirst("\(String.getType(from: Comic.self))#".count))
+    }
+
+    let itemID: String
+    let summaryID: String
+    let itemName: String
+
+    let popularity: Int
+    let title: String
+    let thumbnail: String?
+    let description: String?
+
+}
+
+extension ComicSummary {
+
+    init(_ comic: Comic, id: String, itemName: String) {
+        itemID = "\(itemName)#\(id)"
+        summaryID = "\(String.getType(from: Comic.self))#\(comic.id)"
+        self.itemName = itemName
+        popularity = comic.popularity
+        title = comic.title
+        description = comic.description
+        thumbnail = comic.thumbnail
+    }
+
+}
+
+extension ComicSummary: DatabaseDecodable {
+
+    enum CodingKeys: String, CodingKey {
+        case itemID
+        case summaryID
+        case itemName
+        case popularity
+        case title
+        case thumbnail
+        case description
+    }
+
+    public init(from item: DatabaseItem) throws {
+        let decoder = DatabaseDecoder(from: item)
+
+        itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
+        summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
+        guard summaryID.starts(with: "\(String.getType(from: Comic.self))#") else {
+            throw APIError.invalidSummaryID(summaryID, itemType: .getType(from: Comic.self))
+        }
+
+        itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
+        popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
+        title = try decoder.decode(String.self, forKey: CodingKeys.title)
+        thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
+        description = try? decoder.decode(String.self, forKey: CodingKeys.description)
+    }
+
+}

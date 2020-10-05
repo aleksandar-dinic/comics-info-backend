@@ -19,7 +19,8 @@ extension Character {
             description: character.description,
             seriesID: nil,
             series: nil,
-            comicsID: nil
+            comicsID: nil,
+            comics: nil
         )
     }
 

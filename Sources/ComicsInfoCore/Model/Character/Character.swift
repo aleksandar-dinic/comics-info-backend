@@ -35,6 +35,6 @@ public struct Character: Codable, Identifiable {
     let comicsID: Set<String>?
 
     /// A resource list containing comics which feature this character.
-//    let comics: [Comic]?
+    let comics: [Comic]?
 
 }

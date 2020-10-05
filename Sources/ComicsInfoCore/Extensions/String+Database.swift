@@ -19,12 +19,8 @@ public extension String {
         Lambda.seriesTableName ?? ""
     }
 
-    static var characterType: String {
-        "character"
-    }
-
-    static var seriesType: String {
-        "series"
+    static var comicTableName: String {
+        Lambda.comicTableName ?? ""
     }
 
     static func getType(from item: Any.Type) -> String {

@@ -24,13 +24,13 @@ extension CharacterDatabase: DatabaseDecodable {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
-        guard itemID.starts(with: "\(String.characterType)#") else {
-            throw APIError.invalidItemID(itemID, itemType: .characterType)
+        guard itemID.starts(with: "\(String.getType(from: Character.self))#") else {
+            throw APIError.invalidItemID(itemID, itemType: .getType(from: Character.self))
         }
 
         summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
-        guard summaryID.starts(with: "\(String.characterType)#") else {
-            throw APIError.invalidSummaryID(summaryID, itemType: .characterType)
+        guard summaryID.starts(with: "\(String.getType(from: Character.self))#") else {
+            throw APIError.invalidSummaryID(summaryID, itemType: .getType(from: Character.self))
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
@@ -41,4 +41,3 @@ extension CharacterDatabase: DatabaseDecodable {
     }
 
 }
-
