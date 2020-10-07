@@ -74,4 +74,16 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
         ).getAllMetadata(ids: ids)
     }
 
+    // MARK: - Update item
+
+    public func update(_ item: Character) -> EventLoopFuture<Void> {
+        CharacterUpdateAPIWrapper(
+            on: eventLoop,
+            repositoryAPIService: repositoryAPIService,
+            encoderService: encoderService,
+            decoderService: decoderService,
+            logger: logger
+        ).update(item)
+    }
+
 }

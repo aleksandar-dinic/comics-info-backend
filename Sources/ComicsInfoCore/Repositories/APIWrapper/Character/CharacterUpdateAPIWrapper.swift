@@ -1,8 +1,8 @@
 //
-//  CharacterCreateAPIWrapper.swift
+//  CharacterUpdateAPIWrapper.swift
 //  ComicsInfoCore
 //
-//  Created by Aleksandar Dinic on 02/10/2020.
+//  Created by Aleksandar Dinic on 06/10/2020.
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
@@ -10,26 +10,30 @@ import Logging
 import Foundation
 import NIO
 
-struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory, ComicSummaryFuturesFactory {
+struct CharacterUpdateAPIWrapper: UpdateAPIWrapper, SeriesSummaryFuturesFactory, ComicSummaryFuturesFactory {
 
     typealias Summary = CharacterSummary
     typealias ItemDatabase = CharacterDatabase
 
     let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
     let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
+    
+    let eventLoop: EventLoop
     let repositoryAPIService: RepositoryAPIService
     let encoderService: EncoderService
-    let eventLoop: EventLoop
+    let decoderService: DecoderService
 
     init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
         encoderService: EncoderService,
+        decoderService: DecoderService,
         logger: Logger
     ) {
+        self.eventLoop = eventLoop
         self.repositoryAPIService = repositoryAPIService
         self.encoderService = encoderService
-        self.eventLoop = eventLoop
+        self.decoderService = decoderService
         seriesUseCase = SeriesUseCaseFactory<InMemoryCacheProvider<Series>>(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,
@@ -44,7 +48,7 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
         ).makeUseCase()
     }
 
-    func getSummaryFutures(for item: Character) -> [EventLoopFuture<[DatabasePutItem]>] {
+    func getSummaryFutures(for item: Character) -> [EventLoopFuture<[DatabaseUpdateItem]>] {
         [
             getSeriesSummary(forIDs: item.seriesID, character: item),
             getComicsSummary(forIDs: item.comicsID, character: item)
@@ -53,13 +57,13 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
 
     // MARK: SeriesSummary
 
-    func getSeriesSummary(
+    private func getSeriesSummary(
         forIDs seriesID: Set<String>?,
         character: Character
-    ) -> EventLoopFuture<[DatabasePutItem]> {
+    ) -> EventLoopFuture<[DatabaseUpdateItem]> {
         getSeries(seriesID).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeSeriesSummary($0, item: character)
+            var dbItems: [DatabaseUpdateItem] = makeSeriesSummary($0, item: character)
             return appendItemSummary($0, item: character, dbItems: &dbItems)
         }
     }
@@ -69,10 +73,10 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
     private func getComicsSummary(
         forIDs comicsId: Set<String>?,
         character: Character
-    ) -> EventLoopFuture<[DatabasePutItem]> {
+    ) -> EventLoopFuture<[DatabaseUpdateItem]> {
         getComics(comicsId).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeComicsSummary($0, item: character)
+            var dbItems: [DatabaseUpdateItem] = makeComicsSummary($0, item: character)
             return appendItemSummary($0, item: character, dbItems: &dbItems)
         }
     }

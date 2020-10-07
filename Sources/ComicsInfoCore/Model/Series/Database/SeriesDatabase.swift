@@ -8,10 +8,14 @@
 
 import Foundation
 
-struct SeriesDatabase: Identifiable {
+struct SeriesDatabase: DatabaseMapper {
 
     var id: String {
         String(summaryID.dropFirst("\(String.getType(from: Series.self))#".count))
+    }
+
+    var tableName: String {
+        .seriesTableName
     }
 
     let itemID: String
@@ -44,23 +48,63 @@ struct SeriesDatabase: Identifiable {
 
 extension SeriesDatabase {
 
-    init(series: Series) {
-        itemID = "\(String.getType(from: Series.self))#\(series.id)"
-        summaryID = "\(String.getType(from: Series.self))#\(series.id)"
+    init(item: Series) {
+        itemID = "\(String.getType(from: Series.self))#\(item.id)"
+        summaryID = "\(String.getType(from: Series.self))#\(item.id)"
         itemName = .getType(from: Series.self)
-        popularity = series.popularity
-        title = series.title
-        description = series.description
-        thumbnail = series.thumbnail
-        startYear = series.startYear
-        endYear = series.endYear
-        nextIdentifier = series.nextIdentifier
-        charactersSummary = series.characters?.compactMap {
-            CharacterSummary($0, id: series.id, itemName: .getType(from: Series.self))
+        popularity = item.popularity
+        title = item.title
+        description = item.description
+        thumbnail = item.thumbnail
+        startYear = item.startYear
+        endYear = item.endYear
+        nextIdentifier = item.nextIdentifier
+        charactersSummary = item.characters?.compactMap {
+            CharacterSummary($0, id: item.id, itemName: .getType(from: Series.self))
         }
-        comicsSummary = series.comics?.compactMap {
-            ComicSummary($0, id: series.id, itemName: .getType(from: Series.self))
+        comicsSummary = item.comics?.compactMap {
+            ComicSummary($0, id: item.id, itemName: .getType(from: Series.self))
         }
+    }
+
+}
+
+extension SeriesDatabase {
+
+    enum CodingKeys: String, CodingKey {
+        case itemID
+        case summaryID
+        case itemName
+        case popularity
+        case title
+        case description
+        case startYear
+        case endYear
+        case thumbnail
+        case nextIdentifier
+    }
+
+    public init(from item: DatabaseItem) throws {
+        let decoder = DatabaseDecoder(from: item)
+
+        itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
+        guard itemID.starts(with: "\(String.getType(from: Series.self))#") else {
+            throw APIError.invalidItemID(itemID, itemType: .getType(from: Series.self))
+        }
+
+        summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
+        guard summaryID.starts(with: "\(String.getType(from: Series.self))#") else {
+            throw APIError.invalidSummaryID(summaryID, itemType: .getType(from: Series.self))
+        }
+
+        itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
+        popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
+        title = try decoder.decode(String.self, forKey: CodingKeys.title)
+        description = try? decoder.decode(String.self, forKey: CodingKeys.description)
+        startYear = try? decoder.decode(Int.self, forKey: CodingKeys.startYear)
+        endYear = try? decoder.decode(Int.self, forKey: CodingKeys.endYear)
+        thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
+        nextIdentifier = try? decoder.decode(String.self, forKey: CodingKeys.nextIdentifier)
     }
 
 }

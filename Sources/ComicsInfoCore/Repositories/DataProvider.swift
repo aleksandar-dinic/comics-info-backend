@@ -142,4 +142,10 @@ struct DataProvider<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable> 
         }
     }
 
+    // Update item
+
+    func update(_ item: Item) -> EventLoopFuture<Void> {
+        repositoryAPIWrapper.update(item)
+    }
+
 }

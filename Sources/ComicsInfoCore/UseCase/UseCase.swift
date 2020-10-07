@@ -39,6 +39,8 @@ public protocol UseCase where APIWrapper.Item == CacheService.Item {
         fromDataSource dataSource: DataSourceLayer
     ) -> EventLoopFuture<[Item]>
 
+    func update(_ item: Item) -> EventLoopFuture<Void>
+
 }
 
 public extension UseCase {
@@ -78,6 +80,10 @@ public extension UseCase {
         fromDataSource dataSource: DataSourceLayer
     ) -> EventLoopFuture<[Item]> {
         repository.getAllMetadata(withIDs: ids, fromDataSource: dataSource)
+    }
+
+    func update(_ item: Item) -> EventLoopFuture<Void> {
+        repository.update(item)
     }
 
 }

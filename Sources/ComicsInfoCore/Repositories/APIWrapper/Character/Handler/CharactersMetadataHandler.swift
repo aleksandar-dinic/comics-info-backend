@@ -28,7 +28,6 @@ extension CharactersMetadataHandler {
                 .flatMapThrowing { try handleItems($0, itemsID: charactersID) }
     }
 
-    // FIXME: - itemNotFound id needs to be Item.ID
     private func handleItems<Item: Identifiable>(_ items: [Item], itemsID: Set<Item.ID>) throws -> [Item] where Item.ID == String {
         let ids = Set(items.map { $0.id })
         for id in itemsID {

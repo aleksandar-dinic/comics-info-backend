@@ -36,4 +36,6 @@ public protocol RepositoryAPIWrapper {
     func getMetadata(id: Item.ID) -> EventLoopFuture<Item>
     func getAllMetadata(ids: Set<Item.ID>) -> EventLoopFuture<[Item]>
 
+    func update(_ item: Item) -> EventLoopFuture<Void>
+
 }

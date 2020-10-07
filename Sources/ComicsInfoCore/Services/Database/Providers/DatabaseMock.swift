@@ -35,7 +35,7 @@ struct DatabaseMock: Database {
         tables = [String: Table]()
     }
 
-    mutating func create(_ item: DatabaseItem) -> EventLoopFuture<Void> {
+    mutating func create(_ item: DatabasePutItem) -> EventLoopFuture<Void> {
         logger.log(level: .info, "item: \(item))")
 
         guard let id = item["id"] as? String else {
@@ -50,7 +50,7 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(())
     }
 
-    mutating func createAll(_ items: [DatabaseItem]) -> EventLoopFuture<Void> {
+    mutating func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void> {
         logger.log(level: .info, "items: \(items))")
 
         for item in items {
@@ -72,7 +72,7 @@ struct DatabaseMock: Database {
         logger.log(level: .info, "withID: \(itemID))")
 
         let items = [
-            DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+            DatabasePutItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
         ]
         return eventLoop.makeSucceededFuture(items)
     }
@@ -81,7 +81,7 @@ struct DatabaseMock: Database {
         logger.log(level: .info, "items: \(items))")
 
         let items = [
-            DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+            DatabasePutItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
         ]
         return eventLoop.makeSucceededFuture(items)
     }
@@ -89,7 +89,7 @@ struct DatabaseMock: Database {
     func getMetadata(withID id: String) -> EventLoopFuture<DatabaseItem> {
         logger.log(level: .info, "withID: \(id))")
 
-        let item = DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+        let item = DatabasePutItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
         return eventLoop.makeSucceededFuture(item)
     }
 
@@ -97,9 +97,38 @@ struct DatabaseMock: Database {
         logger.log(level: .info, "withIDs: \(ids))")
 
         let items = [
-            DatabaseItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+            DatabasePutItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
         ]
         return eventLoop.makeSucceededFuture(items)
+    }
+
+    func getAllSummaries(forID summaryID: String) -> EventLoopFuture<[DatabaseItem]> {
+        logger.log(level: .info, "summaryID: \(summaryID))")
+
+        let items = [
+            DatabasePutItem(["identifier": "1", "popularity": 0, "name": "Name"], table: tableName)
+        ]
+        return eventLoop.makeSucceededFuture(items)
+    }
+
+    mutating func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void> {
+        logger.log(level: .info, "items: \(items))")
+
+        for item in items {
+            guard let id = item["id"] as? String else {
+                return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveID)
+            }
+
+            guard !tables[item.table, default: Table(name: item.table)].items.keys.contains(id) else {
+                return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
+            }
+
+
+            let updatedItem = DatabasePutItem(item.attributes, table: item.table)
+            tables[item.table, default: Table(name: item.table)].items[id] = updatedItem
+        }
+
+        return eventLoop.makeSucceededFuture(())
     }
 
 }

@@ -8,20 +8,44 @@
 
 import Foundation
 
-struct ComicSummary: Identifiable {
+struct ComicSummary: ItemSummary {
 
     var id: String {
         String(summaryID.dropFirst("\(String.getType(from: Comic.self))#".count))
+    }
+
+    var tableName: String {
+        .comicTableName
     }
 
     let itemID: String
     let summaryID: String
     let itemName: String
 
-    let popularity: Int
-    let title: String
-    let thumbnail: String?
-    let description: String?
+    var popularity: Int
+    var title: String
+    var thumbnail: String?
+    var description: String?
+
+    mutating func update(with item: Comic) {
+        popularity = item.popularity
+        title = item.title
+
+        if let description = item.description {
+            self.description = description
+        }
+
+        if let thumbnail = item.thumbnail {
+            self.thumbnail = thumbnail
+        }
+    }
+
+    func shouldBeUpdated(with item: Comic) -> Bool {
+        popularity != item.popularity ||
+            title != item.title ||
+            description != item.description ||
+            thumbnail != item.thumbnail
+    }
 
 }
 
@@ -39,7 +63,7 @@ extension ComicSummary {
 
 }
 
-extension ComicSummary: DatabaseDecodable {
+extension ComicSummary {
 
     enum CodingKeys: String, CodingKey {
         case itemID

@@ -10,32 +10,23 @@ import SotoDynamoDB
 import Foundation
 import NIO
 
-public struct DatabaseItem {
+public protocol DatabaseItem {
 
-    private var storage: [String: Any]
-    var table: String
-    var conditionExpression: String
+    var attributes: [String: Any] { get set }
+    var table: String { get }
 
-    var attributeValues: [String: DynamoDB.AttributeValue] {
-        storage.compactMapValues { ($0 as? AttributeValueMapper)?.attributeValue }
-    }
+    subscript(key: String) -> Any? { get }
 
-    init(
-        _ storage: [String: Any] = [:],
-        table: String,
-        conditionExpression: String = "attribute_not_exists(itemID) AND attribute_not_exists(summaryID)"
-    ) {
-        self.storage = storage
-        self.table = table
-        self.conditionExpression = conditionExpression
-    }
+}
+
+extension DatabaseItem {
 
     public subscript(key: String) -> Any? {
         get {
-            storage[key]
+            attributes[key]
         }
         set {
-            storage[key] = newValue
+            attributes[key] = newValue
         }
     }
 

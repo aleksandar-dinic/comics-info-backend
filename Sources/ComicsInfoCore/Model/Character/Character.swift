@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Character: Codable, Identifiable {
+public struct Character: ComicsInfoItem {
 
     /// The unique ID of the character resource.
     public let id: String
@@ -26,15 +26,25 @@ public struct Character: Codable, Identifiable {
     let description: String?
 
     /// A resource list of seriesID in which this character appears.
-    let seriesID: Set<String>?
+    var seriesID: Set<String>?
 
     /// A resource list of series in which this character appears.
     let series: [Series]?
 
     /// A resource list containing comicsID which feature this character.
-    let comicsID: Set<String>?
+    var comicsID: Set<String>?
 
     /// A resource list containing comics which feature this character.
     let comics: [Comic]?
+
+    mutating func removeID(_ itemID: String) {
+        if itemID.starts(with: String.getType(from: Series.self)) {
+            let id = itemID.dropFirst("\(String.getType(from: Series.self))#".count)
+            seriesID?.remove(String(id))
+        } else if itemID.starts(with: String.getType(from: Comic.self)) {
+            let id = itemID.dropFirst("\(String.getType(from: Comic.self))#".count)
+            comicsID?.remove(String(id))
+        }
+    }
 
 }

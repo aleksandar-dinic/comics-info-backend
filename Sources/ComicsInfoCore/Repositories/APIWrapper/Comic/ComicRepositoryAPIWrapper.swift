@@ -74,4 +74,16 @@ public struct ComicRepositoryAPIWrapper: RepositoryAPIWrapper {
         ).getAllMetadata(ids: ids)
     }
 
+    // MARK: - Update item
+
+    public func update(_ item: Comic) -> EventLoopFuture<Void> {
+        ComicUpdateAPIWrapper(
+            on: eventLoop,
+            repositoryAPIService: repositoryAPIService,
+            encoderService: encoderService,
+            decoderService: decoderService,
+            logger: logger
+        ).update(item)
+    }
+
 }

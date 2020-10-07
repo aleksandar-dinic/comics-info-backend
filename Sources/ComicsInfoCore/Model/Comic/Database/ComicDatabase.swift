@@ -8,10 +8,14 @@
 
 import Foundation
 
-struct ComicDatabase: Identifiable {
+struct ComicDatabase: DatabaseMapper {
 
     var id: String {
         String(summaryID.dropFirst("\(String.getType(from: Comic.self))#".count))
+    }
+
+    var tableName: String {
+        .comicTableName
     }
 
     let itemID: String
@@ -50,29 +54,81 @@ struct ComicDatabase: Identifiable {
 
 extension ComicDatabase {
 
-    init(comic: Comic) {
-        itemID = "\(String.getType(from: Comic.self))#\(comic.id)"
-        summaryID = "\(String.getType(from: Comic.self))#\(comic.id)"
+    init(item: Comic) {
+        itemID = "\(String.getType(from: Comic.self))#\(item.id)"
+        summaryID = "\(String.getType(from: Comic.self))#\(item.id)"
         itemName = .getType(from: Comic.self)
-        popularity = comic.popularity
-        title = comic.title
-        description = comic.description
-        thumbnail = comic.thumbnail
-        issueNumber = comic.issueNumber
-        variantDescription = comic.variantDescription
-        format = comic.format
-        pageCount = comic.pageCount
-        variantsIdentifier = comic.variantsIdentifier
-        collectionsIdentifier = comic.collectionsIdentifier
-        collectedIssuesIdentifier = comic.collectedIssuesIdentifier
-        images = comic.images
-        published = comic.published
-        charactersSummary = comic.characters?.compactMap {
-            CharacterSummary($0, id: comic.id, itemName: .getType(from: Comic.self))
+        popularity = item.popularity
+        title = item.title
+        description = item.description
+        thumbnail = item.thumbnail
+        issueNumber = item.issueNumber
+        variantDescription = item.variantDescription
+        format = item.format
+        pageCount = item.pageCount
+        variantsIdentifier = item.variantsIdentifier
+        collectionsIdentifier = item.collectionsIdentifier
+        collectedIssuesIdentifier = item.collectedIssuesIdentifier
+        images = item.images
+        published = item.published
+        charactersSummary = item.characters?.compactMap {
+            CharacterSummary($0, id: item.id, itemName: .getType(from: Comic.self))
         }
-        seriesSummary = comic.series?.compactMap {
-            SeriesSummary($0, id: comic.id, itemName: .getType(from: Comic.self))
+        seriesSummary = item.series?.compactMap {
+            SeriesSummary($0, id: item.id, itemName: .getType(from: Comic.self))
         }
+    }
+
+}
+
+extension ComicDatabase {
+
+    enum CodingKeys: String, CodingKey {
+        case itemID
+        case summaryID
+        case itemName
+        case popularity
+        case title
+        case thumbnail
+        case description
+        case issueNumber
+        case variantDescription
+        case format
+        case pageCount
+        case variantsIdentifier
+        case collectionsIdentifier
+        case collectedIssuesIdentifier
+        case images
+        case published
+    }
+
+    public init(from item: DatabaseItem) throws {
+        let decoder = DatabaseDecoder(from: item)
+
+        itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
+        guard itemID.starts(with: "\(String.getType(from: Comic.self))#") else {
+            throw APIError.invalidItemID(itemID, itemType: .getType(from: Comic.self))
+        }
+
+        summaryID = try decoder.decode(String.self, forKey: CodingKeys.summaryID)
+        guard summaryID.starts(with: "\(String.getType(from: Comic.self))#") else {
+            throw APIError.invalidSummaryID(summaryID, itemType: .getType(from: Comic.self))
+        }
+
+        itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
+        popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
+        title = try decoder.decode(String.self, forKey: CodingKeys.title)
+        thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
+        description = try? decoder.decode(String.self, forKey: CodingKeys.description)
+        issueNumber = try? decoder.decode(String.self, forKey: CodingKeys.issueNumber)
+        variantDescription = try? decoder.decode(String.self, forKey: CodingKeys.variantDescription)
+        format = try? decoder.decode(String.self, forKey: CodingKeys.format)
+        pageCount = try? decoder.decode(Int.self, forKey: CodingKeys.pageCount)
+        variantsIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.variantsIdentifier)
+        collectionsIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.collectionsIdentifier)
+        collectedIssuesIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.collectedIssuesIdentifier)
+        images = try? decoder.decode([String].self, forKey: CodingKeys.images)
+        published = try? decoder.decode(Date.self, forKey: CodingKeys.published)
     }
 
 }

@@ -83,4 +83,12 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
         )
     }
 
+    /// Update item.
+    ///
+    /// - Parameter item: The item.
+    /// - Returns: Future with Item value.
+    public func update(_ item: Item) -> EventLoopFuture<Void> {
+        dataProvider.update(item)
+    }
+
 }

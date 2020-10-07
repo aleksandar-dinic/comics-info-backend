@@ -33,6 +33,13 @@ enum LambdaHandlerFactory {
         return CreateLambdaHandler(context, useCase: useCaseFactory.makeUseCase())
     }
 
+    static func makeUpdateLambdaHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
+        let useCaseFactory = makeUseCaseFactory(on: context.eventLoop, logger: context.logger)
+        let updateResponseWrapper = CharacterUpdateResponseWrapper(characterUseCase: useCaseFactory.makeUseCase())
+
+        return UpdateLambdaHandler(context, updateResponseWrapper: updateResponseWrapper)
+    }
+
     private static func makeUseCaseFactory(
         on eventLoop: EventLoop,
         logger: Logger

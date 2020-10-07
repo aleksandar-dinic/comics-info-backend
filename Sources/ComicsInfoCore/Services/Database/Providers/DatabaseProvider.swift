@@ -19,11 +19,11 @@ public final class DatabaseProvider: RepositoryAPIService {
 
     // Create
 
-    public func create(_ item: DatabaseItem) -> EventLoopFuture<Void> {
+    public func create(_ item: DatabasePutItem) -> EventLoopFuture<Void> {
         database.create(item)
     }
 
-    public func createAll(_ items: [DatabaseItem]) -> EventLoopFuture<Void> {
+    public func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void> {
         database.createAll(items)
     }
 
@@ -45,9 +45,16 @@ public final class DatabaseProvider: RepositoryAPIService {
         database.getAllMetadata(withIDs: ids)
     }
 
-//    func update(_ item: [String: Any]) -> EventLoopFuture<[String: Any]> {
-//    }
-//
+    public func getAllSummaries(forID summaryID: String) -> EventLoopFuture<[DatabaseItem]> {
+        database.getAllSummaries(forID: summaryID)
+    }
+
+    // Update
+
+    public func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void> {
+        database.update(items)
+    }
+
 //    func delete(forID identifier: String) -> EventLoopFuture<[String: Any]> {
 //    }
 

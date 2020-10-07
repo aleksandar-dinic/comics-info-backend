@@ -8,20 +8,44 @@
 
 import Foundation
 
-struct SeriesSummary: Identifiable {
+struct SeriesSummary: ItemSummary {
 
     var id: String {
         String(summaryID.dropFirst("\(String.getType(from: Series.self))#".count))
+    }
+
+    var tableName: String {
+        .seriesTableName
     }
 
     let itemID: String
     let summaryID: String
     let itemName: String
 
-    let popularity: Int
-    let title: String
-    let description: String?
-    let thumbnail: String?
+    var popularity: Int
+    var title: String
+    var description: String?
+    var thumbnail: String?
+
+    mutating func update(with series: Series) {
+        popularity = series.popularity
+        title = series.title
+
+        if let description = series.description {
+            self.description = description
+        }
+
+        if let thumbnail = series.thumbnail {
+            self.thumbnail = thumbnail
+        }
+    }
+
+    func shouldBeUpdated(with item: Series) -> Bool {
+        popularity != item.popularity ||
+            title != item.title ||
+            description != item.description ||
+            thumbnail != item.thumbnail
+    }
 
 }
 
@@ -39,7 +63,7 @@ extension SeriesSummary {
 
 }
 
-extension SeriesSummary: DatabaseDecodable {
+extension SeriesSummary {
 
     enum CodingKeys: String, CodingKey {
         case itemID

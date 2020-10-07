@@ -37,7 +37,12 @@ public final class CharacterInfo {
                 LambdaHandlerFactory.makeCreateLambdaHandler($0)
             }
 
-        case .update, .delete, .none:
+        case .update:
+             Lambda.run {
+                LambdaHandlerFactory.makeUpdateLambdaHandler($0)
+             }
+
+        case .delete, .none:
             throw APIError.handlerUnknown
         }
     }

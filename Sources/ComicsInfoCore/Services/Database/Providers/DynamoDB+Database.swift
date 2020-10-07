@@ -32,7 +32,7 @@ extension DynamoDB: Database {
 // Create item.
 extension DynamoDB {
 
-    public func create(_ item: DatabaseItem) -> EventLoopFuture<Void> {
+    public func create(_ item: DatabasePutItem) -> EventLoopFuture<Void> {
         let input = PutItemInput(
             conditionExpression: item.conditionExpression,
             item: item.attributeValues,
@@ -40,10 +40,11 @@ extension DynamoDB {
         )
 
         DynamoDB.logger.log(level: .info, "\(input)")
-        return putItem(input).flatMapThrowing { _ in }
+        return putItem(input)
+            .flatMapThrowing { DynamoDB.logger.log(level: .info, "\($0)") }
     }
 
-    public func createAll(_ items: [DatabaseItem]) -> EventLoopFuture<Void> {
+    public func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void> {
         var transactItems = [TransactWriteItem]()
 
         for item in items {
@@ -59,7 +60,8 @@ extension DynamoDB {
 
         let input = TransactWriteItemsInput(transactItems: transactItems)
         DynamoDB.logger.log(level: .info, "\(input)")
-        return transactWriteItems(input).flatMapThrowing { _ in }
+        return transactWriteItems(input)
+                .flatMapThrowing { DynamoDB.logger.log(level: .info, "\($0)") }
     }
 
 }
@@ -76,10 +78,11 @@ extension DynamoDB {
 
         DynamoDB.logger.log(level: .info, "\(input)")
         return query(input).flatMapThrowing {
+            DynamoDB.logger.log(level: .info, "\($0)")
             guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
                 throw DatabaseError.itemNotFound(withID: itemID)
             }
-            return items.map { DatabaseItem($0, table: DynamoDB.tableName) }
+            return items.map { DatabasePutItem($0, table: DynamoDB.tableName) }
         }
     }
 
@@ -93,10 +96,11 @@ extension DynamoDB {
 
         DynamoDB.logger.log(level: .info, "\(input)")
         return query(input).flatMapThrowing {
+            DynamoDB.logger.log(level: .info, "\($0)")
             guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
                 throw DatabaseError.itemsNotFound(withIDs: nil)
             }
-            return items.map { DatabaseItem($0, table: DynamoDB.tableName) }
+            return items.map { DatabasePutItem($0, table: DynamoDB.tableName) }
         }
     }
 
@@ -113,10 +117,11 @@ extension DynamoDB {
 
         DynamoDB.logger.log(level: .info, "\(input)")
         return getItem(input).flatMapThrowing {
+            DynamoDB.logger.log(level: .info, "\($0)")
             guard let item = $0.item?.compactMapValues({ $0.value }) else {
                 throw DatabaseError.itemNotFound(withID: id)
             }
-            return DatabaseItem(item, table: DynamoDB.tableName)
+            return DatabasePutItem(item, table: DynamoDB.tableName)
         }
     }
 
@@ -135,13 +140,65 @@ extension DynamoDB {
 
         DynamoDB.logger.log(level: .info, "\(input)")
         return batchGetItem(input).flatMapThrowing {
+            DynamoDB.logger.log(level: .info, "\($0)")
             guard let items = $0.responses?[DynamoDB.tableName]?.compactMap({ $0.compactMapValues { $0.value } }),
                   !items.isEmpty else {
                 let ids = Set(ids.compactMap({ $0.split(separator: "#").last }).map { String($0) })
                 throw DatabaseError.itemsNotFound(withIDs: ids)
             }
-            return items.map { DatabaseItem($0, table: DynamoDB.tableName) }
+            return items.map { DatabasePutItem($0, table: DynamoDB.tableName) }
         }
+    }
+
+}
+
+// Read summary.
+extension DynamoDB {
+
+    public func getAllSummaries(forID summaryID: String) -> EventLoopFuture<[DatabaseItem]> {
+        let input = QueryInput(
+            expressionAttributeValues: [":summaryID": .s(summaryID)],
+            indexName: "summaryID-itemID-index",
+            keyConditionExpression: "summaryID = :summaryID",
+            tableName: DynamoDB.tableName
+        )
+
+        DynamoDB.logger.log(level: .info, "\(input)")
+        return query(input).flatMapThrowing {
+            DynamoDB.logger.log(level: .info, "\($0)")
+            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
+                throw DatabaseError.itemsNotFound(withIDs: nil)
+            }
+            return items.map { DatabasePutItem($0, table: DynamoDB.tableName) }
+        }
+    }
+
+}
+
+// Update item.
+extension DynamoDB {
+
+    public func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void> {
+        var transactItems = [TransactWriteItem]()
+
+        for item in items {
+            let update = Update(
+                conditionExpression: item.conditionExpression,
+                expressionAttributeNames: item.attributeNames,
+                expressionAttributeValues: item.attributeValues,
+                key: item.key,
+                tableName: item.table,
+                updateExpression: item.updateExpression
+            )
+
+            let transactWriteItem = TransactWriteItem(update: update)
+            transactItems.append(transactWriteItem)
+        }
+
+        let input = TransactWriteItemsInput(transactItems: transactItems)
+        DynamoDB.logger.log(level: .info, "\(input)")
+        return transactWriteItems(input)
+                .flatMapThrowing { DynamoDB.logger.log(level: .info, "\($0)") }
     }
 
 }
