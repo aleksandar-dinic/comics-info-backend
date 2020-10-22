@@ -54,56 +54,73 @@ After this, we also need to add the target’s dependencies:
 
 ### Develop Lambda
 
-In `main.swift` we can run our Lambda:
-``` swift
-import AWSLambdaRuntime
-
-Lambda.run(ComicsInfoLambdaHandler.init)
-```
-
-`ComicsInfoLambdaHandler` is our dedicated struct who can handle all incoming requests.
+In `CharacterInfo.swift` we can run our Lambda for working with `Characters`:
 
 ``` swift
-import AWSLambdaRuntime
-import NIO
 
-struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
+public final class CharacterInfo {
 
-    typealias In = Request
-    typealias Out = Response
-
-    private let database: Database
-
-    init(context: Lambda.InitializationContext) {
-        database = DatabaseFectory().makeDatabase(eventLoop: context.eventLoop)
-    }
-
-    func handle(
-        context: Lambda.Context,
-        event: Request
-    ) -> EventLoopFuture<Response> {
-        let handler = getHandler(for: event.context.http)
-
+    public func run(handler: Handler? = Handler(rawValue: Lambda.handler)) throws {
         switch handler {
-        case let .characters(action):
-            let provider = CharacterLambdaProvider(database: database, action: action)
-            return provider.handle(on: context.eventLoop, event: event)
+        case .read:
+            Lambda.run {
+                LambdaHandlerFactory.makeReadLambdaHandler($0)
+            }
 
-        case .series, .comics:
-            let response = Response(statusCode: .notImplemented)
-            return context.eventLoop.makeSucceededFuture(response)
+        case .list:
+            Lambda.run {
+                LambdaHandlerFactory.makeListLambdaHandler($0)
+            }
 
-        case .none:
-            let response = Response(statusCode: .notFound)
-            return context.eventLoop.makeSucceededFuture(response)
+        case .create:
+            Lambda.run {
+                LambdaHandlerFactory.makeCreateLambdaHandler($0)
+            }
+
+        case .update:
+             Lambda.run {
+                LambdaHandlerFactory.makeUpdateLambdaHandler($0)
+             }
+
+        case .delete, .none:
+            throw APIError.handlerUnknown
         }
     }
 
-    private func getHandler(for http: HTTP) -> Handler? {
-        HandlerFectory().makeHandler(
-            path: http.path,
-            method: HTTPMethod(rawValue: http.method.rawValue)
-        )
+}
+```
+
+`LambdaHandlerFactory` will make a handler for our Lambda. For the `read` example, `LambdaHandlerFactory` will make `ReadLambdaHandler`.
+
+``` swift
+import AWSLambdaEvents
+import AWSLambdaRuntime
+import Foundation
+import NIO
+
+public struct ReadLambdaHandler: EventLoopLambdaHandler, LoggerProvider {
+
+    public typealias In = Request
+    public typealias Out = APIGateway.V2.Response
+
+    private let readResponseWrapper: ReadResponseWrapper
+
+    public init(
+        _ context: Lambda.InitializationContext,
+        readResponseWrapper: ReadResponseWrapper
+    ) {
+        self.readResponseWrapper = readResponseWrapper
+    }
+
+    public func handle(
+        context: Lambda.Context,
+        event: Request
+    ) -> EventLoopFuture<APIGateway.V2.Response> {
+        logRequest(context.logger, request: event)
+
+        return readResponseWrapper.handleRead(on: context.eventLoop, request: event)
+            .map { APIGateway.V2.Response(from: $0) }
+            .always { logResponse(context.logger, response: $0) }
     }
 
 }
@@ -112,8 +129,6 @@ struct ComicsInfoLambdaHandler: EventLoopLambdaHandler {
 We can easily initialize `DynamoDB` but we can't easily write tests and run code locally with `DynamoDB`. Instead of initializing `DynamoDB` we will delegate that job to `DatabaseFectory` and if we are testing our code `DatabaseFectory` will make `DatabaseMock` for us, otherwise it will make `DynamoDB`.
 
 The same principle suits `Handler`. `Lambda.env("_HANDLER")` returns the handler variable, but when we run code locally or in testing, this variable is nil. `HandlerFectory` helps us that we always get the correct handler.
-
-`CharacterLambdaProvider` is the starting point where all the fun begins for our characters lambda. Series and Comics have not implemented yet, so we will leave it for later.
 
 ### Test Lambda locally
 
