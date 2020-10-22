@@ -36,7 +36,7 @@ public struct DatabaseUpdateItem: DatabaseItem {
     }
 
     var updateExpression: String {
-        var expression = "SET "
+        var expression = "SET"
 
         for attribute in attributes.keys {
             expression = "\(expression) #\(attribute) = :\(attribute),"

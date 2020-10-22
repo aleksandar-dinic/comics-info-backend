@@ -14,9 +14,7 @@ struct SeriesSummary: ItemSummary {
         String(summaryID.dropFirst("\(String.getType(from: Series.self))#".count))
     }
 
-    var tableName: String {
-        .seriesTableName
-    }
+    var tableName: String
 
     let itemID: String
     let summaryID: String
@@ -24,8 +22,8 @@ struct SeriesSummary: ItemSummary {
 
     var popularity: Int
     var title: String
-    var description: String?
     var thumbnail: String?
+    var description: String?
 
     mutating func update(with series: Series) {
         popularity = series.popularity
@@ -51,14 +49,15 @@ struct SeriesSummary: ItemSummary {
 
 extension SeriesSummary {
 
-    init(_ series: Series, id: String, itemName: String) {
+    init(_ series: Series, id: String, itemName: String, tableName: String) {
         itemID = "\(itemName)#\(id)"
         summaryID = "\(String.getType(from: Series.self))#\(series.id)"
         self.itemName = itemName
         popularity = series.popularity
         title = series.title
-        description = series.description
         thumbnail = series.thumbnail
+        description = series.description
+        self.tableName = tableName
     }
 
 }
@@ -75,7 +74,7 @@ extension SeriesSummary {
         case thumbnail
     }
 
-    public init(from item: DatabaseItem) throws {
+    public init(from item: DatabaseItem, tableName: String) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -87,8 +86,9 @@ extension SeriesSummary {
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
         popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
         title = try decoder.decode(String.self, forKey: CodingKeys.title)
-        description = try? decoder.decode(String.self, forKey: CodingKeys.description)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
+        description = try? decoder.decode(String.self, forKey: CodingKeys.description)
+        self.tableName = tableName
     }
 
 }

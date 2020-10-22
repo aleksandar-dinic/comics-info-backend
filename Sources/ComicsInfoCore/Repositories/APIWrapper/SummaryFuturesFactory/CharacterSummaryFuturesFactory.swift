@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import NIO
 
 protocol CharacterSummaryFuturesFactory: CharactersSummaryDatabaseItemFactory, CharactersMetadataHandler {
 

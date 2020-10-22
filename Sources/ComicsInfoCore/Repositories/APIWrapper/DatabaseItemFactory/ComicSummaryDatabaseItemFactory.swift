@@ -11,6 +11,7 @@ import Foundation
 protocol ComicSummaryDatabaseItemFactory {
 
     var encoderService: EncoderService { get }
+    var tableName: String { get }
 
     func makeComicsSummary<Item: Identifiable>(
         _ comics: [Comic],
@@ -33,7 +34,7 @@ extension ComicSummaryDatabaseItemFactory {
         var items = [DatabasePutItem]()
 
         for comic in comics {
-            let comicSummary = ComicSummary(comic, id: item.id, itemName: .getType(from: Item.self))
+            let comicSummary = ComicSummary(comic, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
             items.append(encoderService.encode(comicSummary))
         }
 
@@ -47,7 +48,7 @@ extension ComicSummaryDatabaseItemFactory {
         var items = [DatabaseUpdateItem]()
 
         for comic in comics {
-            let comicSummary = ComicSummary(comic, id: item.id, itemName: .getType(from: Item.self))
+            let comicSummary = ComicSummary(comic, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
             items.append(encoderService.encode(comicSummary, conditionExpression: nil))
         }
 

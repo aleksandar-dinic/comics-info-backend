@@ -14,7 +14,7 @@ extension Error {
         guard let error = self as? DatabaseError else { return self }
         
         switch error {
-        case .itemDoesNotHaveID:
+        case .itemDoesNotHaveItemID, .itemDoesNotHaveSummaryID:
             return APIError.requestError
 
         case let .itemAlreadyExists(withID: id):

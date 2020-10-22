@@ -10,23 +10,33 @@ import Logging
 import Foundation
 import NIO
 
-public struct SeriesUseCaseFactory<CacheProvider: Cacheable> where CacheProvider.Item == Series {
+public struct SeriesUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory where CacheProvider.Item == Series {
 
-    private let eventLoop: EventLoop
-    private let isLocalServer: Bool
-    private let cacheProvider: CacheProvider
-    private let logger: Logger
+    public let eventLoop: EventLoop
+    public let isLocalServer: Bool
+    public let cacheProvider: CacheProvider
+    public let logger: Logger
+    public let tableName: String
+
+    private let characterTableName: String
+    private let comicTableName: String
 
     public init(
         on eventLoop: EventLoop,
         isLocalServer: Bool,
         cacheProvider: CacheProvider,
-        logger: Logger
+        logger: Logger,
+        tableName: String = .seriesTableName,
+        characterTableName: String = .characterTableName,
+        comicTableName: String = .comicTableName
     ) {
         self.eventLoop = eventLoop
         self.isLocalServer = isLocalServer
         self.cacheProvider = cacheProvider
         self.logger = logger
+        self.tableName = tableName
+        self.characterTableName = characterTableName
+        self.comicTableName = comicTableName
     }
 
     public func makeUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, CacheProvider> {
@@ -45,17 +55,11 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable> where CacheProvider
         SeriesRepositoryAPIWrapper(
             on: eventLoop,
             repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
+            logger: logger,
+            tableName: tableName,
+            characterTableName: characterTableName,
+            comicTableName: comicTableName
         )
-    }
-
-    private func makeRepositoryAPIService() -> RepositoryAPIService {
-        DatabaseProvider(database: makeDatabase())
-    }
-
-    private func makeDatabase() -> Database {
-        DatabaseFectory(isLocalServer: isLocalServer, tableName: .seriesTableName)
-            .makeDatabase(eventLoop: eventLoop, logger: logger)
     }
 
 }

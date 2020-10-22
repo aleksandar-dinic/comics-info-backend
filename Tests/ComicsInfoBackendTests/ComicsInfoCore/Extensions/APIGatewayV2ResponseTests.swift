@@ -31,27 +31,27 @@ final class APIGatewayV2ResponseTests: XCTestCase {
         response = nil
     }
 
-    func testAPIGatewayV2Response_whenInitFromResponse_statusCodeIsEqual() throws {
+    func testAPIGatewayV2Response_whenInitFromResponse_statusCodeIsEqual() {
         XCTAssertEqual(apiGatewayV2Response.statusCode.code, response.statusCode.code)
     }
 
-    func testAPIGatewayV2Response_whenInitFromResponse_headersIsEqual() throws {
+    func testAPIGatewayV2Response_whenInitFromResponse_headersIsEqual() {
         XCTAssertEqual(apiGatewayV2Response.headers, response.headers)
     }
 
-    func testAPIGatewayV2Response_whenInitFromResponse_multiValueHeadersIsEqual() throws {
+    func testAPIGatewayV2Response_whenInitFromResponse_multiValueHeadersIsEqual() {
         XCTAssertEqual(apiGatewayV2Response.multiValueHeaders, response.multiValueHeaders)
     }
 
-    func testAPIGatewayV2Response_whenInitFromResponse_bodyIsEqual() throws {
+    func testAPIGatewayV2Response_whenInitFromResponse_bodyIsEqual() {
         XCTAssertEqual(apiGatewayV2Response.body, response.body)
     }
 
-    func testAPIGatewayV2Response_whenInitFromResponse_isBase64EncodedIsEqual() throws {
+    func testAPIGatewayV2Response_whenInitFromResponse_isBase64EncodedIsEqual() {
         XCTAssertEqual(apiGatewayV2Response.isBase64Encoded, response.isBase64Encoded)
     }
 
-    func testAPIGatewayV2Response_whenInitFromResponse_cookiesIsEqual() throws {
+    func testAPIGatewayV2Response_whenInitFromResponse_cookiesIsEqual() {
         XCTAssertEqual(apiGatewayV2Response.cookies, response.cookies)
     }
 

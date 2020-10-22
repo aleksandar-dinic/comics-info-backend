@@ -18,7 +18,7 @@ final class AttributeValueMapperTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
-    func testData_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testData_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenData = Data(buffer: ByteBuffer(string: "Data"))
         let givenAttributeValue = DynamoDB.AttributeValue.b(givenData)
@@ -30,7 +30,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testBool_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testBool_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenBool = true
         let givenAttributeValue = DynamoDB.AttributeValue.bool(givenBool)
@@ -42,7 +42,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testDataList_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testDataList_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenDataList = [
             Data(buffer: ByteBuffer(string: "Data1")),
@@ -57,7 +57,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testInt_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testInt_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenInt = 42
         let givenAttributeValue = DynamoDB.AttributeValue.n(String(givenInt))
@@ -69,7 +69,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testDouble_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testDouble_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenDouble = 42.42
         let givenAttributeValue = DynamoDB.AttributeValue.n(String(givenDouble))
@@ -81,7 +81,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testIntList_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testIntList_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenIntList = [1, 2, 3, 4, 5]
         let givenAttributeValue = DynamoDB.AttributeValue.ns(givenIntList.map(String.init))
@@ -93,7 +93,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testDoubleList_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testDoubleList_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenDoubleList = [1.1, 2.2, 3.3, 4.4, 5.5]
         let givenAttributeValue = DynamoDB.AttributeValue.ns(givenDoubleList.map { String($0) })
@@ -105,7 +105,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testIntSet_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testIntSet_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenIntSet: Set = [1]
         let givenAttributeValue = DynamoDB.AttributeValue.ns(givenIntSet.map(String.init))
@@ -117,7 +117,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testDoubleSet_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testDoubleSet_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenDoubleSet: Set = [1.1]
         let givenAttributeValue = DynamoDB.AttributeValue.ns(givenDoubleSet.map { String($0) })
@@ -129,7 +129,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testIsNull_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testIsNull_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenNil: Int? = nil
         let givenAttributeValue = DynamoDB.AttributeValue.null(true)
@@ -141,7 +141,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testString_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testString_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenString = "String"
         let givenAttributeValue = DynamoDB.AttributeValue.s(givenString)
@@ -153,7 +153,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testListString_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testListString_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenListString = ["String1", "String2", "String3", "String4"]
         let givenAttributeValue = DynamoDB.AttributeValue.ss(givenListString)
@@ -165,7 +165,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testListBool_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testListBool_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenListBool = [true, true, false, true]
         let givenAttributeValue = DynamoDB.AttributeValue.l([
@@ -182,7 +182,7 @@ final class AttributeValueMapperTests: XCTestCase {
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
 
-    func testDict_whenMapToAttributeValue_isEqualToGivenAttributeValue() throws {
+    func testDict_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
         let givenDict = ["Key1": "Value1", "Key2": "Value2"]
         let givenAttributeValue = DynamoDB.AttributeValue.m([

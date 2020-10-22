@@ -19,14 +19,7 @@ public protocol RepositoryAPIWrapper {
     var logger: Logger { get }
     var decoderService: DecoderService { get }
     var encoderService: EncoderService { get }
-
-    init(
-        on eventLoop: EventLoop,
-        repositoryAPIService: RepositoryAPIService,
-        logger: Logger,
-        decoderService: DecoderService,
-        encoderService: EncoderService
-    )
+    var tableName: String { get }
 
     func create(_ item: Item) -> EventLoopFuture<Void>
 

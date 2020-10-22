@@ -11,6 +11,7 @@ import Foundation
 protocol CharactersSummaryDatabaseItemFactory {
 
     var encoderService: EncoderService { get }
+    var tableName: String { get }
 
     func makeCharactersSummary<Item: Identifiable>(
         _ characters: [Character],
@@ -33,7 +34,7 @@ extension CharactersSummaryDatabaseItemFactory {
         var items = [DatabasePutItem]()
 
         for character in characters {
-            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self))
+            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
             items.append(encoderService.encode(characterSummary))
         }
 
@@ -47,7 +48,7 @@ extension CharactersSummaryDatabaseItemFactory {
         var items = [DatabaseUpdateItem]()
 
         for character in characters {
-            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self))
+            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
             items.append(encoderService.encode(characterSummary, conditionExpression: nil))
         }
 

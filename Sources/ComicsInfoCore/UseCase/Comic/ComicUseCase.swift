@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import NIO
 
 public final class ComicUseCase<APIWrapper: RepositoryAPIWrapper, CacheService: Cacheable>: UseCase where APIWrapper.Item == Comic, CacheService.Item == Comic {
 

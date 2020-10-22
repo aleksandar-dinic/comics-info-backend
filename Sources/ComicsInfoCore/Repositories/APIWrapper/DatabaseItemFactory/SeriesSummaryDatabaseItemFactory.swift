@@ -11,6 +11,7 @@ import Foundation
 protocol SeriesSummaryDatabaseItemFactory {
 
     var encoderService: EncoderService { get }
+    var tableName: String { get }
 
     func makeSeriesSummary<Item: Identifiable>(
         _ series: [Series],
@@ -33,7 +34,7 @@ extension SeriesSummaryDatabaseItemFactory {
         var items = [DatabasePutItem]()
 
         for series in series {
-            let seriesSummary = SeriesSummary(series, id: item.id, itemName: .getType(from: Item.self))
+            let seriesSummary = SeriesSummary(series, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
             items.append(encoderService.encode(seriesSummary))
         }
 
@@ -47,7 +48,7 @@ extension SeriesSummaryDatabaseItemFactory {
         var items = [DatabaseUpdateItem]()
 
         for series in series {
-            let seriesSummary = SeriesSummary(series, id: item.id, itemName: .getType(from: Item.self))
+            let seriesSummary = SeriesSummary(series, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
             items.append(encoderService.encode(seriesSummary, conditionExpression: nil))
         }
 

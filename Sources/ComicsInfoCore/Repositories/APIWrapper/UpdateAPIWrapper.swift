@@ -19,6 +19,7 @@ protocol UpdateAPIWrapper {
     var repositoryAPIService: RepositoryAPIService { get }
     var encoderService: EncoderService { get }
     var decoderService: DecoderService { get }
+    var tableName: String { get }
 
     func update(_ item: Item) -> EventLoopFuture<Void>
 
@@ -68,7 +69,7 @@ extension UpdateAPIWrapper {
     }
 
     private func createDatabaseItem(_ item: Item) -> DatabaseUpdateItem {
-        encoderService.encode(ItemDatabase(item: item))
+        encoderService.encode(ItemDatabase(item: item, tableName: tableName))
     }
 
     func createSummaries(
@@ -89,7 +90,7 @@ extension UpdateAPIWrapper {
     ) -> [DatabaseUpdateItem] where LinkItem.ID == String {
 
         for linkItem in linkItems {
-            let summary = Summary(item, id: linkItem.id, itemName: .getType(from: LinkItem.self))
+            let summary = Summary(item, id: linkItem.id, itemName: .getType(from: LinkItem.self), tableName: tableName)
             dbItems.append(encoderService.encode(summary, conditionExpression: nil))
         }
 

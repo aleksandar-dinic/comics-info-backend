@@ -12,7 +12,7 @@ protocol ItemSummary: DatabaseDecodable {
 
     associatedtype Item: Identifiable
 
-    init(_ item: Item, id: String, itemName: String)
+    init(_ item: Item, id: String, itemName: String, tableName: String)
 
     mutating func update(with item: Item)
     func shouldBeUpdated(with item: Item) -> Bool

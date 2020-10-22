@@ -14,9 +14,7 @@ struct CharacterDatabase: DatabaseMapper {
         String(summaryID.dropFirst("\(String.getType(from: Character.self))#".count))
     }
 
-    var tableName: String {
-        .characterTableName
-    }
+    var tableName: String
 
     let itemID: String
     let summaryID: String
@@ -29,15 +27,37 @@ struct CharacterDatabase: DatabaseMapper {
     var seriesSummary: [SeriesSummary]?
     var comicsSummary: [ComicSummary]?
 
+    init(
+        tableName: String,
+        itemID: String,
+        summaryID: String,
+        itemName: String,
+        popularity: Int,
+        name: String,
+        description: String?,
+        thumbnail: String?,
+        seriesSummary: [SeriesSummary]?,
+        comicsSummary: [ComicSummary]?
+    ) {
+        self.tableName = tableName
+        self.itemID = itemID
+        self.summaryID = summaryID
+        self.itemName = itemName
+        self.popularity = popularity
+        self.name = name
+        self.description = description
+        self.thumbnail = thumbnail
+        self.seriesSummary = seriesSummary
+        self.comicsSummary = comicsSummary
+    }
+
     func getSeriesID() -> Set<String>? {
         guard let seriesSummary = seriesSummary else { return nil }
-
         return Set(seriesSummary.compactMap { $0.id })
     }
 
     func getComicsID() -> Set<String>? {
         guard let comicsSummary = comicsSummary else { return nil }
-
         return Set(comicsSummary.compactMap { $0.id })
     }
 
@@ -45,7 +65,7 @@ struct CharacterDatabase: DatabaseMapper {
 
 extension CharacterDatabase {
 
-    init(item: Character) {
+    init(item: Character, tableName: String) {
         itemID = "\(String.getType(from: Character.self))#\(item.id)"
         summaryID = "\(String.getType(from: Character.self))#\(item.id)"
         itemName = .getType(from: Character.self)
@@ -54,11 +74,12 @@ extension CharacterDatabase {
         description = item.description
         thumbnail = item.thumbnail
         seriesSummary = item.series?.compactMap {
-            SeriesSummary($0, id: item.id, itemName: .getType(from: Character.self))
+            SeriesSummary($0, id: item.id, itemName: .getType(from: Character.self), tableName: tableName)
         }
         comicsSummary = item.comics?.compactMap {
-            ComicSummary($0, id: item.id, itemName: .getType(from: Character.self))
+            ComicSummary($0, id: item.id, itemName: .getType(from: Character.self), tableName: tableName)
         }
+        self.tableName = tableName
     }
 
 }
@@ -75,7 +96,7 @@ extension CharacterDatabase {
         case description
     }
 
-    public init(from item: DatabaseItem) throws {
+    public init(from item: DatabaseItem, tableName: String) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -93,6 +114,7 @@ extension CharacterDatabase {
         name = try decoder.decode(String.self, forKey: CodingKeys.name)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
+        self.tableName = tableName
     }
 
 }

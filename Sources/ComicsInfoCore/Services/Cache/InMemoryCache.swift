@@ -14,13 +14,13 @@ public final class InMemoryCache<Key: Hashable, Value: Codable> {
     private let queue: DispatchQueue
 
     public var isEmpty: Bool {
-        return queue.sync {
+        queue.sync {
             storage.isEmpty
         }
     }
 
     public var values: [Value] {
-        return queue.sync {
+        queue.sync {
             Array(storage.values)
         }
     }
@@ -35,7 +35,7 @@ public final class InMemoryCache<Key: Hashable, Value: Codable> {
 
     public subscript(key: Key) -> Value? {
         get {
-            return queue.sync {
+            queue.sync {
                 storage[key]
             }
         }

@@ -15,33 +15,29 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
     typealias Summary = CharacterSummary
     typealias ItemDatabase = CharacterDatabase
 
-    let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
-    let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
     let repositoryAPIService: RepositoryAPIService
     let encoderService: EncoderService
     let eventLoop: EventLoop
+    let tableName: String
+
+    let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
+    let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
 
     init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
         encoderService: EncoderService,
-        logger: Logger
+        logger: Logger,
+        tableName: String,
+        seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>,
+        comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
     ) {
         self.repositoryAPIService = repositoryAPIService
         self.encoderService = encoderService
         self.eventLoop = eventLoop
-        seriesUseCase = SeriesUseCaseFactory<InMemoryCacheProvider<Series>>(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.seriesInMemoryCache,
-            logger: logger
-        ).makeUseCase()
-        comicUseCase = ComicUseCaseFactory<InMemoryCacheProvider<Comic>>(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.comicInMemoryCache,
-            logger: logger
-        ).makeUseCase()
+        self.tableName = tableName
+        self.seriesUseCase = seriesUseCase
+        self.comicUseCase = comicUseCase
     }
 
     func getSummaryFutures(for item: Character) -> [EventLoopFuture<[DatabasePutItem]>] {
@@ -53,7 +49,7 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
 
     // MARK: SeriesSummary
 
-    func getSeriesSummary(
+    private func getSeriesSummary(
         forIDs seriesID: Set<String>?,
         character: Character
     ) -> EventLoopFuture<[DatabasePutItem]> {

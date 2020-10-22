@@ -22,30 +22,25 @@ struct CharacterUpdateAPIWrapper: UpdateAPIWrapper, SeriesSummaryFuturesFactory,
     let repositoryAPIService: RepositoryAPIService
     let encoderService: EncoderService
     let decoderService: DecoderService
+    let tableName: String
 
     init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
         encoderService: EncoderService,
         decoderService: DecoderService,
-        logger: Logger
+        logger: Logger,
+        tableName: String,
+        seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>,
+        comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
     ) {
         self.eventLoop = eventLoop
         self.repositoryAPIService = repositoryAPIService
         self.encoderService = encoderService
         self.decoderService = decoderService
-        seriesUseCase = SeriesUseCaseFactory<InMemoryCacheProvider<Series>>(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.seriesInMemoryCache,
-            logger: logger
-        ).makeUseCase()
-        comicUseCase = ComicUseCaseFactory<InMemoryCacheProvider<Comic>>(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.comicInMemoryCache,
-            logger: logger
-        ).makeUseCase()
+        self.tableName = tableName
+        self.seriesUseCase = seriesUseCase
+        self.comicUseCase = comicUseCase
     }
 
     func getSummaryFutures(for item: Character) -> [EventLoopFuture<[DatabaseUpdateItem]>] {

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import NIO
 
 public final class CharacterUseCase<APIWrapper: RepositoryAPIWrapper, CacheService: Cacheable>: UseCase where APIWrapper.Item == Character, CacheService.Item == Character {
 

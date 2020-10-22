@@ -14,9 +14,7 @@ struct SeriesDatabase: DatabaseMapper {
         String(summaryID.dropFirst("\(String.getType(from: Series.self))#".count))
     }
 
-    var tableName: String {
-        .seriesTableName
-    }
+    var tableName: String
 
     let itemID: String
     let summaryID: String
@@ -32,15 +30,13 @@ struct SeriesDatabase: DatabaseMapper {
     var charactersSummary: [CharacterSummary]?
     var comicsSummary: [ComicSummary]?
 
-    func getCharactersID() -> Set<String> {
-        guard let charactersSummary = charactersSummary else { return [] }
-
+    func getCharactersID() -> Set<String>? {
+        guard let charactersSummary = charactersSummary else { return nil }
         return Set(charactersSummary.compactMap { $0.id })
     }
 
     func getComicsID() -> Set<String>? {
         guard let comicsSummary = comicsSummary else { return nil }
-
         return Set(comicsSummary.compactMap { $0.id })
     }
 
@@ -48,7 +44,7 @@ struct SeriesDatabase: DatabaseMapper {
 
 extension SeriesDatabase {
 
-    init(item: Series) {
+    init(item: Series, tableName: String) {
         itemID = "\(String.getType(from: Series.self))#\(item.id)"
         summaryID = "\(String.getType(from: Series.self))#\(item.id)"
         itemName = .getType(from: Series.self)
@@ -60,11 +56,12 @@ extension SeriesDatabase {
         endYear = item.endYear
         nextIdentifier = item.nextIdentifier
         charactersSummary = item.characters?.compactMap {
-            CharacterSummary($0, id: item.id, itemName: .getType(from: Series.self))
+            CharacterSummary($0, id: item.id, itemName: .getType(from: Series.self), tableName: tableName)
         }
         comicsSummary = item.comics?.compactMap {
-            ComicSummary($0, id: item.id, itemName: .getType(from: Series.self))
+            ComicSummary($0, id: item.id, itemName: .getType(from: Series.self), tableName: tableName)
         }
+        self.tableName = tableName
     }
 
 }
@@ -84,7 +81,7 @@ extension SeriesDatabase {
         case nextIdentifier
     }
 
-    public init(from item: DatabaseItem) throws {
+    public init(from item: DatabaseItem, tableName: String) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -105,6 +102,7 @@ extension SeriesDatabase {
         endYear = try? decoder.decode(Int.self, forKey: CodingKeys.endYear)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         nextIdentifier = try? decoder.decode(String.self, forKey: CodingKeys.nextIdentifier)
+        self.tableName = tableName
     }
 
 }

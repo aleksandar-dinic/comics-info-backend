@@ -17,19 +17,29 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
     public let logger: Logger
     public let decoderService: DecoderService
     public let encoderService: EncoderService
+    public let tableName: String
+
+    private let seriesTableName: String
+    private let comicTableName: String
 
     public init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
         logger: Logger,
         decoderService: DecoderService = DecoderProvider(),
-        encoderService: EncoderService = EncoderProvider()
+        encoderService: EncoderService = EncoderProvider(),
+        tableName: String,
+        seriesTableName: String,
+        comicTableName: String
     ) {
         self.eventLoop = eventLoop
         self.repositoryAPIService = repositoryAPIService
         self.logger = logger
         self.decoderService = decoderService
         self.encoderService = encoderService
+        self.tableName = tableName
+        self.seriesTableName = seriesTableName
+        self.comicTableName = comicTableName
     }
 
     // MARK: - Create item
@@ -39,7 +49,10 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
             on: eventLoop,
             repositoryAPIService: repositoryAPIService,
             encoderService: encoderService,
-            logger: logger
+            logger: logger,
+            tableName: tableName,
+            seriesUseCase: makeSeriesUseCase(),
+            comicUseCase: makeComicUseCase()
         ).create(item)
     }
 
@@ -62,9 +75,13 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
     // MARK: - Get metadata
 
     public func getMetadata(id: String) -> EventLoopFuture<Character> {
-        repositoryAPIService.getMetadata(withID: id)
+        repositoryAPIService.getMetadata(withID: mapItemID(id))
             .flatMapThrowing { Character(from: try decoderService.decode(from: $0)) }
             .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Character.self) }
+    }
+
+    private func mapItemID(_ id: String) -> String {
+        "\(String.getType(from: Item.self))#\(id)"
     }
 
     public func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[Character]> {
@@ -82,8 +99,31 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
             repositoryAPIService: repositoryAPIService,
             encoderService: encoderService,
             decoderService: decoderService,
-            logger: logger
+            logger: logger,
+            tableName: tableName,
+            seriesUseCase: makeSeriesUseCase(),
+            comicUseCase: makeComicUseCase()
         ).update(item)
+    }
+
+    private func makeSeriesUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> {
+        SeriesUseCaseFactory(
+            on: eventLoop,
+            isLocalServer: LocalServer.isEnabled,
+            cacheProvider: LocalServer.seriesInMemoryCache,
+            logger: logger,
+            tableName: seriesTableName
+        ).makeUseCase()
+    }
+
+    private func makeComicUseCase() -> ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>> {
+        ComicUseCaseFactory(
+            on: eventLoop,
+            isLocalServer: LocalServer.isEnabled,
+            cacheProvider: LocalServer.comicInMemoryCache,
+            logger: logger,
+            tableName: comicTableName
+        ).makeUseCase()
     }
 
 }

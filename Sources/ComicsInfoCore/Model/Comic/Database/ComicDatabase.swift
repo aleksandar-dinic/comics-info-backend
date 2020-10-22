@@ -14,9 +14,7 @@ struct ComicDatabase: DatabaseMapper {
         String(summaryID.dropFirst("\(String.getType(from: Comic.self))#".count))
     }
 
-    var tableName: String {
-        .comicTableName
-    }
+    var tableName: String
 
     let itemID: String
     let summaryID: String
@@ -40,13 +38,11 @@ struct ComicDatabase: DatabaseMapper {
 
     func getCharactersID() -> Set<String>? {
         guard let charactersSummary = charactersSummary else { return nil }
-
         return Set(charactersSummary.compactMap { $0.id })
     }
 
     func getSeriesID() -> Set<String>? {
         guard let seriesSummary = seriesSummary else { return nil }
-
         return Set(seriesSummary.compactMap { $0.id })
     }
 
@@ -54,7 +50,7 @@ struct ComicDatabase: DatabaseMapper {
 
 extension ComicDatabase {
 
-    init(item: Comic) {
+    init(item: Comic, tableName: String) {
         itemID = "\(String.getType(from: Comic.self))#\(item.id)"
         summaryID = "\(String.getType(from: Comic.self))#\(item.id)"
         itemName = .getType(from: Comic.self)
@@ -72,11 +68,12 @@ extension ComicDatabase {
         images = item.images
         published = item.published
         charactersSummary = item.characters?.compactMap {
-            CharacterSummary($0, id: item.id, itemName: .getType(from: Comic.self))
+            CharacterSummary($0, id: item.id, itemName: .getType(from: Comic.self), tableName: tableName)
         }
         seriesSummary = item.series?.compactMap {
-            SeriesSummary($0, id: item.id, itemName: .getType(from: Comic.self))
+            SeriesSummary($0, id: item.id, itemName: .getType(from: Comic.self), tableName: tableName)
         }
+        self.tableName = tableName
     }
 
 }
@@ -102,7 +99,7 @@ extension ComicDatabase {
         case published
     }
 
-    public init(from item: DatabaseItem) throws {
+    public init(from item: DatabaseItem, tableName: String) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -129,6 +126,7 @@ extension ComicDatabase {
         collectedIssuesIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.collectedIssuesIdentifier)
         images = try? decoder.decode([String].self, forKey: CodingKeys.images)
         published = try? decoder.decode(Date.self, forKey: CodingKeys.published)
+        self.tableName = tableName
     }
 
 }

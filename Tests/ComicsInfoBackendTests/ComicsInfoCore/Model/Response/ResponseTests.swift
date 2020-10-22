@@ -7,7 +7,6 @@
 //
 
 @testable import ComicsInfoCore
-@testable import CharacterInfo
 import XCTest
 
 final class ResponseTests: XCTestCase {
@@ -16,7 +15,7 @@ final class ResponseTests: XCTestCase {
     private var givenStatusCode: HTTPResponseStatus!
 
     override func setUpWithError() throws {
-        object = CharactersMock.character
+        object = CharacterMock.character
         givenStatusCode = HTTPResponseStatus.ok
     }
 
@@ -47,18 +46,6 @@ final class ResponseTests: XCTestCase {
 
         // Then
         XCTAssertEqual(sut.statusCode.code, givenStatusCode.code)
-    }
-
-    func testResponse_whenInitializeWithError_bodyIsEqualGivenBody() {
-        // Given
-        let givenError = APIError.requestError
-        let givenBody = "{\"message\":\"\(String(describing: givenError))\"}"
-
-        // When
-        let sut = Response(with: givenError, statusCode: givenStatusCode)
-
-        // Then
-        XCTAssertEqual(sut.body, givenBody)
     }
 
 }

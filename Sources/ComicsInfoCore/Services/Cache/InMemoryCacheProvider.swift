@@ -72,6 +72,10 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
         let promise = eventLoop.makePromise(of: [Item].self)
 
         eventLoop.execute {
+            guard !ids.isEmpty else {
+                return promise.fail(CacheError.itemsNotFound(itemType: Item.self))
+            }
+
             var items = [Item]()
             for id in ids {
                 guard let item = inMemoryCache[id] else { continue }

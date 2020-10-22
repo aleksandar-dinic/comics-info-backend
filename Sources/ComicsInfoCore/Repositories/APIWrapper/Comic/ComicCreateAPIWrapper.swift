@@ -15,33 +15,29 @@ struct ComicCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory, 
     typealias Summary = ComicSummary
     typealias ItemDatabase = ComicDatabase
 
-    let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
-    let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
     let repositoryAPIService: RepositoryAPIService
     let encoderService: EncoderService
     let eventLoop: EventLoop
+    let tableName: String
+
+    let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
+    let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
 
     init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
         encoderService: EncoderService,
-        logger: Logger
+        logger: Logger,
+        tableName: String,
+        characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>,
+        seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
     ) {
         self.repositoryAPIService = repositoryAPIService
         self.encoderService = encoderService
         self.eventLoop = eventLoop
-        characterUseCase = CharacterUseCaseFactory<InMemoryCacheProvider<Character>>(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.characterInMemoryCache,
-            logger: logger
-        ).makeUseCase()
-        seriesUseCase = SeriesUseCaseFactory<InMemoryCacheProvider<Series>>(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.seriesInMemoryCache,
-            logger: logger
-        ).makeUseCase()
+        self.tableName = tableName
+        self.characterUseCase = characterUseCase
+        self.seriesUseCase = seriesUseCase
     }
 
     func getSummaryFutures(for item: Comic) -> [EventLoopFuture<[DatabasePutItem]>] {

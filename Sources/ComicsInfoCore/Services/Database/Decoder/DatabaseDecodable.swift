@@ -14,7 +14,7 @@ public protocol DatabaseDecodable {
     var summaryID: String { get }
     var tableName: String { get }
 
-    init(from item: DatabaseItem) throws
+    init(from item: DatabaseItem, tableName: String) throws
 
 }
 
@@ -22,6 +22,6 @@ protocol DatabaseMapper: DatabaseDecodable {
 
     associatedtype Item: Identifiable
 
-    init(item: Item)
+    init(item: Item, tableName: String)
 
 }

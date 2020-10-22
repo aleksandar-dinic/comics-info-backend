@@ -10,7 +10,8 @@ import Foundation
 
 enum DatabaseError: Error {
 
-    case itemDoesNotHaveID
+    case itemDoesNotHaveItemID
+    case itemDoesNotHaveSummaryID
     case itemAlreadyExists(withID: String)
 
     case itemNotFound(withID: String)

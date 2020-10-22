@@ -23,7 +23,7 @@ public struct CharacterReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, Cac
         request: Request
     ) -> EventLoopFuture<Response> {
         guard let id = request.pathParameters?["id"] else {
-            let response = Response(statusCode: .notFound)
+            let response = Response(statusCode: .badRequest)
             return eventLoop.makeSucceededFuture(response)
         }
 

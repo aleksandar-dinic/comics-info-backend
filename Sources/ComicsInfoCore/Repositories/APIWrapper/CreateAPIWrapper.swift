@@ -18,6 +18,7 @@ protocol CreateAPIWrapper {
     var eventLoop: EventLoop { get }
     var repositoryAPIService: RepositoryAPIService { get }
     var encoderService: EncoderService { get }
+    var tableName: String { get }
 
     func create(_ item: Item) -> EventLoopFuture<Void>
     func createSummaries(for item: Item) -> EventLoopFuture<[DatabasePutItem]>
@@ -31,6 +32,7 @@ extension CreateAPIWrapper {
     func create(_ item: Item) -> EventLoopFuture<Void> {
         createSummaries(for: item)
             .flatMap { repositoryAPIService.createAll($0) }
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
 
     func createSummaries(for item: Item) -> EventLoopFuture<[DatabasePutItem]> {
@@ -44,7 +46,12 @@ extension CreateAPIWrapper {
     ) -> [DatabasePutItem] where LinkItem.ID == String {
 
         for linkItem in linkItems {
-            let summary = Summary(item, id: linkItem.id, itemName: .getType(from: LinkItem.self))
+            let summary = Summary(
+                item,
+                id: linkItem.id,
+                itemName: .getType(from: LinkItem.self),
+                tableName: tableName
+            )
             dbItems.append(encoderService.encode(summary))
         }
 
@@ -52,7 +59,7 @@ extension CreateAPIWrapper {
     }
 
     private func createDatabaseItem(_ item: Item) -> DatabasePutItem {
-        encoderService.encode(ItemDatabase(item: item))
+        encoderService.encode(ItemDatabase(item: item, tableName: tableName))
     }
 
 }

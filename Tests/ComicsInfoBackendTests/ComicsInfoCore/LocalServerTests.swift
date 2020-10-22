@@ -20,7 +20,7 @@ final class LocalServerTests: XCTestCase {
 
     func test_isEnabledIsFalse() {
         // When
-        _ = LocalServer()
+        _ = LocalServer(enabled: false)
 
         // Then
         XCTAssertFalse(LocalServer.isEnabled)

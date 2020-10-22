@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import NIO
 
 public final class SeriesUseCase<APIWrapper: RepositoryAPIWrapper, CacheService: Cacheable>: UseCase where APIWrapper.Item == Series, CacheService.Item == Series {
 
