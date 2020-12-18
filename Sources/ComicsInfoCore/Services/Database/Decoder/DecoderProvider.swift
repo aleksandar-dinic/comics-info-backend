@@ -13,7 +13,7 @@ public struct DecoderProvider: DecoderService {
     public init() {}
 
     public func decode<Item: DatabaseDecodable>(from item: DatabaseItem) throws -> Item {
-        return try Item(from: item, tableName: item.table)
+        return try Item(from: item)
     }
 
 }

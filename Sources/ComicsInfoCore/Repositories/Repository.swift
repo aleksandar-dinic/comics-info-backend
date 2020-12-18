@@ -23,8 +23,11 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
     ///
     /// - Parameter item: The item.
     /// - Returns: Future with Item value.
-    public func create(_ item: Item) -> EventLoopFuture<Void> {
-        dataProvider.create(item)
+    public func create(
+        _ item: Item,
+        in table: String
+    ) -> EventLoopFuture<Void> {
+        dataProvider.create(item, in: table)
     }
 
     /// Gets item.
@@ -35,11 +38,13 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
     /// - Returns: Future with Item value.
     public func getItem(
         withID itemID: Item.ID,
-        fromDataSource dataSource: DataSourceLayer
+        fromDataSource dataSource: DataSourceLayer,
+        from table: String
     ) -> EventLoopFuture<Item> {
         dataProvider.getItem(
             withID: itemID,
-            fromDataSource: dataSource
+            fromDataSource: dataSource,
+            from: table
         )
     }
 
@@ -47,8 +52,11 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
     ///
     /// - Parameter dataSource: Layer of data source.
     /// - Returns: Future with Items value.
-    public func getAllItems(fromDataSource dataSource: DataSourceLayer) -> EventLoopFuture<[Item]> {
-        dataProvider.getAllItems(fromDataSource: dataSource)
+    public func getAllItems(
+        fromDataSource dataSource: DataSourceLayer,
+        from table: String
+    ) -> EventLoopFuture<[Item]> {
+        dataProvider.getAllItems(fromDataSource: dataSource, from: table)
     }
 
     /// Gets item metadata.
@@ -59,11 +67,13 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
     /// - Returns: Future with Item metadata.
     public func getMetadata(
         withID id: Item.ID,
-        fromDataSource dataSource: DataSourceLayer
+        fromDataSource dataSource: DataSourceLayer,
+        from table: String
     ) -> EventLoopFuture<Item> {
         dataProvider.getMetadata(
             withID: id,
-            fromDataSource: dataSource
+            fromDataSource: dataSource,
+            from: table
         )
     }
 
@@ -75,11 +85,13 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
     /// - Returns: Future with Items metadata.
     public func getAllMetadata(
         withIDs ids: Set<Item.ID>,
-        fromDataSource dataSource: DataSourceLayer
+        fromDataSource dataSource: DataSourceLayer,
+        from table: String
     ) -> EventLoopFuture<[Item]> {
         dataProvider.getAllMetadata(
             withIDs: ids,
-            fromDataSource: dataSource
+            fromDataSource: dataSource,
+            from: table
         )
     }
 
@@ -87,8 +99,11 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
     ///
     /// - Parameter item: The item.
     /// - Returns: Future with Item value.
-    public func update(_ item: Item) -> EventLoopFuture<Void> {
-        dataProvider.update(item)
+    public func update(
+        _ item: Item,
+        in table: String
+    ) -> EventLoopFuture<Void> {
+        dataProvider.update(item, in: table)
     }
 
 }

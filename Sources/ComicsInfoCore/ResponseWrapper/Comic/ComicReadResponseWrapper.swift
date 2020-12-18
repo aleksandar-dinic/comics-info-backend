@@ -20,14 +20,16 @@ public struct ComicReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, CachePr
 
     public func handleRead(
         on eventLoop: EventLoop,
-        request: Request
+        request: Request,
+        environment: String?
     ) -> EventLoopFuture<Response> {
         guard let id = request.pathParameters?["id"] else {
             let response = Response(statusCode: .badRequest)
             return eventLoop.makeSucceededFuture(response)
         }
 
-        return comicUseCase.getItem(withID: id, fromDataSource: .memory)
+        let table = String.tableName(for: environment)
+        return comicUseCase.getItem(withID: id, fromDataSource: .memory, from: table)
             .map { Response(with: Domain.Comic(from: $0), statusCode: .ok) }
             .flatMapError { self.catch($0, on: eventLoop) }
     }

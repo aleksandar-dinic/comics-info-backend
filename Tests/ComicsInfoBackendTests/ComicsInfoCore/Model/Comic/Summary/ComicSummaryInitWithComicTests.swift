@@ -20,7 +20,7 @@ final class ComicSummaryInitWithComicTests: XCTestCase {
         comic = ComicMock.comic
         itemName = "comic"
         id = "2"
-        sut = ComicSummary(comic, id: id, itemName: itemName, tableName: "comic")
+        sut = ComicSummary(comic, id: id, itemName: itemName)
     }
 
     override func tearDownWithError() throws {

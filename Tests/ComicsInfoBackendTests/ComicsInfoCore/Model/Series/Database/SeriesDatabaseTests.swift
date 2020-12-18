@@ -16,7 +16,7 @@ final class SeriesDatabaseTests: XCTestCase {
 
     override func setUpWithError() throws {
         givenSeries = SeriesMock.series
-        sut = SeriesDatabase(item: givenSeries, tableName: "series")
+        sut = SeriesDatabase(item: givenSeries)
     }
 
     override func tearDownWithError() throws {
@@ -26,10 +26,6 @@ final class SeriesDatabaseTests: XCTestCase {
 
     func testID() {
         XCTAssertEqual(sut.id, "1")
-    }
-
-    func testTableName_isEqualToSeries() {
-        XCTAssertEqual(sut.tableName, "series")
     }
 
     func testItemID_whenInitFromSeries_isEqualToItemID() {
@@ -53,7 +49,7 @@ final class SeriesDatabaseTests: XCTestCase {
         givenSeries = SeriesMock.makeSeries()
 
         // When
-        sut = SeriesDatabase(item: givenSeries, tableName: "series")
+        sut = SeriesDatabase(item: givenSeries)
 
         // Then
         XCTAssertNil(sut.getCharactersID())
@@ -68,7 +64,7 @@ final class SeriesDatabaseTests: XCTestCase {
         givenSeries = SeriesMock.makeSeries()
 
         // When
-        sut = SeriesDatabase(item: givenSeries, tableName: "series")
+        sut = SeriesDatabase(item: givenSeries)
 
         // Then
         XCTAssertNil(sut.getComicsID())

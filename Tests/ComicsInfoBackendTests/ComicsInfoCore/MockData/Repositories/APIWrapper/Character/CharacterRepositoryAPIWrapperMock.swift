@@ -23,15 +23,11 @@ enum CharacterRepositoryAPIWrapperMock {
             on: eventLoop,
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryAPIService(
                 on: eventLoop,
-                tableName: "character",
                 logger: logger
             ),
             logger: logger,
             decoderService: decoderService,
-            encoderService: encoderService,
-            tableName: "character",
-            seriesTableName: "series",
-            comicTableName: "comic"
+            encoderService: encoderService
         )
     }
 

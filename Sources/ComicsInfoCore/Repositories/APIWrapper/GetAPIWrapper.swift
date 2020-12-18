@@ -16,7 +16,7 @@ protocol GetAPIWrapper: CharactersSummaryHandler, SeriesSummaryHandler, ComicsSu
     var repositoryAPIService: RepositoryAPIService { get }
     var decoderService: DecoderService { get }
 
-    func get(withID itemID: String) -> EventLoopFuture<Item>
+    func get(withID itemID: String, from table: String) -> EventLoopFuture<Item>
     func handleItem(_ items: [DatabaseItem], id: String) throws -> Item
 
     func handleDatabaseItem<DBItem: DatabaseDecodable>(_ items: [DatabaseItem], id: String) throws -> DBItem
@@ -25,8 +25,8 @@ protocol GetAPIWrapper: CharactersSummaryHandler, SeriesSummaryHandler, ComicsSu
 
 extension GetAPIWrapper {
 
-    func get(withID itemID: String) -> EventLoopFuture<Item> {
-        repositoryAPIService.getItem(withID: mapToDatabaseID(itemID, itemType: Item.self))
+    func get(withID itemID: String, from table: String) -> EventLoopFuture<Item> {
+        repositoryAPIService.getItem(withID: mapToDatabaseID(itemID, itemType: Item.self), from: table)
             .flatMapThrowing { try handleItem($0, id: itemID) }
             .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }

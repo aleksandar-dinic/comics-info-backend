@@ -12,15 +12,18 @@ import XCTest
 final class SeriesGetAllAPIWrapperTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var sut: SeriesGetAllAPIWrapper!
+    private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         sut = SeriesGetAllAPIWrapperMock.make()
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        table = nil
     }
 
     func test_whenGetAllItems_returnsAllItems() throws {
@@ -33,7 +36,7 @@ final class SeriesGetAllAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         try createSeries(SeriesMock.makeSeries(id: "2", comicsID: [comic.id]))
 
         // When
-        let feature = sut.getAll()
+        let feature = sut.getAll(from: table)
         let series = try feature.wait()
 
         // Then
@@ -45,7 +48,7 @@ final class SeriesGetAllAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var thrownError: Error?
 
         // When
-        let feature = sut.getAll()
+        let feature = sut.getAll(from: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

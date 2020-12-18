@@ -15,7 +15,7 @@ final class CharacterDatabase_DatabaseMapperTests: XCTestCase {
     private var sut: CharacterDatabase!
 
     override func setUpWithError() throws {
-        databaseItem = DatabasePutItem(CharacterMock.items, table: "character")
+        databaseItem = DatabasePutItem(CharacterMock.items, table: String.tableName(for: "TEST"))
     }
 
     override func tearDownWithError() throws {
@@ -24,7 +24,7 @@ final class CharacterDatabase_DatabaseMapperTests: XCTestCase {
     }
 
     private func makeCharacterDatabaseFromDatabaseItem() throws -> CharacterDatabase {
-        try CharacterDatabase(from: databaseItem, tableName: "character")
+        try CharacterDatabase(from: databaseItem)
     }
 
     // MARK: - Item ID

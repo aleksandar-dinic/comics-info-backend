@@ -10,17 +10,21 @@ import Foundation
 
 public protocol EncoderService {
 
-    func encode<Item: DatabaseDecodable>(_ item: Item) -> DatabasePutItem
+    func encode<Item: DatabaseDecodable>(_ item: Item, table: String) -> DatabasePutItem
 
-    func encode<Item: DatabaseDecodable>(_ item: Item, conditionExpression: String?) -> DatabaseUpdateItem
+    func encode<Item: DatabaseDecodable>(
+        _ item: Item,
+        table: String,
+        conditionExpression: String?
+    ) -> DatabaseUpdateItem
 
 }
 
 extension EncoderService {
 
-    public func encode<Item: DatabaseDecodable>(_ item: Item) -> DatabasePutItem {
+    public func encode<Item: DatabaseDecodable>(_ item: Item, table: String) -> DatabasePutItem {
         let mirror = Mirror(reflecting: item)
-        var databaseItem = DatabasePutItem(table: item.tableName)
+        var databaseItem = DatabasePutItem(table: table)
 
         for child in mirror.children {
             guard let label = child.label else { continue }
@@ -33,12 +37,13 @@ extension EncoderService {
 
     public func encode<Item: DatabaseDecodable>(
         _ item: Item,
+        table: String,
         conditionExpression: String? = "attribute_exists(itemID) AND attribute_exists(summaryID)"
     ) -> DatabaseUpdateItem {
 
         let mirror = Mirror(reflecting: item)
         var databaseItem = DatabaseUpdateItem(
-            table: item.tableName,
+            table: table,
             itemID: item.itemID,
             summaryID: item.summaryID,
             conditionExpression: conditionExpression

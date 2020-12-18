@@ -12,7 +12,6 @@ import Foundation
 enum CharacterSummaryMock {
 
     static func makeCharacterSummary(
-        tableName: String = "character",
         itemID: String = "character#1",
         summaryID: String = "character#1",
         itemName: String = "character",
@@ -22,7 +21,6 @@ enum CharacterSummaryMock {
         description: String? = nil
     ) -> CharacterSummary {
         CharacterSummary(
-            tableName: tableName,
             itemID: itemID,
             summaryID: summaryID,
             itemName: itemName,
@@ -35,7 +33,6 @@ enum CharacterSummaryMock {
 
     static var characterSummary: CharacterSummary {
         CharacterSummary(
-            tableName: "character",
             itemID: "character#1",
             summaryID: "character#1",
             itemName: "character",

@@ -16,14 +16,12 @@ enum RepositoryAPIServiceMock {
     static func makeRepositoryAPIService(
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
-        tableName: String,
         logger: Logger
     ) -> RepositoryAPIService {
         DatabaseProvider(
             database: makeDatabase(
                 isLocalServer: isLocalServer,
                 on: eventLoop,
-                tableName: tableName,
                 logger: logger
             )
         )
@@ -32,10 +30,9 @@ enum RepositoryAPIServiceMock {
     static func makeDatabase(
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
-        tableName: String,
         logger: Logger
     ) -> Database {
-        DatabaseFectory(isLocalServer: isLocalServer, tableName: tableName)
+        DatabaseFectory(isLocalServer: isLocalServer)
             .makeDatabase(eventLoop: eventLoop, logger: logger)
     }
 

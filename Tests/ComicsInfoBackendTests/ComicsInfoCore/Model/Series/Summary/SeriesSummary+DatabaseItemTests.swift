@@ -15,7 +15,7 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
     private var sut: SeriesSummary!
 
     override func setUpWithError() throws {
-        databaseItem = DatabasePutItem(SeriesMock.items, table: "series")
+        databaseItem = DatabasePutItem(SeriesMock.items, table: String.tableName(for: "TEST"))
     }
 
     override func tearDownWithError() throws {
@@ -24,7 +24,7 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
     }
 
     private func makeSeriesSummaryFromDatabaseItem() throws -> SeriesSummary {
-        try SeriesSummary(from: databaseItem, tableName: "series")
+        try SeriesSummary(from: databaseItem)
     }
 
     // MARK: - Item ID

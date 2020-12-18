@@ -11,16 +11,8 @@ import Foundation
 
 public extension String {
 
-    static var characterTableName: String {
-        Lambda.characterTableName ?? ""
-    }
-
-    static var seriesTableName: String {
-        Lambda.seriesTableName ?? ""
-    }
-
-    static var comicTableName: String {
-        Lambda.comicTableName ?? ""
+    static func tableName(for environment: String?) -> String {
+        Lambda.tableName(for: environment) ?? ""
     }
 
     static func getType(from item: Any.Type) -> String {

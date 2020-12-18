@@ -17,17 +17,20 @@ final class CreateResponseWrapperTest: XCTestCase {
 
     private var eventLoop: EventLoop!
     private var sut: CreateResponseWrapper<UseCase>!
+    private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         sut = CharacterCreateResponseWrapperMock.make(on: eventLoop)
+        environment = "TEST"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
         sut = nil
+        environment = nil
     }
 
     func test_whenHandleCreateWithoutBody_statusIsBadRequest() throws {
@@ -35,7 +38,7 @@ final class CreateResponseWrapperTest: XCTestCase {
         let request = Request(pathParameters: nil, body: nil)
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -47,7 +50,7 @@ final class CreateResponseWrapperTest: XCTestCase {
         let request = Request(pathParameters: nil, body: "")
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -59,7 +62,7 @@ final class CreateResponseWrapperTest: XCTestCase {
         let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -69,11 +72,11 @@ final class CreateResponseWrapperTest: XCTestCase {
     func test_whenHandleCreateSameItemTwice_statusIsForbidden() throws {
         // Given
         let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
-        var feature = sut.handleCreate(on: eventLoop, request: request)
+        var feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
         _ = try feature.wait()
 
         // When
-        feature = sut.handleCreate(on: eventLoop, request: request)
+        feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then

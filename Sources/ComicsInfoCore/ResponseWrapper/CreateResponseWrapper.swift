@@ -19,16 +19,18 @@ struct CreateResponseWrapper<UseCaseType: UseCase>: ErrorResponseWrapper {
 
     func handleCreate(
         on eventLoop: EventLoop,
-        request: Request
+        request: Request,
+        environment: String?
     ) -> EventLoopFuture<Response> {
         guard let data = request.body?.data(using: .utf8) else {
             let response = Response(statusCode: .badRequest)
             return eventLoop.makeSucceededFuture(response)
         }
 
+        let table = String.tableName(for: environment)
         do {
             let item = try JSONDecoder().decode(UseCaseType.Item.self, from: data)
-            return useCase.create(item)
+            return useCase.create(item, in: table)
                 .map { Response(with: ResponseStatus("\(type(of: item.self)) created"), statusCode: .created) }
                 .flatMapError { self.catch($0, on: eventLoop, statusCode: .forbidden) }
 

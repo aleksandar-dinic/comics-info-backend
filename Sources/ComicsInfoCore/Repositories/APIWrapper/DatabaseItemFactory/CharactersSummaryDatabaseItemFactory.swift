@@ -11,16 +11,17 @@ import Foundation
 protocol CharactersSummaryDatabaseItemFactory {
 
     var encoderService: EncoderService { get }
-    var tableName: String { get }
 
     func makeCharactersSummary<Item: Identifiable>(
         _ characters: [Character],
-        item: Item
+        item: Item,
+        in table: String
     ) -> [DatabasePutItem] where Item.ID == String
 
     func makeCharactersSummary<Item: Identifiable>(
         _ characters: [Character],
-        item: Item
+        item: Item,
+        in table: String
     ) -> [DatabaseUpdateItem] where Item.ID == String
 
 }
@@ -29,13 +30,14 @@ extension CharactersSummaryDatabaseItemFactory {
 
     func makeCharactersSummary<Item: Identifiable>(
         _ characters: [Character],
-        item: Item
+        item: Item,
+        in table: String
     ) -> [DatabasePutItem] where Item.ID == String {
         var items = [DatabasePutItem]()
 
         for character in characters {
-            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
-            items.append(encoderService.encode(characterSummary))
+            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self))
+            items.append(encoderService.encode(characterSummary, table: table))
         }
 
         return items
@@ -43,13 +45,14 @@ extension CharactersSummaryDatabaseItemFactory {
 
     func makeCharactersSummary<Item: Identifiable>(
         _ characters: [Character],
-        item: Item
+        item: Item,
+        in table: String
     ) -> [DatabaseUpdateItem] where Item.ID == String {
         var items = [DatabaseUpdateItem]()
 
         for character in characters {
-            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self), tableName: tableName)
-            items.append(encoderService.encode(characterSummary, conditionExpression: nil))
+            let characterSummary = CharacterSummary(character, id: item.id, itemName: .getType(from: Item.self))
+            items.append(encoderService.encode(characterSummary, table: table, conditionExpression: nil))
         }
 
         return items

@@ -20,7 +20,7 @@ final class SeriesSummaryInitWithSeriesTests: XCTestCase {
         series = SeriesMock.series
         itemName = "character"
         id = "2"
-        sut = SeriesSummary(series, id: id, itemName: itemName, tableName: "series")
+        sut = SeriesSummary(series, id: id, itemName: itemName)
     }
 
     override func tearDownWithError() throws {

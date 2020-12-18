@@ -29,24 +29,27 @@ public final class DatabaseProvider: RepositoryAPIService {
 
     // Read
 
-    public func getItem(withID itemID: String) -> EventLoopFuture<[DatabaseItem]> {
-        database.getItem(withID: itemID)
+    public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<[DatabaseItem]> {
+        database.getItem(withID: itemID, tableName: table)
     }
 
-    public func getAll(_ items: String) -> EventLoopFuture<[DatabaseItem]> {
-        database.getAll(items)
+    public func getAll(_ items: String, from table: String) -> EventLoopFuture<[DatabaseItem]> {
+        database.getAll(items, tableName: table)
     }
 
-    public func getMetadata(withID id: String) -> EventLoopFuture<DatabaseItem> {
-        database.getMetadata(withID: id)
+    public func getMetadata(withID id: String, from table: String) -> EventLoopFuture<DatabaseItem> {
+        database.getMetadata(withID: id, tableName: table)
     }
 
-    public func getAllMetadata(withIDs ids: Set<String>) -> EventLoopFuture<[DatabaseItem]> {
-        database.getAllMetadata(withIDs: ids)
+    public func getAllMetadata(
+        withIDs ids: Set<String>,
+        from table: String
+    ) -> EventLoopFuture<[DatabaseItem]> {
+        database.getAllMetadata(withIDs: ids, tableName: table)
     }
 
-    public func getAllSummaries(forID summaryID: String) -> EventLoopFuture<[DatabaseItem]> {
-        database.getAllSummaries(forID: summaryID)
+    public func getAllSummaries(forID summaryID: String, from table: String) -> EventLoopFuture<[DatabaseItem]> {
+        database.getAllSummaries(forID: summaryID, tableName: table)
     }
 
     // Update

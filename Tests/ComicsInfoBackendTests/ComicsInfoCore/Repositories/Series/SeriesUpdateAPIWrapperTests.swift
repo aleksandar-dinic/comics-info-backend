@@ -12,15 +12,18 @@ import XCTest
 final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var sut: SeriesUpdateAPIWrapper!
+    private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         sut = SeriesUpdateAPIWrapperMock.make()
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        table = nil
     }
 
     func test_whenGetSummaryFutures_returnsAllSummaries() throws {
@@ -32,7 +35,7 @@ final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         let series = SeriesMock.makeSeries(charactersID: [character.id], comicsID: [comic.id])
 
         // When
-        let features = sut.getSummaryFutures(for: series)
+        let features = sut.getSummaryFutures(for: series, from: table)
         var items = [DatabaseUpdateItem]()
         for feature in features {
             items.append(contentsOf: try feature.wait())
@@ -77,7 +80,7 @@ final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var dbItems = [DatabaseUpdateItem]()
 
         // When
-        let items = sut.appendItemSummary([comic], item: series, dbItems: &dbItems)
+        let items = sut.appendItemSummary([comic], item: series, dbItems: &dbItems, tableName: table)
 
         // Then
         XCTAssertEqual(items.count, 1)
@@ -97,7 +100,7 @@ final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         try createSeries(SeriesMock.makeSeries(title: "Old Title"))
 
         // When
-        let feature = sut.update(SeriesMock.makeSeries())
+        let feature = sut.update(SeriesMock.makeSeries(), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -110,7 +113,7 @@ final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var thrownError: Error?
 
         // When
-        let feature = sut.update(SeriesMock.makeSeries(charactersID: charactersID))
+        let feature = sut.update(SeriesMock.makeSeries(charactersID: charactersID), in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -132,7 +135,7 @@ final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var thrownError: Error?
 
         // When
-        let feature = sut.update(SeriesMock.makeSeries(comicsID: comicsID))
+        let feature = sut.update(SeriesMock.makeSeries(comicsID: comicsID), in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -157,7 +160,7 @@ final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         try createSeries(SeriesMock.makeSeries(charactersID: [character.id], comicsID: [comic.id]))
 
         // When
-        let feature = sut.update(SeriesMock.makeSeries(title: "New Title"))
+        let feature = sut.update(SeriesMock.makeSeries(title: "New Title"), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -173,7 +176,7 @@ final class SeriesUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         try createSeries(SeriesMock.makeSeries())
 
         // When
-        let feature = sut.update(SeriesMock.makeSeries(title: "New Title", charactersID: [character.id], comicsID: [comic.id]))
+        let feature = sut.update(SeriesMock.makeSeries(title: "New Title", charactersID: [character.id], comicsID: [comic.id]), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())

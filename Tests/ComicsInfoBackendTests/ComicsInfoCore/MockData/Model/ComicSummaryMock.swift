@@ -12,7 +12,6 @@ import Foundation
 enum ComicSummaryMock {
 
     static func makeComicSummary(
-        tableName: String = "comic",
         itemID: String = "comic#1",
         summaryID: String = "comic#1",
         itemName: String = "comic",
@@ -22,7 +21,6 @@ enum ComicSummaryMock {
         description: String? = nil
     ) -> ComicSummary {
         ComicSummary(
-            tableName: tableName,
             itemID: itemID,
             summaryID: summaryID,
             itemName: itemName,
@@ -35,7 +33,6 @@ enum ComicSummaryMock {
 
     static var comicSummary: ComicSummary {
         ComicSummary(
-            tableName: "comic",
             itemID: "comic#1",
             summaryID: "comic#1",
             itemName: "comic",

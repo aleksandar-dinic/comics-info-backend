@@ -20,7 +20,7 @@ final class CharacterSummaryInitWithCharacterTests: XCTestCase {
         character = CharacterMock.character
         itemName = "series"
         id = "2"
-        sut = CharacterSummary(character, id: id, itemName: itemName, tableName: "character")
+        sut = CharacterSummary(character, id: id, itemName: itemName)
     }
 
     override func tearDownWithError() throws {

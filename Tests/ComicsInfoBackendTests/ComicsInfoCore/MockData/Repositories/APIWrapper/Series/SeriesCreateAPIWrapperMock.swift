@@ -22,12 +22,10 @@ enum SeriesCreateAPIWrapperMock {
             on: eventLoop,
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryAPIService(
                 on: eventLoop,
-                tableName: "series",
                 logger: logger
             ),
             encoderService: encoderService,
             logger: logger,
-            tableName: "series",
             characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
         )

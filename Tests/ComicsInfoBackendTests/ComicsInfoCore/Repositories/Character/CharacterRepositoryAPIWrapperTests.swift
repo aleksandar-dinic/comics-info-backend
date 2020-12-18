@@ -12,15 +12,18 @@ import XCTest
 final class CharacterRepositoryAPIWrapperTests: XCTestCase, CreateCharacterProtocol {
 
     private var sut: CharacterRepositoryAPIWrapper!
+    private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         sut = CharacterRepositoryAPIWrapperMock.make()
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        table = nil
     }
 
     func test_whenGetMetadata_isEqualToGivenMetadata() throws {
@@ -29,7 +32,7 @@ final class CharacterRepositoryAPIWrapperTests: XCTestCase, CreateCharacterProto
         try createCharacter(givenCharacter)
 
         // When
-        let feature = sut.getMetadata(id: givenCharacter.id)
+        let feature = sut.getMetadata(id: givenCharacter.id, from: table)
         let character = try feature.wait()
 
         // Then
@@ -42,7 +45,7 @@ final class CharacterRepositoryAPIWrapperTests: XCTestCase, CreateCharacterProto
         var thrownError: Error?
 
         // When
-        let feature = sut.getMetadata(id: givenCharacter.id)
+        let feature = sut.getMetadata(id: givenCharacter.id, from: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

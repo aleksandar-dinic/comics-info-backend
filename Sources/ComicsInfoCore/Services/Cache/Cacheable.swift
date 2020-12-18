@@ -13,12 +13,30 @@ public protocol Cacheable {
 
     associatedtype Item: Codable & Identifiable
 
-    func getItem(withID itemID: Item.ID, on eventLoop: EventLoop) -> EventLoopFuture<Item>
-    func getAllItems(on eventLoop: EventLoop) -> EventLoopFuture<[Item]>
+    func getItem(
+        withID itemID: Item.ID,
+        from table: String,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<Item>
 
-    func getMetadata(withID id: Item.ID, on eventLoop: EventLoop) -> EventLoopFuture<Item>
-    func getAllMetadata(withIDs ids: Set<Item.ID>, on eventLoop: EventLoop) -> EventLoopFuture<[Item]>
+    func getAllItems(
+        from table: String,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<[Item]>
 
-    func save(items: [Item])
+    func getMetadata(
+        withID id: Item.ID,
+        from table: String,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<Item>
+
+    func getAllMetadata(
+        withIDs ids: Set<Item.ID>,
+        from table: String,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<[Item]>
+
+    func save(items: [Item], in table: String)
+    func saveMetadata(items: [Item], in table: String)
 
 }

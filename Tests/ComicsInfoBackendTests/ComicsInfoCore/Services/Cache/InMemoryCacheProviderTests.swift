@@ -16,28 +16,31 @@ final class InMemoryCacheProviderTests: XCTestCase {
     private var givenData: [String: Character]!
     private var inMemoryCache: InMemoryCache<String, Character>!
     private var sut: InMemoryCacheProvider<Character>!
+    private var table: String!
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let character = CharacterMock.character
         givenData = [character.id: character]
         inMemoryCache = InMemoryCache(storage: givenData)
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
         inMemoryCache = nil
         givenData = nil
+        table = nil
     }
 
     // MARK: - Get All Items
 
     func testGetAllItems_isEqualToGivenData() throws {
         // Given
-        sut = InMemoryCacheProvider(inMemoryCache)
+        sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
 
         // When
-        let items = try sut.getAllItems(on: eventLoop).wait()
+        let items = try sut.getAllItems(from: table, on: eventLoop).wait()
 
         // Then
         XCTAssertEqual(items.count, givenData.count)
@@ -49,7 +52,7 @@ final class InMemoryCacheProviderTests: XCTestCase {
         var thrownError: Error?
 
         // When
-        let itemsFuture = sut.getAllItems(on: eventLoop)
+        let itemsFuture = sut.getAllItems(from: table, on: eventLoop)
         XCTAssertThrowsError(try itemsFuture.wait()) {
             thrownError = $0
         }
@@ -66,10 +69,10 @@ final class InMemoryCacheProviderTests: XCTestCase {
 
     func testGetItemWithID_isEqualToGivenItem() throws {
         // Give
-        sut = InMemoryCacheProvider(inMemoryCache)
+        sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
 
         // When
-        let item = try sut.getItem(withID: "1", on: eventLoop).wait()
+        let item = try sut.getItem(withID: "1", from: table, on: eventLoop).wait()
 
         // Then
         XCTAssertEqual(item.id, "1")
@@ -81,7 +84,7 @@ final class InMemoryCacheProviderTests: XCTestCase {
         var thrownError: Error?
 
         // When
-        let itemFuture = sut.getItem(withID: "-1", on: eventLoop)
+        let itemFuture = sut.getItem(withID: "-1", from: table, on: eventLoop)
         XCTAssertThrowsError(try itemFuture.wait()) {
             thrownError = $0
         }
@@ -99,10 +102,10 @@ final class InMemoryCacheProviderTests: XCTestCase {
 
     func testGetMetadataWithID_isEqualToGivenMetadata() throws {
         // Give
-        sut = InMemoryCacheProvider(inMemoryCache)
+        sut = InMemoryCacheProvider(metadataCaches: [table: inMemoryCache])
 
         // When
-        let item = try sut.getMetadata(withID: "1", on: eventLoop).wait()
+        let item = try sut.getMetadata(withID: "1", from: table, on: eventLoop).wait()
 
         // Then
         XCTAssertEqual(item.id, "1")
@@ -114,7 +117,7 @@ final class InMemoryCacheProviderTests: XCTestCase {
         var thrownError: Error?
 
         // When
-        let itemFuture = sut.getMetadata(withID: "-1", on: eventLoop)
+        let itemFuture = sut.getMetadata(withID: "-1", from: table, on: eventLoop)
         XCTAssertThrowsError(try itemFuture.wait()) {
             thrownError = $0
         }
@@ -132,10 +135,10 @@ final class InMemoryCacheProviderTests: XCTestCase {
 
     func testGetAllMetadata_isEqualToGivenMetadata() throws {
         // Given
-        sut = InMemoryCacheProvider(inMemoryCache)
+        sut = InMemoryCacheProvider(metadataCaches: [table: inMemoryCache])
 
         // When
-        let items = try sut.getAllMetadata(withIDs: ["1"], on: eventLoop).wait()
+        let items = try sut.getAllMetadata(withIDs: ["1"], from: table, on: eventLoop).wait()
 
         // Then
         XCTAssertEqual(items.count, givenData.count)
@@ -147,7 +150,7 @@ final class InMemoryCacheProviderTests: XCTestCase {
         var thrownError: Error?
 
         // When
-        let itemsFuture = sut.getAllMetadata(withIDs: ["-1"], on: eventLoop)
+        let itemsFuture = sut.getAllMetadata(withIDs: ["-1"], from: table, on: eventLoop)
         XCTAssertThrowsError(try itemsFuture.wait()) {
             thrownError = $0
         }
@@ -162,11 +165,11 @@ final class InMemoryCacheProviderTests: XCTestCase {
 
     func testGetAllMetadata_whenCacheIsEmptyWithEmptyIDs_throwsItemsNotFound() throws {
         // Given
-        sut = InMemoryCacheProvider(inMemoryCache)
+        sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
         var thrownError: Error?
 
         // When
-        let itemsFuture = sut.getAllMetadata(withIDs: [], on: eventLoop)
+        let itemsFuture = sut.getAllMetadata(withIDs: [], from: table, on: eventLoop)
         XCTAssertThrowsError(try itemsFuture.wait()) {
             thrownError = $0
         }
@@ -183,10 +186,10 @@ final class InMemoryCacheProviderTests: XCTestCase {
 
     func testSaveItems() {
         // Given
-        sut = InMemoryCacheProvider(inMemoryCache)
+        sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
 
         // When
-        sut.save(items: Array(givenData.values))
+        sut.save(items: Array(givenData.values), in: table)
 
         // Then
         XCTAssertEqual(inMemoryCache.values.count, givenData.count)

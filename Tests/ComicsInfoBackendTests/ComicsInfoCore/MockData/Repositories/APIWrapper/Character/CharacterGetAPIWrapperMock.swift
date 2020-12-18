@@ -20,7 +20,6 @@ enum CharacterGetAPIWrapperMock {
     ) -> CharacterGetAPIWrapper {
         let repositoryAPIService = RepositoryAPIServiceMock.makeRepositoryAPIService(
             on: eventLoop,
-            tableName: "character",
             logger: logger
         )
         return CharacterGetAPIWrapper(

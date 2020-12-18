@@ -18,18 +18,12 @@ struct ComicUseCaseFactoryMock: UseCaseFactory {
 
     var isLocalServer: Bool
     var cacheProvider: InMemoryCacheProvider<Comic>
-    var tableName: String
-    let characterTableName: String
-    let seriesTableName: String
 
     init(on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         self.logger = logger ?? Logger(label: "ComicUseCaseFactoryMock")
         isLocalServer = true
         cacheProvider = InMemoryCacheProvider<Comic>()
-        tableName = "comic"
-        characterTableName = "character"
-        seriesTableName = "series"
     }
 
     func makeUseCase() -> ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>> {
@@ -48,10 +42,7 @@ struct ComicUseCaseFactoryMock: UseCaseFactory {
         ComicRepositoryAPIWrapper(
             on: eventLoop,
             repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger,
-            tableName: tableName,
-            characterTableName: characterTableName,
-            seriesTableName: seriesTableName
+            logger: logger
         )
     }
 

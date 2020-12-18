@@ -16,7 +16,6 @@ final class Series_DatabaseItemMapperTests: XCTestCase {
 
     override func setUpWithError() throws {
         seriesDatabase = SeriesDatabase(
-            tableName: "series",
             itemID: "series#1",
             summaryID: "series#1",
             itemName: "series",

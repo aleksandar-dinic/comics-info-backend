@@ -20,14 +20,16 @@ public struct SeriesReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheP
 
     public func handleRead(
         on eventLoop: EventLoop,
-        request: Request
+        request: Request,
+        environment: String?
     ) -> EventLoopFuture<Response> {
         guard let id = request.pathParameters?["id"] else {
             let response = Response(statusCode: .badRequest)
             return eventLoop.makeSucceededFuture(response)
         }
 
-        return seriesUseCase.getItem(withID: id, fromDataSource: .memory)
+        let table = String.tableName(for: environment)
+        return seriesUseCase.getItem(withID: id, fromDataSource: .memory, from: table)
             .map { Response(with: Domain.Series(from: $0), statusCode: .ok) }
             .flatMapError { self.catch($0, on: eventLoop) }
     }

@@ -19,7 +19,6 @@ public protocol UseCaseFactory  {
     var isLocalServer: Bool { get }
     var cacheProvider: CacheProvider { get }
     var logger: Logger { get }
-    var tableName: String { get }
 
     func makeUseCase() -> UseCaseType
 
@@ -32,7 +31,7 @@ extension UseCaseFactory {
     }
 
     private func makeDatabase() -> Database {
-        DatabaseFectory(isLocalServer: isLocalServer, tableName: tableName)
+        DatabaseFectory(isLocalServer: isLocalServer)
             .makeDatabase(eventLoop: eventLoop, logger: logger)
     }
 

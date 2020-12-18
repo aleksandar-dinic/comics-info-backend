@@ -12,7 +12,6 @@ import Foundation
 enum SeriesSummaryMock {
 
     static func makeSeriesSummary(
-        tableName: String = "series",
         itemID: String = "series#1",
         summaryID: String = "series#1",
         itemName: String = "series",
@@ -22,7 +21,6 @@ enum SeriesSummaryMock {
         description: String? = nil
     ) -> SeriesSummary {
         SeriesSummary(
-            tableName: tableName,
             itemID: itemID,
             summaryID: summaryID,
             itemName: itemName,
@@ -35,7 +33,6 @@ enum SeriesSummaryMock {
 
     static var seriesSummary: SeriesSummary {
         SeriesSummary(
-            tableName: "series",
             itemID: "series#1",
             summaryID: "series#1",
             itemName: "series",

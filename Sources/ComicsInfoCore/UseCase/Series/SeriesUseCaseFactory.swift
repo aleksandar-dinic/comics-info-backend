@@ -16,27 +16,17 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory whe
     public let isLocalServer: Bool
     public let cacheProvider: CacheProvider
     public let logger: Logger
-    public let tableName: String
-
-    private let characterTableName: String
-    private let comicTableName: String
 
     public init(
         on eventLoop: EventLoop,
         isLocalServer: Bool,
         cacheProvider: CacheProvider,
-        logger: Logger,
-        tableName: String = .seriesTableName,
-        characterTableName: String = .characterTableName,
-        comicTableName: String = .comicTableName
+        logger: Logger
     ) {
         self.eventLoop = eventLoop
         self.isLocalServer = isLocalServer
         self.cacheProvider = cacheProvider
         self.logger = logger
-        self.tableName = tableName
-        self.characterTableName = characterTableName
-        self.comicTableName = comicTableName
     }
 
     public func makeUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, CacheProvider> {
@@ -55,10 +45,7 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory whe
         SeriesRepositoryAPIWrapper(
             on: eventLoop,
             repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger,
-            tableName: tableName,
-            characterTableName: characterTableName,
-            comicTableName: comicTableName
+            logger: logger
         )
     }
 

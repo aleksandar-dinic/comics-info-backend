@@ -16,7 +16,7 @@ protocol GetAllAPIWrapper: CharactersSummaryHandler, SeriesSummaryHandler, Comic
     var repositoryAPIService: RepositoryAPIService { get }
     var decoderService: DecoderService { get }
 
-    func getAll() -> EventLoopFuture<[Item]>
+    func getAll(from table: String) -> EventLoopFuture<[Item]>
 
     func handleItems(_ items: [DatabaseItem]) throws -> [Item]
 
@@ -24,8 +24,8 @@ protocol GetAllAPIWrapper: CharactersSummaryHandler, SeriesSummaryHandler, Comic
 
 extension GetAllAPIWrapper {
 
-    func getAll() -> EventLoopFuture<[Item]> {
-        repositoryAPIService.getAll(.getType(from: Item.self))
+    func getAll(from table: String) -> EventLoopFuture<[Item]> {
+        repositoryAPIService.getAll(.getType(from: Item.self), from: table)
             .flatMapThrowing { try handleItems($0) }
             .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }

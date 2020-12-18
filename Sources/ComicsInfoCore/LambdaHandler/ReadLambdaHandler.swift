@@ -31,7 +31,11 @@ public struct ReadLambdaHandler: EventLoopLambdaHandler, LoggerProvider {
     ) -> EventLoopFuture<APIGateway.V2.Response> {
         logRequest(context.logger, request: event)
 
-        return readResponseWrapper.handleRead(on: context.eventLoop, request: event)
+        return readResponseWrapper.handleRead(
+            on: context.eventLoop,
+            request: event,
+            environment: context.environment
+        )
             .map { APIGateway.V2.Response(from: $0) }
             .always { logResponse(context.logger, response: $0) }
     }

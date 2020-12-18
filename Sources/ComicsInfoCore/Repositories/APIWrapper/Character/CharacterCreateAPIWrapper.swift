@@ -18,7 +18,6 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
     let repositoryAPIService: RepositoryAPIService
     let encoderService: EncoderService
     let eventLoop: EventLoop
-    let tableName: String
 
     let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
     let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
@@ -28,22 +27,23 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
         repositoryAPIService: RepositoryAPIService,
         encoderService: EncoderService,
         logger: Logger,
-        tableName: String,
         seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>,
         comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
     ) {
         self.repositoryAPIService = repositoryAPIService
         self.encoderService = encoderService
         self.eventLoop = eventLoop
-        self.tableName = tableName
         self.seriesUseCase = seriesUseCase
         self.comicUseCase = comicUseCase
     }
 
-    func getSummaryFutures(for item: Character) -> [EventLoopFuture<[DatabasePutItem]>] {
+    func getSummaryFutures(
+        for item: Character,
+        in table: String
+    ) -> [EventLoopFuture<[DatabasePutItem]>] {
         [
-            getSeriesSummary(forIDs: item.seriesID, character: item),
-            getComicsSummary(forIDs: item.comicsID, character: item)
+            getSeriesSummary(forIDs: item.seriesID, character: item, from: table),
+            getComicsSummary(forIDs: item.comicsID, character: item, from: table)
         ]
     }
 
@@ -51,12 +51,13 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
 
     private func getSeriesSummary(
         forIDs seriesID: Set<String>?,
-        character: Character
+        character: Character,
+        from table: String
     ) -> EventLoopFuture<[DatabasePutItem]> {
-        getSeries(seriesID).flatMapThrowing {
+        getSeries(seriesID, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeSeriesSummary($0, item: character)
-            return appendItemSummary($0, item: character, dbItems: &dbItems)
+            var dbItems: [DatabasePutItem] = makeSeriesSummary($0, item: character, in: table)
+            return appendItemSummary($0, item: character, dbItems: &dbItems, tableName: table)
         }
     }
 
@@ -64,12 +65,13 @@ struct CharacterCreateAPIWrapper: CreateAPIWrapper, SeriesSummaryFuturesFactory,
 
     private func getComicsSummary(
         forIDs comicsId: Set<String>?,
-        character: Character
+        character: Character,
+        from table: String
     ) -> EventLoopFuture<[DatabasePutItem]> {
-        getComics(comicsId).flatMapThrowing {
+        getComics(comicsId, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeComicsSummary($0, item: character)
-            return appendItemSummary($0, item: character, dbItems: &dbItems)
+            var dbItems: [DatabasePutItem] = makeComicsSummary($0, item: character, in: table)
+            return appendItemSummary($0, item: character, dbItems: &dbItems, tableName: table)
         }
     }
 

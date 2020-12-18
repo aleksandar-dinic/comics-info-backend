@@ -12,15 +12,18 @@ import XCTest
 final class SeriesRepositoryAPIWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     private var sut: SeriesRepositoryAPIWrapper!
+    private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         sut = SeriesRepositoryAPIWrapperMock.make()
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        table = nil
     }
 
     func test_whenGetMetadata_isEqualToGivenMetadata() throws {
@@ -29,7 +32,7 @@ final class SeriesRepositoryAPIWrapperTests: XCTestCase, CreateSeriesProtocol {
         try createSeries(givenSeries)
 
         // When
-        let feature = sut.getMetadata(id: givenSeries.id)
+        let feature = sut.getMetadata(id: givenSeries.id, from: table)
         let series = try feature.wait()
 
         // Then
@@ -42,7 +45,7 @@ final class SeriesRepositoryAPIWrapperTests: XCTestCase, CreateSeriesProtocol {
         var thrownError: Error?
 
         // When
-        let feature = sut.getMetadata(id: givenSeries.id)
+        let feature = sut.getMetadata(id: givenSeries.id, from: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

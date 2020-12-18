@@ -13,18 +13,18 @@ protocol SeriesMetadataHandler: EmptyItemsHandler {
 
     var seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> { get }
 
-    func getSeries(_ seriesIDs: Set<String>?) -> EventLoopFuture<[Series]>
+    func getSeries(_ seriesIDs: Set<String>?, from table: String) -> EventLoopFuture<[Series]>
 
 }
 
 extension SeriesMetadataHandler {
 
-    func getSeries(_ seriesIDs: Set<String>?) -> EventLoopFuture<[Series]> {
+    func getSeries(_ seriesIDs: Set<String>?, from table: String) -> EventLoopFuture<[Series]> {
         guard let seriesIDs = seriesIDs, !seriesIDs.isEmpty else {
             return handleEmptyItems()
         }
 
-        return seriesUseCase.getAllMetadata(withIDs: seriesIDs, fromDataSource: .memory)
+        return seriesUseCase.getAllMetadata(withIDs: seriesIDs, fromDataSource: .memory, from: table)
                 .flatMapThrowing { try handleItems($0, itemsID: seriesIDs) }
     }
 

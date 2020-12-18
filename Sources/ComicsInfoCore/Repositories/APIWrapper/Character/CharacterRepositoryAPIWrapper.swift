@@ -17,65 +17,54 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
     public let logger: Logger
     public let decoderService: DecoderService
     public let encoderService: EncoderService
-    public let tableName: String
-
-    private let seriesTableName: String
-    private let comicTableName: String
 
     public init(
         on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
         logger: Logger,
         decoderService: DecoderService = DecoderProvider(),
-        encoderService: EncoderService = EncoderProvider(),
-        tableName: String,
-        seriesTableName: String,
-        comicTableName: String
+        encoderService: EncoderService = EncoderProvider()
     ) {
         self.eventLoop = eventLoop
         self.repositoryAPIService = repositoryAPIService
         self.logger = logger
         self.decoderService = decoderService
         self.encoderService = encoderService
-        self.tableName = tableName
-        self.seriesTableName = seriesTableName
-        self.comicTableName = comicTableName
     }
 
     // MARK: - Create item
 
-    public func create(_ item: Character) -> EventLoopFuture<Void> {
+    public func create(_ item: Character, in table: String) -> EventLoopFuture<Void> {
         CharacterCreateAPIWrapper(
             on: eventLoop,
             repositoryAPIService: repositoryAPIService,
             encoderService: encoderService,
             logger: logger,
-            tableName: tableName,
             seriesUseCase: makeSeriesUseCase(),
             comicUseCase: makeComicUseCase()
-        ).create(item)
+        ).create(item, in: table)
     }
 
     // MARK: - Get item
 
-    public func getItem(withID itemID: String) -> EventLoopFuture<Character> {
+    public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<Character> {
         CharacterGetAPIWrapper(
             repositoryAPIService: repositoryAPIService,
             decoderService: decoderService
-        ).get(withID: itemID)
+        ).get(withID: itemID, from: table)
     }
 
-    public func getAllItems() -> EventLoopFuture<[Character]> {
+    public func getAllItems(from table: String) -> EventLoopFuture<[Character]> {
         CharacterGetAllAPIWrapper(
             repositoryAPIService: repositoryAPIService,
             decoderService: decoderService
-        ).getAll()
+        ).getAll(from: table)
     }
 
     // MARK: - Get metadata
 
-    public func getMetadata(id: String) -> EventLoopFuture<Character> {
-        repositoryAPIService.getMetadata(withID: mapItemID(id))
+    public func getMetadata(id: String, from table: String) -> EventLoopFuture<Character> {
+        repositoryAPIService.getMetadata(withID: mapItemID(id), from: table)
             .flatMapThrowing { Character(from: try decoderService.decode(from: $0)) }
             .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Character.self) }
     }
@@ -84,26 +73,25 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
         "\(String.getType(from: Item.self))#\(id)"
     }
 
-    public func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[Character]> {
+    public func getAllMetadata(ids: Set<String>, from table: String) -> EventLoopFuture<[Character]> {
         CharacterGetAllMetadataAPIWrapper(
             repositoryAPIService: repositoryAPIService,
             decoderService: decoderService
-        ).getAllMetadata(ids: ids)
+        ).getAllMetadata(ids: ids, from: table)
     }
 
     // MARK: - Update item
 
-    public func update(_ item: Character) -> EventLoopFuture<Void> {
+    public func update(_ item: Character, in table: String) -> EventLoopFuture<Void> {
         CharacterUpdateAPIWrapper(
             on: eventLoop,
             repositoryAPIService: repositoryAPIService,
             encoderService: encoderService,
             decoderService: decoderService,
             logger: logger,
-            tableName: tableName,
             seriesUseCase: makeSeriesUseCase(),
             comicUseCase: makeComicUseCase()
-        ).update(item)
+        ).update(item, in: table)
     }
 
     private func makeSeriesUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> {
@@ -111,8 +99,7 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,
             cacheProvider: LocalServer.seriesInMemoryCache,
-            logger: logger,
-            tableName: seriesTableName
+            logger: logger
         ).makeUseCase()
     }
 
@@ -121,8 +108,7 @@ public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,
             cacheProvider: LocalServer.comicInMemoryCache,
-            logger: logger,
-            tableName: comicTableName
+            logger: logger
         ).makeUseCase()
     }
 

@@ -19,16 +19,15 @@ public protocol RepositoryAPIWrapper {
     var logger: Logger { get }
     var decoderService: DecoderService { get }
     var encoderService: EncoderService { get }
-    var tableName: String { get }
 
-    func create(_ item: Item) -> EventLoopFuture<Void>
+    func create(_ item: Item, in table: String) -> EventLoopFuture<Void>
 
-    func getItem(withID itemID: Item.ID) -> EventLoopFuture<Item>
-    func getAllItems() -> EventLoopFuture<[Item]>
+    func getItem(withID itemID: Item.ID, from table: String) -> EventLoopFuture<Item>
+    func getAllItems(from table: String) -> EventLoopFuture<[Item]>
 
-    func getMetadata(id: Item.ID) -> EventLoopFuture<Item>
-    func getAllMetadata(ids: Set<Item.ID>) -> EventLoopFuture<[Item]>
+    func getMetadata(id: Item.ID, from table: String) -> EventLoopFuture<Item>
+    func getAllMetadata(ids: Set<Item.ID>, from table: String) -> EventLoopFuture<[Item]>
 
-    func update(_ item: Item) -> EventLoopFuture<Void>
+    func update(_ item: Item, in table: String) -> EventLoopFuture<Void>
 
 }

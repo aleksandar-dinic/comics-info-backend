@@ -18,8 +18,9 @@ public struct ComicListResponseWrapper<APIWrapper: RepositoryAPIWrapper, CachePr
         self.comicUseCase = comicUseCase
     }
 
-    public func handleList(on eventLoop: EventLoop) -> EventLoopFuture<Response> {
-        comicUseCase.getAllItems(fromDataSource: .memory)
+    public func handleList(on eventLoop: EventLoop, environment: String?) -> EventLoopFuture<Response> {
+        let table = String.tableName(for: environment)
+        return comicUseCase.getAllItems(fromDataSource: .memory, from: table)
             .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }
             .flatMapError { self.catch($0, on: eventLoop) }
     }

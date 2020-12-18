@@ -12,15 +12,18 @@ import XCTest
 final class CharacterGetAllMetadataAPIWrapperTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var sut: CharacterGetAllMetadataAPIWrapper!
+    private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         sut = CharacterGetAllMetadataAPIWrapperMock.make()
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        table = nil
     }
 
     func test_whenGetAllMetadata_returnsAllMetadata() throws {
@@ -33,7 +36,7 @@ final class CharacterGetAllMetadataAPIWrapperTests: XCTestCase, CreateCharacterP
         try createCharacter(CharacterMock.makeCharacter(id: "2", comicsID: [comic.id]))
 
         // When
-        let feature = sut.getAllMetadata(ids: ["1", "2"])
+        let feature = sut.getAllMetadata(ids: ["1", "2"], from: table)
         let characters = try feature.wait()
 
         // Then
@@ -45,7 +48,7 @@ final class CharacterGetAllMetadataAPIWrapperTests: XCTestCase, CreateCharacterP
         var thrownError: Error?
 
         // When
-        let feature = sut.getAllMetadata(ids: ["1", "2"])
+        let feature = sut.getAllMetadata(ids: ["1", "2"], from: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

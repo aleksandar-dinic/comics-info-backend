@@ -11,6 +11,10 @@ import NIO
 
 public protocol ReadResponseWrapper: ErrorResponseWrapper {
 
-    func handleRead(on eventLoop: EventLoop, request: Request) -> EventLoopFuture<Response>
+    func handleRead(
+        on eventLoop: EventLoop,
+        request: Request,
+        environment: String?
+    ) -> EventLoopFuture<Response>
 
 }

@@ -20,7 +20,6 @@ enum SeriesGetAPIWrapperMock {
     ) -> SeriesGetAPIWrapper {
         let repositoryAPIService = RepositoryAPIServiceMock.makeRepositoryAPIService(
             on: eventLoop,
-            tableName: "series",
             logger: logger
         )
         return SeriesGetAPIWrapper(

@@ -20,7 +20,6 @@ enum ComicGetAllMetadataAPIWrapperMock {
     ) -> ComicGetAllMetadataAPIWrapper {
         let repositoryAPIService = RepositoryAPIServiceMock.makeRepositoryAPIService(
             on: eventLoop,
-            tableName: "comic",
             logger: logger
         )
         return ComicGetAllMetadataAPIWrapper(

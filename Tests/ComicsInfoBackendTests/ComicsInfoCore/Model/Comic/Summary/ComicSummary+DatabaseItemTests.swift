@@ -15,7 +15,7 @@ final class ComicSummary_DatabaseItemTests: XCTestCase {
     private var sut: ComicSummary!
 
     override func setUpWithError() throws {
-        databaseItem = DatabasePutItem(ComicMock.items, table: "comic")
+        databaseItem = DatabasePutItem(ComicMock.items, table: String.tableName(for: "TEST"))
     }
 
     override func tearDownWithError() throws {
@@ -24,7 +24,7 @@ final class ComicSummary_DatabaseItemTests: XCTestCase {
     }
 
     private func makeComicSummaryFromDatabaseItem() throws -> ComicSummary {
-        try ComicSummary(from: databaseItem, tableName: "comic")
+        try ComicSummary(from: databaseItem)
     }
 
     // MARK: - Item ID

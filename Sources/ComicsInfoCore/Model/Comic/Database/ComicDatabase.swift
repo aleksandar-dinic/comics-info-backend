@@ -14,8 +14,6 @@ struct ComicDatabase: DatabaseMapper {
         String(summaryID.dropFirst("\(String.getType(from: Comic.self))#".count))
     }
 
-    var tableName: String
-
     let itemID: String
     let summaryID: String
     let itemName: String
@@ -50,7 +48,7 @@ struct ComicDatabase: DatabaseMapper {
 
 extension ComicDatabase {
 
-    init(item: Comic, tableName: String) {
+    init(item: Comic) {
         itemID = "\(String.getType(from: Comic.self))#\(item.id)"
         summaryID = "\(String.getType(from: Comic.self))#\(item.id)"
         itemName = .getType(from: Comic.self)
@@ -68,12 +66,11 @@ extension ComicDatabase {
         images = item.images
         published = item.published
         charactersSummary = item.characters?.compactMap {
-            CharacterSummary($0, id: item.id, itemName: .getType(from: Comic.self), tableName: tableName)
+            CharacterSummary($0, id: item.id, itemName: .getType(from: Comic.self))
         }
         seriesSummary = item.series?.compactMap {
-            SeriesSummary($0, id: item.id, itemName: .getType(from: Comic.self), tableName: tableName)
+            SeriesSummary($0, id: item.id, itemName: .getType(from: Comic.self))
         }
-        self.tableName = tableName
     }
 
 }
@@ -99,7 +96,7 @@ extension ComicDatabase {
         case published
     }
 
-    public init(from item: DatabaseItem, tableName: String) throws {
+    public init(from item: DatabaseItem) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -126,7 +123,6 @@ extension ComicDatabase {
         collectedIssuesIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.collectedIssuesIdentifier)
         images = try? decoder.decode([String].self, forKey: CodingKeys.images)
         published = try? decoder.decode(Date.self, forKey: CodingKeys.published)
-        self.tableName = tableName
     }
 
 }

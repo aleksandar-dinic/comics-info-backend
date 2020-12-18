@@ -13,18 +13,18 @@ protocol ComicsMetadataHandler: EmptyItemsHandler {
 
     var comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>> { get }
 
-    func getComics(_ comicsID: Set<String>?) -> EventLoopFuture<[Comic]>
+    func getComics(_ comicsID: Set<String>?, from table: String) -> EventLoopFuture<[Comic]>
 
 }
 
 extension ComicsMetadataHandler {
 
-    func getComics(_ comicsID: Set<String>?) -> EventLoopFuture<[Comic]> {
+    func getComics(_ comicsID: Set<String>?, from table: String) -> EventLoopFuture<[Comic]> {
         guard let comicsID = comicsID, !comicsID.isEmpty else {
             return handleEmptyItems()
         }
 
-        return comicUseCase.getAllMetadata(withIDs: comicsID, fromDataSource: .memory)
+        return comicUseCase.getAllMetadata(withIDs: comicsID, fromDataSource: .memory, from: table)
                 .flatMapThrowing { try handleItems($0, itemsID: comicsID) }
     }
 

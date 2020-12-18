@@ -16,7 +16,6 @@ final class Comic_DatabaseItemMapperTests: XCTestCase {
 
     override func setUpWithError() throws {
         comicDatabase = ComicDatabase(
-            tableName: "comic",
             itemID: "comic#1",
             summaryID: "comic#1",
             itemName: "comic",

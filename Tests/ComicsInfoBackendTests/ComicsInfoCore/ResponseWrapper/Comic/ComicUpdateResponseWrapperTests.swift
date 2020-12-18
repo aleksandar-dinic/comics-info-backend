@@ -16,6 +16,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
 
     private var eventLoop: EventLoop!
     private var sut: ComicUpdateResponseWrapper<ComicRepositoryAPIWrapper, Cache>!
+    private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
@@ -23,11 +24,13 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let useCase = ComicUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = ComicUpdateResponseWrapper(comicUseCase: useCase)
+        environment = "TEST"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
         sut = nil
+        environment = nil
     }
 
     func test_whenHandleUpdateWithoutBody_statusIsBadRequest() throws {
@@ -35,7 +38,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
         let request = Request(pathParameters: nil, body: nil)
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -47,7 +50,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
         let request = Request(pathParameters: nil, body: "")
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -59,7 +62,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
         let request = Request(pathParameters: nil, body: ComicMock.requestBody)
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -73,7 +76,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
         let request = Request(pathParameters: nil, body: ComicMock.requestBody)
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then

@@ -16,6 +16,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase, CreateCharacterProtoc
 
     private var eventLoop: EventLoop!
     private var sut: CharacterReadResponseWrapper<CharacterRepositoryAPIWrapper, Cache>!
+    private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
@@ -23,11 +24,13 @@ final class CharacterReadResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let useCase = CharacterUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = CharacterReadResponseWrapper(characterUseCase: useCase)
+        environment = "TEST"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
         sut = nil
+        environment = nil
     }
 
     func test_whenHandleReadWithoutPathParameters_statusIsBadRequest() throws {
@@ -35,7 +38,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         let request = Request(pathParameters: nil, body: nil)
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -47,7 +50,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         let request = Request(pathParameters: ["invalidID": "-1"], body: nil)
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -59,7 +62,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         let request = Request(pathParameters: ["id": "1"], body: nil)
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -73,7 +76,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         let request = Request(pathParameters: ["id": "1"], body: nil)
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
         let response = try feature.wait()
 
         // Then

@@ -14,8 +14,6 @@ struct SeriesDatabase: DatabaseMapper {
         String(summaryID.dropFirst("\(String.getType(from: Series.self))#".count))
     }
 
-    var tableName: String
-
     let itemID: String
     let summaryID: String
     let itemName: String
@@ -44,7 +42,7 @@ struct SeriesDatabase: DatabaseMapper {
 
 extension SeriesDatabase {
 
-    init(item: Series, tableName: String) {
+    init(item: Series) {
         itemID = "\(String.getType(from: Series.self))#\(item.id)"
         summaryID = "\(String.getType(from: Series.self))#\(item.id)"
         itemName = .getType(from: Series.self)
@@ -56,12 +54,11 @@ extension SeriesDatabase {
         endYear = item.endYear
         nextIdentifier = item.nextIdentifier
         charactersSummary = item.characters?.compactMap {
-            CharacterSummary($0, id: item.id, itemName: .getType(from: Series.self), tableName: tableName)
+            CharacterSummary($0, id: item.id, itemName: .getType(from: Series.self))
         }
         comicsSummary = item.comics?.compactMap {
-            ComicSummary($0, id: item.id, itemName: .getType(from: Series.self), tableName: tableName)
+            ComicSummary($0, id: item.id, itemName: .getType(from: Series.self))
         }
-        self.tableName = tableName
     }
 
 }
@@ -81,7 +78,7 @@ extension SeriesDatabase {
         case nextIdentifier
     }
 
-    public init(from item: DatabaseItem, tableName: String) throws {
+    public init(from item: DatabaseItem) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -102,7 +99,6 @@ extension SeriesDatabase {
         endYear = try? decoder.decode(Int.self, forKey: CodingKeys.endYear)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         nextIdentifier = try? decoder.decode(String.self, forKey: CodingKeys.nextIdentifier)
-        self.tableName = tableName
     }
 
 }

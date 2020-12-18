@@ -13,18 +13,18 @@ protocol CharactersMetadataHandler: EmptyItemsHandler {
 
     var characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> { get }
 
-    func getCharacters(_ charactersID: Set<String>?) -> EventLoopFuture<[Character]>
+    func getCharacters(_ charactersID: Set<String>?, from table: String) -> EventLoopFuture<[Character]>
 
 }
 
 extension CharactersMetadataHandler {
 
-    func getCharacters(_ charactersID: Set<String>?) -> EventLoopFuture<[Character]> {
+    func getCharacters(_ charactersID: Set<String>?, from table: String) -> EventLoopFuture<[Character]> {
         guard let charactersID = charactersID, !charactersID.isEmpty else {
             return handleEmptyItems()
         }
 
-        return characterUseCase.getAllMetadata(withIDs: charactersID, fromDataSource: .memory)
+        return characterUseCase.getAllMetadata(withIDs: charactersID, fromDataSource: .memory, from: table)
                 .flatMapThrowing { try handleItems($0, itemsID: charactersID) }
     }
 

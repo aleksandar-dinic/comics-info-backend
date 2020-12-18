@@ -14,11 +14,9 @@ import NIO
 public struct DatabaseFectory {
 
     private let isLocalServer: Bool
-    private let tableName: String
 
-    public init(isLocalServer: Bool, tableName: String) {
+    public init(isLocalServer: Bool) {
         self.isLocalServer = isLocalServer
-        self.tableName = tableName
     }
 
     public func makeDatabase(
@@ -26,10 +24,10 @@ public struct DatabaseFectory {
         logger: Logger
     ) -> Database {
         guard !isLocalServer else {
-            return DatabaseMock(eventLoop: eventLoop, tableName: tableName, logger: logger)
+            return DatabaseMock(eventLoop: eventLoop, logger: logger)
         }
 
-        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, tableName: tableName, logger: logger)
+        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, logger: logger)
     }
 
 }

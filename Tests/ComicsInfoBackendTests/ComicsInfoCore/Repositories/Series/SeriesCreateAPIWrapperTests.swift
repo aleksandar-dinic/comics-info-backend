@@ -12,15 +12,18 @@ import XCTest
 final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, CreateComicProtocol {
 
     private var sut: SeriesCreateAPIWrapper!
+    private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         sut = SeriesCreateAPIWrapperMock.make()
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        table = nil
     }
 
     func test_whenGetSummaryFutures_returnsAllSummaries() throws {
@@ -32,7 +35,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         let series = SeriesMock.makeSeries(charactersID: [character.id], comicsID: [comic.id])
 
         // When
-        let features = sut.getSummaryFutures(for: series)
+        let features = sut.getSummaryFutures(for: series, in: table)
         var items = [DatabasePutItem]()
         for feature in features {
             items.append(contentsOf: try feature.wait())
@@ -77,7 +80,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var dbItems = [DatabasePutItem]()
 
         // When
-        let items = sut.appendItemSummary([comic], item: series, dbItems: &dbItems)
+        let items = sut.appendItemSummary([comic], item: series, dbItems: &dbItems, tableName: table)
 
         // Then
         XCTAssertEqual(items.count, 1)
@@ -96,7 +99,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         // Given
 
         // When
-        let feature = sut.create(SeriesMock.makeSeries())
+        let feature = sut.create(SeriesMock.makeSeries(), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -104,12 +107,12 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
 
     func test_whenSeriesTheSameSeriesTwice_throwsItemAlreadyExists() throws {
         // Given
-        var feature = sut.create(SeriesMock.makeSeries())
+        var feature = sut.create(SeriesMock.makeSeries(), in: table)
         try feature.wait()
         var thrownError: Error?
 
         // When
-        feature = sut.create(SeriesMock.makeSeries())
+        feature = sut.create(SeriesMock.makeSeries(), in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -130,7 +133,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var thrownError: Error?
 
         // When
-        let feature = sut.create(SeriesMock.makeSeries(charactersID: charactersID))
+        let feature = sut.create(SeriesMock.makeSeries(charactersID: charactersID), in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -151,7 +154,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var thrownError: Error?
 
         // When
-        let feature = sut.create(SeriesMock.makeSeries(comicsID: comicsID))
+        let feature = sut.create(SeriesMock.makeSeries(comicsID: comicsID), in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -174,7 +177,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         try createComic(comic)
 
         // When
-        let feature = sut.create(SeriesMock.makeSeries(charactersID: [character.id], comicsID: [comic.id]))
+        let feature = sut.create(SeriesMock.makeSeries(charactersID: [character.id], comicsID: [comic.id]), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -188,7 +191,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var thrownError: Error?
 
         // When
-        let feature = sut.create(series)
+        let feature = sut.create(series, in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -211,7 +214,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
         var thrownError: Error?
 
         // When
-        let feature = sut.create(series)
+        let feature = sut.create(series, in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

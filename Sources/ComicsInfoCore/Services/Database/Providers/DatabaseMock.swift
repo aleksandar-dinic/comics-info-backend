@@ -30,17 +30,15 @@ struct DatabaseMock: Database {
     }
 
     private let eventLoop: EventLoop
-    private let tableName: String
     private let logger: Logger
 
-    init(eventLoop: EventLoop, tableName: String, logger: Logger) {
+    init(eventLoop: EventLoop, logger: Logger) {
         self.eventLoop = eventLoop
-        self.tableName = tableName
         self.logger = logger
     }
 
     mutating func create(_ item: DatabasePutItem) -> EventLoopFuture<Void> {
-        logger.log(level: .info, "item: \(item))")
+        logger.log(level: .info, "Create item: \(item))")
 
         guard let itemID = item["itemID"] as? String else {
             return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveItemID)
@@ -60,7 +58,7 @@ struct DatabaseMock: Database {
     }
 
     mutating func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void> {
-        logger.log(level: .info, "items: \(items))")
+        logger.log(level: .info, "CreateAll items: \(items))")
 
         for item in items {
             guard let itemID = item["itemID"] as? String else {
@@ -82,8 +80,8 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(())
     }
 
-    func getItem(withID itemID: String) -> EventLoopFuture<[DatabaseItem]> {
-        logger.log(level: .info, "withID: \(itemID))")
+    func getItem(withID itemID: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+        logger.log(level: .info, "GetItem withID: \(itemID))")
 
         var items = [DatabaseItem]()
         items = DatabaseMock.tables[tableName]?.items.values.map { $0 } ?? []
@@ -95,8 +93,8 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(items.filter({ $0.attributes["itemID"] as? String == itemID }))
     }
 
-    func getAll(_ items: String) -> EventLoopFuture<[DatabaseItem]> {
-        logger.log(level: .info, "items: \(items))")
+    func getAll(_ items: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+        logger.log(level: .info, "GetAll items: \(items))")
 
         var items = [DatabaseItem]()
         items = DatabaseMock.tables[tableName]?.items.values.map { $0 } ?? []
@@ -108,8 +106,8 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(items)
     }
 
-    func getMetadata(withID id: String) -> EventLoopFuture<DatabaseItem> {
-        logger.log(level: .info, "withID: \(id))")
+    func getMetadata(withID id: String, tableName: String) -> EventLoopFuture<DatabaseItem> {
+        logger.log(level: .info, "GetMetadata withID: \(id))")
 
         var items = [DatabaseItem]()
         items = DatabaseMock.tables[tableName]?.items.values.map { $0 } ?? []
@@ -121,35 +119,20 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(item)
     }
 
-    func getAllMetadata(withIDs ids: Set<String>) -> EventLoopFuture<[DatabaseItem]> {
-        logger.log(level: .info, "withIDs: \(ids))")
+    func getAllMetadata(withIDs ids: Set<String>, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+        logger.log(level: .info, "GetAllMetadata withIDs: \(ids))")
 
         var items = [DatabaseItem]()
         for id in ids {
-            let table = getTable(from: id)
-            guard let item = DatabaseMock.tables[table]?.items["\(id)|\(id)"] else { continue }
+            guard let item = DatabaseMock.tables[tableName]?.items["\(id)|\(id)"] else { continue }
             items.append(item)
         }
 
         return eventLoop.makeSucceededFuture(items)
     }
 
-    private func getTable(from itemID: String) -> String {
-        if itemID.starts(with: String.getType(from: Character.self)) {
-            return String(itemID.dropLast(itemID.count - "\(String.getType(from: Character.self))".count))
-
-        } else if itemID.starts(with: String.getType(from: Series.self)) {
-            return String(itemID.dropLast(itemID.count - "\(String.getType(from: Series.self))".count))
-
-        } else if itemID.starts(with: String.getType(from: Comic.self)) {
-            return String(itemID.dropLast(itemID.count - "\(String.getType(from: Comic.self))".count))
-        }
-
-        return ""
-    }
-
-    func getAllSummaries(forID summaryID: String) -> EventLoopFuture<[DatabaseItem]> {
-        logger.log(level: .info, "summaryID: \(summaryID))")
+    func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+        logger.log(level: .info, "GetAllSummaries summaryID: \(summaryID))")
 
         var items = [DatabaseItem]()
         items = DatabaseMock.tables[tableName]?.items.values.map { $0 } ?? []
@@ -162,7 +145,7 @@ struct DatabaseMock: Database {
     }
 
     mutating func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void> {
-        logger.log(level: .info, "items: \(items))")
+        logger.log(level: .info, "Update items: \(items))")
 
         for item in items {
             guard let itemID = item.key["itemID"]?.value else {

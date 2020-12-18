@@ -16,7 +16,6 @@ final class Character_DatabaseItemMapperTests: XCTestCase {
 
     override func setUpWithError() throws {
         characterDatabase = CharacterDatabase(
-            tableName: "character",
             itemID: "character#1",
             summaryID: "character#1",
             itemName: "character",

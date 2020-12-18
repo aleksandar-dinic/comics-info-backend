@@ -31,7 +31,7 @@ public struct ListLambdaHandler: EventLoopLambdaHandler, LoggerProvider {
     ) -> EventLoopFuture<APIGateway.V2.Response> {
         logRequest(context.logger, request: event)
 
-        return listResponseWrapper.handleList(on: context.eventLoop)
+        return listResponseWrapper.handleList(on: context.eventLoop, environment: context.environment)
             .map { APIGateway.V2.Response(from: $0) }
             .always { logResponse(context.logger, response: $0) }
     }

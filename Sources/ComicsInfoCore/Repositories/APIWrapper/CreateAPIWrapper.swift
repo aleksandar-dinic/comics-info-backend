@@ -18,48 +18,50 @@ protocol CreateAPIWrapper {
     var eventLoop: EventLoop { get }
     var repositoryAPIService: RepositoryAPIService { get }
     var encoderService: EncoderService { get }
-    var tableName: String { get }
 
-    func create(_ item: Item) -> EventLoopFuture<Void>
-    func createSummaries(for item: Item) -> EventLoopFuture<[DatabasePutItem]>
+    func create(_ item: Item, in table: String) -> EventLoopFuture<Void>
+    func createSummaries(for item: Item, in table: String) -> EventLoopFuture<[DatabasePutItem]>
 
-    func getSummaryFutures(for item: Item) -> [EventLoopFuture<[DatabasePutItem]>]
+    func getSummaryFutures(for item: Item, in table: String) -> [EventLoopFuture<[DatabasePutItem]>]
 
 }
 
 extension CreateAPIWrapper {
 
-    func create(_ item: Item) -> EventLoopFuture<Void> {
-        createSummaries(for: item)
+    func create(_ item: Item, in table: String) -> EventLoopFuture<Void> {
+        createSummaries(for: item, in: table)
             .flatMap { repositoryAPIService.createAll($0) }
             .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
 
-    func createSummaries(for item: Item) -> EventLoopFuture<[DatabasePutItem]> {
-        .reduce([createDatabaseItem(item)], getSummaryFutures(for: item), on: eventLoop) { $0 + $1 }
+    func createSummaries(for item: Item, in table: String) -> EventLoopFuture<[DatabasePutItem]> {
+        .reduce(
+            [createDatabaseItem(item, in: table)],
+            getSummaryFutures(for: item, in: table), on: eventLoop
+        ) { $0 + $1 }
     }
 
     func appendItemSummary<LinkItem: Identifiable>(
         _ linkItems: [LinkItem],
         item: Item,
-        dbItems: inout [DatabasePutItem]
+        dbItems: inout [DatabasePutItem],
+        tableName: String
     ) -> [DatabasePutItem] where LinkItem.ID == String {
 
         for linkItem in linkItems {
             let summary = Summary(
                 item,
                 id: linkItem.id,
-                itemName: .getType(from: LinkItem.self),
-                tableName: tableName
+                itemName: .getType(from: LinkItem.self)
             )
-            dbItems.append(encoderService.encode(summary))
+            dbItems.append(encoderService.encode(summary, table: tableName))
         }
 
         return dbItems
     }
 
-    private func createDatabaseItem(_ item: Item) -> DatabasePutItem {
-        encoderService.encode(ItemDatabase(item: item, tableName: tableName))
+    private func createDatabaseItem(_ item: Item, in table: String) -> DatabasePutItem {
+        encoderService.encode(ItemDatabase(item: item), table: table)
     }
 
 }

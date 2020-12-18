@@ -14,8 +14,6 @@ struct CharacterDatabase: DatabaseMapper {
         String(summaryID.dropFirst("\(String.getType(from: Character.self))#".count))
     }
 
-    var tableName: String
-
     let itemID: String
     let summaryID: String
     let itemName: String
@@ -28,7 +26,6 @@ struct CharacterDatabase: DatabaseMapper {
     var comicsSummary: [ComicSummary]?
 
     init(
-        tableName: String,
         itemID: String,
         summaryID: String,
         itemName: String,
@@ -39,7 +36,6 @@ struct CharacterDatabase: DatabaseMapper {
         seriesSummary: [SeriesSummary]?,
         comicsSummary: [ComicSummary]?
     ) {
-        self.tableName = tableName
         self.itemID = itemID
         self.summaryID = summaryID
         self.itemName = itemName
@@ -65,7 +61,7 @@ struct CharacterDatabase: DatabaseMapper {
 
 extension CharacterDatabase {
 
-    init(item: Character, tableName: String) {
+    init(item: Character) {
         itemID = "\(String.getType(from: Character.self))#\(item.id)"
         summaryID = "\(String.getType(from: Character.self))#\(item.id)"
         itemName = .getType(from: Character.self)
@@ -74,12 +70,11 @@ extension CharacterDatabase {
         description = item.description
         thumbnail = item.thumbnail
         seriesSummary = item.series?.compactMap {
-            SeriesSummary($0, id: item.id, itemName: .getType(from: Character.self), tableName: tableName)
+            SeriesSummary($0, id: item.id, itemName: .getType(from: Character.self))
         }
         comicsSummary = item.comics?.compactMap {
-            ComicSummary($0, id: item.id, itemName: .getType(from: Character.self), tableName: tableName)
+            ComicSummary($0, id: item.id, itemName: .getType(from: Character.self))
         }
-        self.tableName = tableName
     }
 
 }
@@ -96,7 +91,7 @@ extension CharacterDatabase {
         case description
     }
 
-    public init(from item: DatabaseItem, tableName: String) throws {
+    public init(from item: DatabaseItem) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -114,7 +109,6 @@ extension CharacterDatabase {
         name = try decoder.decode(String.self, forKey: CodingKeys.name)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
-        self.tableName = tableName
     }
 
 }

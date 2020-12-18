@@ -11,6 +11,6 @@ import NIO
 
 public protocol ListResponseWrapper: ErrorResponseWrapper {
 
-    func handleList(on eventLoop: EventLoop) -> EventLoopFuture<Response>
+    func handleList(on eventLoop: EventLoop, environment: String?) -> EventLoopFuture<Response>
 
 }

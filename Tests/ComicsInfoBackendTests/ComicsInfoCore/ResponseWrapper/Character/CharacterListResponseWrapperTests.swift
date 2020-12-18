@@ -16,6 +16,7 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
 
     private var eventLoop: EventLoop!
     private var sut: CharacterListResponseWrapper<CharacterRepositoryAPIWrapper, Cache>!
+    private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
@@ -23,18 +24,20 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let useCase = CharacterUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = CharacterListResponseWrapper(characterUseCase: useCase)
+        environment = "TEST"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
         sut = nil
+        environment = nil
     }
 
     func test_whenHandleListWithoutItems_statusIsNotFound() throws {
         // Given
 
         // When
-        let feature = sut.handleList(on: eventLoop)
+        let feature = sut.handleList(on: eventLoop, environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -46,7 +49,7 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         try createCharacter(CharacterMock.makeCharacter())
 
         // When
-        let feature = sut.handleList(on: eventLoop)
+        let feature = sut.handleList(on: eventLoop, environment: environment)
         let response = try feature.wait()
 
         // Then

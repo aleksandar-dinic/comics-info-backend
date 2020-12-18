@@ -21,12 +21,6 @@ final class CharacterSummaryTests: XCTestCase {
         sut = nil
     }
 
-    // MARK: - Table name
-
-    func testTableName_isEqualToCharacter() {
-        XCTAssertEqual(sut.tableName, "character")
-    }
-
     // MARK: - Update
 
     func testPopularity_whenUpdateWithCharacter_isEqulToCharacterPopularity() {

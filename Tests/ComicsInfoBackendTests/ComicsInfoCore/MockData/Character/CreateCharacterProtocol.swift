@@ -11,15 +11,15 @@ import Foundation
 
 protocol CreateCharacterProtocol {
 
-    func createCharacter(_ character: Character) throws
+    func createCharacter(_ character: Character, in table: String) throws
 
 }
 
 extension CreateCharacterProtocol {
 
-    func createCharacter(_ character: Character) throws {
+    func createCharacter(_ character: Character, in table: String = String.tableName(for: "TEST")) throws {
         let useCase = CharacterUseCaseFactoryMock().makeUseCase()
-        let feature = useCase.create(character)
+        let feature = useCase.create(character, in: table)
         try feature.wait()
     }
 

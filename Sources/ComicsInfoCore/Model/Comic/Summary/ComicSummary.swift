@@ -14,8 +14,6 @@ struct ComicSummary: ItemSummary {
         String(summaryID.dropFirst("\(String.getType(from: Comic.self))#".count))
     }
 
-    var tableName: String
-
     let itemID: String
     let summaryID: String
     let itemName: String
@@ -49,7 +47,7 @@ struct ComicSummary: ItemSummary {
 
 extension ComicSummary {
 
-    init(_ comic: Comic, id: String, itemName: String, tableName: String) {
+    init(_ comic: Comic, id: String, itemName: String) {
         itemID = "\(itemName)#\(id)"
         summaryID = "\(String.getType(from: Comic.self))#\(comic.id)"
         self.itemName = itemName
@@ -57,7 +55,6 @@ extension ComicSummary {
         title = comic.title
         description = comic.description
         thumbnail = comic.thumbnail
-        self.tableName = tableName
     }
 
 }
@@ -74,7 +71,7 @@ extension ComicSummary {
         case description
     }
 
-    public init(from item: DatabaseItem, tableName: String) throws {
+    public init(from item: DatabaseItem) throws {
         let decoder = DatabaseDecoder(from: item)
 
         itemID = try decoder.decode(String.self, forKey: CodingKeys.itemID)
@@ -88,7 +85,6 @@ extension ComicSummary {
         title = try decoder.decode(String.self, forKey: CodingKeys.title)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
-        self.tableName = tableName
     }
 
 }

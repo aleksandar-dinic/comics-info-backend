@@ -12,15 +12,18 @@ import XCTest
 final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var sut: ComicUpdateAPIWrapper!
+    private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         sut = ComicUpdateAPIWrapperMock.make()
+        table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        table = nil
     }
 
     func test_whenGetSummaryFutures_returnsAllSummaries() throws {
@@ -32,7 +35,7 @@ final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cre
         let comic = ComicMock.makeComic(charactersID: [character.id], seriesID: [series.id])
 
         // When
-        let features = sut.getSummaryFutures(for: comic)
+        let features = sut.getSummaryFutures(for: comic, from: table)
         var items = [DatabaseUpdateItem]()
         for feature in features {
             items.append(contentsOf: try feature.wait())
@@ -77,7 +80,7 @@ final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cre
         var dbItems = [DatabaseUpdateItem]()
 
         // When
-        let items = sut.appendItemSummary([character], item: comic, dbItems: &dbItems)
+        let items = sut.appendItemSummary([character], item: comic, dbItems: &dbItems, tableName: table)
 
         // Then
         XCTAssertEqual(items.count, 1)
@@ -97,7 +100,7 @@ final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cre
         try createComic(ComicMock.makeComic(title: "Old Title"))
 
         // When
-        let feature = sut.update(ComicMock.makeComic())
+        let feature = sut.update(ComicMock.makeComic(), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -110,7 +113,7 @@ final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cre
         var thrownError: Error?
 
         // When
-        let feature = sut.update(ComicMock.makeComic(seriesID: seriesID))
+        let feature = sut.update(ComicMock.makeComic(seriesID: seriesID), in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -132,7 +135,7 @@ final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cre
         var thrownError: Error?
 
         // When
-        let feature = sut.update(ComicMock.makeComic(charactersID: charactersID))
+        let feature = sut.update(ComicMock.makeComic(charactersID: charactersID), in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -157,7 +160,7 @@ final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cre
         try createComic(ComicMock.makeComic(charactersID: [character.id], seriesID: [series.id]))
 
         // When
-        let feature = sut.update(ComicMock.makeComic(title: "New Title"))
+        let feature = sut.update(ComicMock.makeComic(title: "New Title"), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -173,7 +176,7 @@ final class ComicUpdateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cre
         try createComic(ComicMock.makeComic())
 
         // When
-        let feature = sut.update(ComicMock.makeComic(title: "New Title", charactersID: [character.id], seriesID: [series.id]))
+        let feature = sut.update(ComicMock.makeComic(title: "New Title", charactersID: [character.id], seriesID: [series.id]), in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())

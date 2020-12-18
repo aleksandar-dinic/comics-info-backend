@@ -16,14 +16,14 @@ protocol GetAllMetadataAPIWrapper {
     var repositoryAPIService: RepositoryAPIService { get }
     var decoderService: DecoderService { get }
 
-    func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[Item]>
+    func getAllMetadata(ids: Set<String>, from table: String) -> EventLoopFuture<[Item]>
 
 }
 
 extension GetAllMetadataAPIWrapper {
 
-    func getAllMetadata(ids: Set<String>) -> EventLoopFuture<[Item]> {
-        repositoryAPIService.getAllMetadata(withIDs: mapItemsID(ids))
+    func getAllMetadata(ids: Set<String>, from table: String) -> EventLoopFuture<[Item]> {
+        repositoryAPIService.getAllMetadata(withIDs: mapItemsID(ids), from: table)
             .flatMapThrowing { try handleItems($0, ids: ids) }
             .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }

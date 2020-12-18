@@ -9,41 +9,49 @@
 import Foundation
 import NIO
 
-public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
+public final class InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
-    private let inMemoryCache: InMemoryCache<Item.ID, Item>
+    private var itemsCaches: [String: InMemoryCache<Item.ID, Item>]
+    private var metadataCaches: [String: InMemoryCache<Item.ID, Item>]
 
-    public init(_ inMemoryCache: InMemoryCache<Item.ID, Item> = InMemoryCache()) {
-        self.inMemoryCache = inMemoryCache
+    public init(
+        itemsCaches: [String: InMemoryCache<Item.ID, Item>] = [:],
+        metadataCaches: [String: InMemoryCache<Item.ID, Item>] = [:]
+    ) {
+        self.itemsCaches = itemsCaches
+        self.metadataCaches = metadataCaches
     }
 
-    // FIXME: - Logic between get Item and get ItemMetadata
     public func getItem(
         withID itemID: Item.ID,
+        from table: String,
         on eventLoop: EventLoop
     ) -> EventLoopFuture<Item> {
         let promise = eventLoop.makePromise(of: Item.self)
 
         eventLoop.execute {
-            guard let item = inMemoryCache[itemID] else {
+            guard let cache = self.itemsCaches[table], let item = cache[itemID] else {
                 return promise.fail(CacheError.itemNotFound(withID: itemID, itemType: Item.self))
             }
+
             promise.succeed(item)
         }
 
         return promise.futureResult
     }
 
-    // FIXME: - Logic between get AllItems and get AllMetadata
-    public func getAllItems(on eventLoop: EventLoop) -> EventLoopFuture<[Item]> {
+    public func getAllItems(
+        from table: String,
+        on eventLoop: EventLoop
+    ) -> EventLoopFuture<[Item]> {
         let promise = eventLoop.makePromise(of: [Item].self)
 
         eventLoop.execute {
-            guard !inMemoryCache.isEmpty else {
+            guard let cache = self.itemsCaches[table], !cache.isEmpty else {
                 return promise.fail(CacheError.itemsNotFound(itemType: Item.self))
             }
 
-            promise.succeed(inMemoryCache.values)
+            promise.succeed(cache.values)
         }
 
         return promise.futureResult
@@ -51,12 +59,13 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
     public func getMetadata(
         withID id: Item.ID,
+        from table: String,
         on eventLoop: EventLoop
     ) -> EventLoopFuture<Item> {
         let promise = eventLoop.makePromise(of: Item.self)
 
         eventLoop.execute {
-            guard let item = inMemoryCache[id] else {
+            guard let cache = self.metadataCaches[table], let item = cache[id] else {
                 return promise.fail(CacheError.itemNotFound(withID: id, itemType: Item.self))
             }
             promise.succeed(item)
@@ -67,6 +76,7 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
     public func getAllMetadata(
         withIDs ids: Set<Item.ID>,
+        from table: String,
         on eventLoop: EventLoop
     ) -> EventLoopFuture<[Item]> {
         let promise = eventLoop.makePromise(of: [Item].self)
@@ -78,22 +88,41 @@ public struct InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
 
             var items = [Item]()
             for id in ids {
-                guard let item = inMemoryCache[id] else { continue }
+                guard let cache = self.metadataCaches[table], let item = cache[id] else { continue }
                 items.append(item)
             }
 
-            // FIXME: -
-            return items.count != ids.count ? promise.fail(CacheError.itemsNotFound(itemType: Item.self)) : promise.succeed(items)
+            if items.count == ids.count {
+                promise.succeed(items)
+            } else {
+                promise.fail(CacheError.itemsNotFound(itemType: Item.self))
+            }
         }
 
         return promise.futureResult
     }
 
-    public func save(items: [Item]) {
+    public func save(items: [Item], in table: String) {
         for item in items {
-            inMemoryCache[item.id] = item
+            if itemsCaches[table] == nil {
+                itemsCaches[table] = InMemoryCache<Item.ID, Item>()
+            }
+            itemsCaches[table]?[item.id] = item
+
+            if metadataCaches[table] == nil {
+                metadataCaches[table] = InMemoryCache<Item.ID, Item>()
+            }
+            metadataCaches[table]?[item.id] = item
+        }
+    }
+
+    public func saveMetadata(items: [Item], in table: String) {
+        for item in items {
+            if metadataCaches[table] == nil {
+                metadataCaches[table] = InMemoryCache<Item.ID, Item>()
+            }
+            metadataCaches[table]?[item.id] = item
         }
     }
 
 }
-

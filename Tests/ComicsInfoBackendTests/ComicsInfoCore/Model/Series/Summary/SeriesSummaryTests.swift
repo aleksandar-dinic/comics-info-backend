@@ -21,12 +21,6 @@ final class SeriesSummaryTests: XCTestCase {
         sut = nil
     }
 
-    // MARK: - Table name
-
-    func testTableName_isEqualToSeries() {
-        XCTAssertEqual(sut.tableName, "series")
-    }
-
     // MARK: - Update
 
     func testPopularity_whenUpdateWithSeries_isEqulToSeriesPopularity() {
