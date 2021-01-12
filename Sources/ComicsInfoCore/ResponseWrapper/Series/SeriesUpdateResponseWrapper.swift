@@ -6,15 +6,14 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import struct Domain.Series
 import Foundation
 import NIO
 
-public struct SeriesUpdateResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: UpdateResponseWrapper where APIWrapper.Item == Series, CacheProvider.Item == Series {
+public struct SeriesUpdateResponseWrapper<APIWrapper: UpdateRepositoryAPIWrapper>: UpdateResponseWrapper where APIWrapper.Item == Series {
 
-    private let seriesUseCase: SeriesUseCase<APIWrapper, CacheProvider>
+    private let seriesUseCase: SeriesUpdateUseCase<APIWrapper>
 
-    public init(seriesUseCase: SeriesUseCase<APIWrapper, CacheProvider>) {
+    public init(seriesUseCase: SeriesUpdateUseCase<APIWrapper>) {
         self.seriesUseCase = seriesUseCase
     }
 

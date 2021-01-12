@@ -19,13 +19,12 @@ enum CharacterCreateAPIWrapperMock {
         encoderService: EncoderService = EncoderProvider()
     ) -> CharacterCreateAPIWrapper {
         CharacterCreateAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryAPIService(
+            eventLoop: eventLoop,
+            repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryCreateAPIService(
                 on: eventLoop,
                 logger: logger
             ),
             encoderService: encoderService,
-            logger: logger,
             seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
         )

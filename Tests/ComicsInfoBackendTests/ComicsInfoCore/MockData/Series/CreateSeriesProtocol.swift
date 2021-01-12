@@ -18,7 +18,7 @@ protocol CreateSeriesProtocol {
 extension CreateSeriesProtocol {
 
     func createSeries(_ series: Series, in table: String = String.tableName(for: "TEST")) throws {
-        let useCase = SeriesUseCaseFactoryMock().makeUseCase()
+        let useCase = SeriesCreateUseCaseFactoryMock().makeUseCase()
         let feature = useCase.create(series, in: table)
         try feature.wait()
     }

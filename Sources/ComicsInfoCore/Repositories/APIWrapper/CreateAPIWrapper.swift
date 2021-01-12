@@ -16,7 +16,7 @@ protocol CreateAPIWrapper {
     associatedtype ItemDatabase: DatabaseMapper where ItemDatabase.Item == Item
 
     var eventLoop: EventLoop { get }
-    var repositoryAPIService: RepositoryAPIService { get }
+    var repositoryAPIService: CreateRepositoryAPIService { get }
     var encoderService: EncoderService { get }
 
     func create(_ item: Item, in table: String) -> EventLoopFuture<Void>

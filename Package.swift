@@ -35,7 +35,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/soto-project/soto.git",
-            .upToNextMinor(from: "5.0.0-beta.1")
+            from: "5.1.0"
         )
     ],
     targets: [

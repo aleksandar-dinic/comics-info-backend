@@ -6,15 +6,14 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import struct Domain.Comic
 import Foundation
 import NIO
 
-public struct ComicUpdateResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: UpdateResponseWrapper where APIWrapper.Item == Comic, CacheProvider.Item == Comic {
+public struct ComicUpdateResponseWrapper<APIWrapper: UpdateRepositoryAPIWrapper>: UpdateResponseWrapper where APIWrapper.Item == Comic {
 
-    private let comicUseCase: ComicUseCase<APIWrapper, CacheProvider>
+    private let comicUseCase: ComicUpdateUseCase<APIWrapper>
 
-    public init(comicUseCase: ComicUseCase<APIWrapper, CacheProvider>) {
+    public init(comicUseCase: ComicUpdateUseCase<APIWrapper>) {
         self.comicUseCase = comicUseCase
     }
 

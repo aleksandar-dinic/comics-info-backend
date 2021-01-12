@@ -12,17 +12,15 @@ import NIO
 
 final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
-    private typealias Cache = InMemoryCacheProvider<Series>
-
     private var eventLoop: EventLoop!
-    private var sut: SeriesUpdateResponseWrapper<SeriesRepositoryAPIWrapper, Cache>!
+    private var sut: SeriesUpdateResponseWrapper<SeriesUpdateRepositoryAPIWrapper>!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let useCase = SeriesUseCaseFactoryMock(on: eventLoop).makeUseCase()
+        let useCase = SeriesUpdateUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = SeriesUpdateResponseWrapper(seriesUseCase: useCase)
         environment = "TEST"
     }

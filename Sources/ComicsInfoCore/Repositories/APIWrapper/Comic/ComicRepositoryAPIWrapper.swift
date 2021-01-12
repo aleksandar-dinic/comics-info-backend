@@ -6,43 +6,20 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
 public struct ComicRepositoryAPIWrapper: RepositoryAPIWrapper {
 
-    public let eventLoop: EventLoop
     public let repositoryAPIService: RepositoryAPIService
-    public let logger: Logger
     public let decoderService: DecoderService
-    public let encoderService: EncoderService
 
     public init(
-        on eventLoop: EventLoop,
         repositoryAPIService: RepositoryAPIService,
-        logger: Logger,
-        decoderService: DecoderService = DecoderProvider(),
-        encoderService: EncoderService = EncoderProvider()
+        decoderService: DecoderService = DecoderProvider()
     ) {
-        self.eventLoop = eventLoop
         self.repositoryAPIService = repositoryAPIService
-        self.logger = logger
         self.decoderService = decoderService
-        self.encoderService = encoderService
-    }
-
-    // MARK: - Create item
-
-    public func create(_ item: Comic, in table: String) -> EventLoopFuture<Void> {
-        ComicCreateAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: repositoryAPIService,
-            encoderService: encoderService,
-            logger: logger,
-            characterUseCase: makeCharacterUseCase(),
-            seriesUseCase: makeSeriesUseCase()
-        ).create(item, in: table)
     }
 
     // MARK: - Get item
@@ -78,38 +55,6 @@ public struct ComicRepositoryAPIWrapper: RepositoryAPIWrapper {
             repositoryAPIService: repositoryAPIService,
             decoderService: decoderService
         ).getAllMetadata(ids: ids, from: table)
-    }
-
-    // MARK: - Update item
-
-    public func update(_ item: Comic, in table: String) -> EventLoopFuture<Void> {
-        ComicUpdateAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: repositoryAPIService,
-            encoderService: encoderService,
-            decoderService: decoderService,
-            logger: logger,
-            characterUseCase: makeCharacterUseCase(),
-            seriesUseCase: makeSeriesUseCase()
-        ).update(item, in: table)
-    }
-
-    private func makeCharacterUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
-        CharacterUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.characterInMemoryCache,
-            logger: logger
-        ).makeUseCase()
-    }
-
-    private func makeSeriesUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> {
-        SeriesUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.seriesInMemoryCache,
-            logger: logger
-        ).makeUseCase()
     }
 
 }

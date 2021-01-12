@@ -18,7 +18,7 @@ protocol CreateCharacterProtocol {
 extension CreateCharacterProtocol {
 
     func createCharacter(_ character: Character, in table: String = String.tableName(for: "TEST")) throws {
-        let useCase = CharacterUseCaseFactoryMock().makeUseCase()
+        let useCase = CharacterCreateUseCaseFactoryMock().makeUseCase()
         let feature = useCase.create(character, in: table)
         try feature.wait()
     }

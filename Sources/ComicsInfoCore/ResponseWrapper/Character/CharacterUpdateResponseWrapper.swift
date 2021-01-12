@@ -6,15 +6,14 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import struct Domain.Character
 import Foundation
 import NIO
 
-public struct CharacterUpdateResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: UpdateResponseWrapper where APIWrapper.Item == Character, CacheProvider.Item == Character {
+public struct CharacterUpdateResponseWrapper<APIWrapper: UpdateRepositoryAPIWrapper>: UpdateResponseWrapper where APIWrapper.Item == Character {
 
-    private let characterUseCase: CharacterUseCase<APIWrapper, CacheProvider>
+    private let characterUseCase: CharacterUpdateUseCase<APIWrapper>
 
-    public init(characterUseCase: CharacterUseCase<APIWrapper, CacheProvider>) {
+    public init(characterUseCase: CharacterUpdateUseCase<APIWrapper>) {
         self.characterUseCase = characterUseCase
     }
 

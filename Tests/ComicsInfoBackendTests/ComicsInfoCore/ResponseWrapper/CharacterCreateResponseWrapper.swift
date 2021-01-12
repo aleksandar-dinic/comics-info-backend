@@ -12,11 +12,10 @@ import NIO
 
 final class CreateResponseWrapper: XCTestCase {
 
-    private typealias Cache = InMemoryCacheProvider<Character>
-    private typealias UseCase = CharacterUseCase<CharacterRepositoryAPIWrapper, Cache>
+    private typealias UseCase = CharacterCreateUseCase<CharacterCreateRepositoryAPIWrapper>
 
     private var eventLoop: EventLoop!
-    private var sut: CreateResponseWrapper<UseCase>!
+    private var sut: ComicsInfoCore.CreateResponseWrapper<UseCase>!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
@@ -34,7 +33,7 @@ final class CreateResponseWrapper: XCTestCase {
         let request = Request(pathParameters: nil, body: nil)
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: "TEST")
         let response = try feature.wait()
 
         // Then
@@ -46,7 +45,7 @@ final class CreateResponseWrapper: XCTestCase {
         let request = Request(pathParameters: nil, body: "")
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: "TEST")
         let response = try feature.wait()
 
         // Then
@@ -58,7 +57,7 @@ final class CreateResponseWrapper: XCTestCase {
         let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: "TEST")
         let response = try feature.wait()
 
         // Then
@@ -68,11 +67,11 @@ final class CreateResponseWrapper: XCTestCase {
     func test_whenHandleCreateSameItemTwice_statusIsForbidden() throws {
         // Given
         let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
-        var feature = sut.handleCreate(on: eventLoop, request: request)
+        var feature = sut.handleCreate(on: eventLoop, request: request, environment: "TEST")
         _ = try feature.wait()
 
         // When
-        feature = sut.handleCreate(on: eventLoop, request: request)
+        feature = sut.handleCreate(on: eventLoop, request: request, environment: "TEST")
         let response = try feature.wait()
 
         // Then

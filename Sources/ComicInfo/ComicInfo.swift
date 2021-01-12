@@ -6,9 +6,9 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import AWSLambdaRuntime
 import ComicsInfoCore
 import Foundation
+import enum AWSLambdaRuntime.Lambda
 
 public final class ComicInfo {
 
@@ -23,24 +23,16 @@ public final class ComicInfo {
     public func run(handler: Handler? = Handler(rawValue: Lambda.handler)) throws {
         switch handler {
         case .read:
-            Lambda.run {
-                LambdaHandlerFactory.makeReadLambdaHandler($0)
-            }
+            Lambda.run { LambdaHandlerFactory.makeReadLambdaHandler($0) }
 
         case .list:
-            Lambda.run {
-                LambdaHandlerFactory.makeListLambdaHandler($0)
-            }
+            Lambda.run { LambdaHandlerFactory.makeListLambdaHandler($0) }
 
         case .create:
-            Lambda.run {
-                LambdaHandlerFactory.makeCreateLambdaHandler($0)
-            }
+            Lambda.run { LambdaCreateHandlerFactory.makeHandler($0) }
 
         case .update:
-            Lambda.run {
-                LambdaHandlerFactory.makeUpdateLambdaHandler($0)
-            }
+            Lambda.run { LambdaUpdateHandlerFactory.makeHandler($0) }
 
         case .delete, .none:
             throw APIError.handlerUnknown

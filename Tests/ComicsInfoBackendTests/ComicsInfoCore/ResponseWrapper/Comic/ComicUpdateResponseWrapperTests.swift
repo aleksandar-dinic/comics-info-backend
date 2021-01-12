@@ -12,17 +12,15 @@ import NIO
 
 final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
 
-    private typealias Cache = InMemoryCacheProvider<Comic>
-
     private var eventLoop: EventLoop!
-    private var sut: ComicUpdateResponseWrapper<ComicRepositoryAPIWrapper, Cache>!
+    private var sut: ComicUpdateResponseWrapper<ComicUpdateRepositoryAPIWrapper>!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let useCase = ComicUseCaseFactoryMock(on: eventLoop).makeUseCase()
+        let useCase = ComicUpdateUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = ComicUpdateResponseWrapper(comicUseCase: useCase)
         environment = "TEST"
     }

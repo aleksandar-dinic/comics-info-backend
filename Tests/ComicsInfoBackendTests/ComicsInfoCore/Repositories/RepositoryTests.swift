@@ -17,7 +17,7 @@ final class RepositoryTests: XCTestCase {
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
-        sut = RepositoryMock.makeCharacterRepository()
+        sut = RepositoryMock.makeCharacterRepository(tables: [:])
         table = String.tableName(for: "TEST")
     }
 
@@ -26,27 +26,14 @@ final class RepositoryTests: XCTestCase {
         table = nil
     }
 
-    // MARK: - Create
-
-    func test_whenCreateItem_itemIsCreated() throws {
-        // Given
-        let givenItem = CharacterMock.makeCharacter()
-
-        // When
-        let feature = sut.create(givenItem, in: table)
-
-        // Then
-        XCTAssertNoThrow(try feature.wait())
-    }
-
     // MARK: - Get Item
 
     func test_whenGetItemFromDatabase_returnsItem() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let feature = sut.create(givenItem, in: table)
-        try feature.wait()
-
+        let tables = CharacterMock.makeDatabaseTables(table)
+        sut = RepositoryMock.makeCharacterRepository(tables: tables)
+        
         // When
         let featureGet = sut.getItem(withID: givenItem.id, fromDataSource: .database, from: table)
         let item = try featureGet.wait()
@@ -60,10 +47,8 @@ final class RepositoryTests: XCTestCase {
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
         let givenItems = CharacterMock.charactersList
-        for givenItem in givenItems {
-            let feature = sut.create(givenItem, in: table)
-            try feature.wait()
-        }
+        let tables = CharacterMock.makeDatabaseTablesList(table)
+        sut = RepositoryMock.makeCharacterRepository(tables: tables)
 
         // When
         let featureGet = sut.getAllItems(fromDataSource: .database, from: table)
@@ -78,8 +63,8 @@ final class RepositoryTests: XCTestCase {
     func test_whenGetMetadataFromDatabase_returnsMetadata() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let feature = sut.create(givenItem, in: table)
-        try feature.wait()
+        let tables = CharacterMock.makeDatabaseTables(table)
+        sut = RepositoryMock.makeCharacterRepository(tables: tables)
 
         // When
         let featureGet = sut.getMetadata(withID: givenItem.id, fromDataSource: .database, from: table)
@@ -94,10 +79,8 @@ final class RepositoryTests: XCTestCase {
     func test_whenGetAllMetadataFromDatabase_returnsAllMetadata() throws {
         // Given
         let givenItems = CharacterMock.charactersList
-        for givenItem in givenItems {
-            let feature = sut.create(givenItem, in: table)
-            try feature.wait()
-        }
+        let tables = CharacterMock.makeDatabaseTablesList(table)
+        sut = RepositoryMock.makeCharacterRepository(tables: tables)
 
         // When
         let featureGet = sut.getAllMetadata(withIDs: Set(givenItems.map { $0.id }), fromDataSource: .database, from: table)
@@ -105,22 +88,6 @@ final class RepositoryTests: XCTestCase {
 
         // Then
         XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
-    }
-
-    // MARK: - Update
-
-    func test_whenUpdateItem_itemUpdated() throws {
-        // Given
-        let givenItem = CharacterMock.makeCharacter()
-        let feature = sut.create(givenItem, in: table)
-        try feature.wait()
-
-        let updateItem = CharacterMock.makeCharacter(name: "New name")
-        // When
-        let featureUpdate = sut.update(updateItem, in: table)
-
-        // Then
-        XCTAssertNoThrow(try featureUpdate.wait())
     }
 
 }

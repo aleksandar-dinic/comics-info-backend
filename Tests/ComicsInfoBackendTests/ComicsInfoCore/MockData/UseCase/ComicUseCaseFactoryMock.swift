@@ -40,9 +40,7 @@ struct ComicUseCaseFactoryMock: UseCaseFactory {
 
     private func makeRepositoryAPIWrapper() -> ComicRepositoryAPIWrapper {
         ComicRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
+            repositoryAPIService: makeRepositoryAPIService()
         )
     }
 

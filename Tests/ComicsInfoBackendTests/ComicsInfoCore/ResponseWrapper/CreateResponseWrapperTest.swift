@@ -12,11 +12,10 @@ import NIO
 
 final class CreateResponseWrapperTest: XCTestCase {
 
-    private typealias Cache = InMemoryCacheProvider<Character>
-    private typealias UseCase = CharacterUseCase<CharacterRepositoryAPIWrapper, Cache>
+    private typealias UseCase = CharacterCreateUseCase<CharacterCreateRepositoryAPIWrapper>
 
     private var eventLoop: EventLoop!
-    private var sut: CreateResponseWrapper<UseCase>!
+    private var sut: ComicsInfoCore.CreateResponseWrapper<UseCase>!
     private var environment: String!
 
     override func setUpWithError() throws {

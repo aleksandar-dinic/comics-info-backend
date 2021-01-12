@@ -18,11 +18,6 @@ public protocol UseCase where APIWrapper.Item == CacheService.Item {
 
     var repository: Repository<APIWrapper, CacheService> { get }
 
-    func create(
-        _ item: Item,
-        in table: String
-    ) -> EventLoopFuture<Void>
-
     func getItem(
         withID itemID: Item.ID,
         fromDataSource dataSource: DataSourceLayer,
@@ -46,21 +41,9 @@ public protocol UseCase where APIWrapper.Item == CacheService.Item {
         from table: String
     ) -> EventLoopFuture<[Item]>
 
-    func update(
-        _ item: Item,
-        in table: String
-    ) -> EventLoopFuture<Void>
-
 }
 
 public extension UseCase {
-
-    func create(
-        _ item: Item,
-        in table: String
-    ) -> EventLoopFuture<Void> {
-        repository.create(item, in: table)
-    }
 
     func getItem(
         withID itemID: Item.ID,
@@ -103,13 +86,6 @@ public extension UseCase {
             fromDataSource: dataSource,
             from: table
         )
-    }
-
-    func update(
-        _ item: Item,
-        in table: String
-    ) -> EventLoopFuture<Void> {
-        repository.update(item, in: table)
     }
 
 }

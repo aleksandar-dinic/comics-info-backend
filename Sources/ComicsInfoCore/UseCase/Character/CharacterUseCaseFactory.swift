@@ -42,11 +42,7 @@ public struct CharacterUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory 
     }
 
     private func makeRepositoryAPIWrapper() -> CharacterRepositoryAPIWrapper {
-        CharacterRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        CharacterRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
     
 }

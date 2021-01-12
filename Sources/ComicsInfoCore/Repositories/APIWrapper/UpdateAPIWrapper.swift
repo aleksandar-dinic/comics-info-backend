@@ -16,7 +16,7 @@ protocol UpdateAPIWrapper {
     associatedtype ItemDatabase: DatabaseMapper where ItemDatabase.Item == Item
 
     var eventLoop: EventLoop { get }
-    var repositoryAPIService: RepositoryAPIService { get }
+    var repositoryAPIService: UpdateRepositoryAPIService { get }
     var encoderService: EncoderService { get }
     var decoderService: DecoderService { get }
 

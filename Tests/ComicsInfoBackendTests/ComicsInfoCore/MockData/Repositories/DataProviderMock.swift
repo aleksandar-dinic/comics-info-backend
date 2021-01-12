@@ -15,17 +15,41 @@ enum DataProviderMock {
 
     static func makeCharacterDataProvider(
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
-        cacheProvider: InMemoryCacheProvider<Character> = InMemoryCacheProvider<Character>()
+        cacheProvider: InMemoryCacheProvider<Character> = InMemoryCacheProvider<Character>(),
+        tables: [String: TableMock]
     ) -> DataProvider<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
         let repositoryAPIWrapper = RepositoryAPIWrapperMock.makeCharacterRepositoryAPIWrapper(
             on: eventLoop,
-            logger: Logger(label: "DataProviderMock")
+            logger: Logger(label: "DataProviderMock"),
+            tables: tables
         )
         return DataProvider(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: repositoryAPIWrapper,
             cacheProvider: cacheProvider
         )
+    }
+    
+    static func makeCharacterUpdateDataProvider(
+        on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
+        tables: [String: TableMock]
+    ) -> UpdateDataProvider<CharacterUpdateRepositoryAPIWrapper> {
+        let repositoryAPIWrapper = RepositoryAPIWrapperMock.makeCharacterRepositoryUpdateAPIWrapper(
+            on: eventLoop,
+            logger: Logger(label: "UpdateDataProviderMock"),
+            tables: tables
+        )
+        return UpdateDataProvider(repositoryAPIWrapper: repositoryAPIWrapper)
+    }
+    
+    static func makeCharacterCreateDataProvider(
+        on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
+    ) -> CreateDataProvider<CharacterCreateRepositoryAPIWrapper> {
+        let repositoryAPIWrapper = RepositoryAPIWrapperMock.makeCharacterRepositoryCreateAPIWrapper(
+            on: eventLoop,
+            logger: Logger(label: "CreateDataProviderMock")
+        )
+        return CreateDataProvider(repositoryAPIWrapper: repositoryAPIWrapper)
     }
 
 }

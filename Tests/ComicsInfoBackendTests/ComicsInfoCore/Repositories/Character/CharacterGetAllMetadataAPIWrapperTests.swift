@@ -17,7 +17,7 @@ final class CharacterGetAllMetadataAPIWrapperTests: XCTestCase, CreateCharacterP
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
-        sut = CharacterGetAllMetadataAPIWrapperMock.make()
+        sut = CharacterGetAllMetadataAPIWrapperMock.make(tables: [:])
         table = String.tableName(for: "TEST")
     }
 

@@ -12,17 +12,15 @@ import NIO
 
 final class CharacterUpdateResponseWrapperTests: XCTestCase, CreateCharacterProtocol {
 
-    private typealias Cache = InMemoryCacheProvider<Character>
-
     private var eventLoop: EventLoop!
-    private var sut: CharacterUpdateResponseWrapper<CharacterRepositoryAPIWrapper, Cache>!
+    private var sut: CharacterUpdateResponseWrapper<CharacterUpdateRepositoryAPIWrapper>!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let useCase = CharacterUseCaseFactoryMock(on: eventLoop).makeUseCase()
+        let useCase = CharacterUpdateUseCaseFactoryMock(tables: [:], on: eventLoop).makeUseCase()
         sut = CharacterUpdateResponseWrapper(characterUseCase: useCase)
         environment = "TEST"
     }

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CharacterInfo
+import class CharacterInfo.CharacterInfo
 
 let characterInfo = CharacterInfo()
 

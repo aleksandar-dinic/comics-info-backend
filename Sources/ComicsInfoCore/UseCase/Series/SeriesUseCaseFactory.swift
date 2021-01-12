@@ -42,11 +42,7 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory whe
     }
 
     private func makeRepositoryAPIWrapper() -> SeriesRepositoryAPIWrapper {
-        SeriesRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        SeriesRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
 
 }

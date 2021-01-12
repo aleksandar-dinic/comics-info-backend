@@ -42,11 +42,7 @@ public struct ComicUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory wher
     }
 
     private func makeRepositoryAPIWrapper() -> ComicRepositoryAPIWrapper {
-        ComicRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        ComicRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
 
 }

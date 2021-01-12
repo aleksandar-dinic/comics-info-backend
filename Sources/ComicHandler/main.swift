@@ -6,8 +6,8 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import ComicInfo
 import Foundation
+import class ComicInfo.ComicInfo
 
 let comicInfo = ComicInfo()
 

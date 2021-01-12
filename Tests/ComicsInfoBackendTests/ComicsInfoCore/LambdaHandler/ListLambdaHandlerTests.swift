@@ -33,18 +33,16 @@ final class ListLambdaHandlerTests: XCTestCase, LambdaMockFactory {
 
     func test_whenHandle_responseStatusIsOK() throws {
         // Given
-        var database = DatabaseMock(eventLoop: eventLoop, logger: logger)
-        let item: [String : Any] = [
-            "itemID": "character#1",
-            "summaryID": "character#1",
-            "itemName": "character",
-            "popularity": 0,
-            "name": "Character Name"
-        ]
-        let feature = database.create(DatabasePutItem(item, table: String.tableName(for: "TEST")))
-        try feature.wait()
+//        let item: [String : Any] = [
+//            "itemID": "character#1",
+//            "summaryID": "character#1",
+//            "itemName": "character",
+//            "popularity": 0,
+//            "name": "Character Name"
+//        ]
 
-        let useCase = CharacterUseCaseFactoryMock(on: eventLoop, logger: logger).makeUseCase()
+        let tables = CharacterMock.makeDatabaseTables(String.tableName(for: "TEST"))
+        let useCase = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
         let listResponseWrapper = CharacterListResponseWrapper(characterUseCase: useCase)
         let sut = ListLambdaHandler(
             makeLambdaInitializationContext(logger: logger, on: eventLoop),

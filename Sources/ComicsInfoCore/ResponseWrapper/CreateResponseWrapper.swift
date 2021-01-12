@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-struct CreateResponseWrapper<UseCaseType: UseCase>: ErrorResponseWrapper {
+struct CreateResponseWrapper<UseCaseType: CreateUseCase>: ErrorResponseWrapper {
 
     private let useCase: UseCaseType
 

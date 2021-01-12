@@ -17,7 +17,7 @@ final class CharacterRepositoryAPIWrapperTests: XCTestCase, CreateCharacterProto
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
-        sut = CharacterRepositoryAPIWrapperMock.make()
+        sut = CharacterRepositoryAPIWrapperMock.make(tables: [:])
         table = String.tableName(for: "TEST")
     }
 

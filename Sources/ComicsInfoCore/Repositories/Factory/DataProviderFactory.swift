@@ -26,7 +26,7 @@ extension DataProviderFactory {
 
     public func makeDataProvider() -> DataProvider<APIWrapper, CacheProvider> {
         DataProvider(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: repositoryAPIWrapper,
             cacheProvider: cacheProvider
         )

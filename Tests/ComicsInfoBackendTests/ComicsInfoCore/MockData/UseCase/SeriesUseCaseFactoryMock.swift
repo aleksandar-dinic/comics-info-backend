@@ -40,9 +40,7 @@ struct SeriesUseCaseFactoryMock: UseCaseFactory {
 
     private func makeRepositoryAPIWrapper() -> SeriesRepositoryAPIWrapper {
         SeriesRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
+            repositoryAPIService: makeRepositoryAPIService()
         )
     }
 

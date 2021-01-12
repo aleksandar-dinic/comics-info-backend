@@ -13,13 +13,15 @@ import NIO
 
 struct CharacterUseCaseFactoryMock: UseCaseFactory {
 
+    let tables: [String: TableMock]
     var eventLoop: EventLoop
     var logger: Logger
 
     var isLocalServer: Bool
     var cacheProvider: InMemoryCacheProvider<Character>
 
-    init(on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+    init(tables: [String: TableMock], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+        self.tables = tables
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         self.logger = logger ?? Logger(label: "CharacterUseCaseFactoryMock")
         isLocalServer = true
@@ -40,10 +42,17 @@ struct CharacterUseCaseFactoryMock: UseCaseFactory {
 
     private func makeRepositoryAPIWrapper() -> CharacterRepositoryAPIWrapper {
         CharacterRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
+            repositoryAPIService: makeRepositoryAPIService()
         )
+    }
+    
+    func makeRepositoryAPIService() -> RepositoryAPIService {
+        DatabaseProvider(database: makeDatabase())
+    }
+
+    private func makeDatabase() -> Database {
+        DatabaseFectory(isLocalServer: isLocalServer)
+            .makeDatabase(eventLoop: eventLoop, logger: logger, tables: tables)
     }
 
 }

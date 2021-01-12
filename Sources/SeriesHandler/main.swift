@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SeriesInfo
+import class SeriesInfo.SeriesInfo
 
 let seriesInfo = SeriesInfo()
 

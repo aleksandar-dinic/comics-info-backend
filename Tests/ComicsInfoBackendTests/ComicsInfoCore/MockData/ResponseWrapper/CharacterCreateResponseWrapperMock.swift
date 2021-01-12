@@ -12,11 +12,10 @@ import NIO
 
 enum CharacterCreateResponseWrapperMock {
 
-    typealias Cache = InMemoryCacheProvider<Character>
-    typealias UseCase = CharacterUseCase<CharacterRepositoryAPIWrapper, Cache>
+    typealias UseCase = CharacterCreateUseCase<CharacterCreateRepositoryAPIWrapper>
 
-    static func make(on eventLoop: EventLoop) -> CreateResponseWrapper<UseCase> {
-        CreateResponseWrapper(useCase: CharacterUseCaseFactoryMock(on: eventLoop).makeUseCase())
+    static func make(on eventLoop: EventLoop) -> ComicsInfoCore.CreateResponseWrapper<UseCase> {
+        ComicsInfoCore.CreateResponseWrapper(useCase: CharacterCreateUseCaseFactoryMock(on: eventLoop).makeUseCase())
     }
 
 }

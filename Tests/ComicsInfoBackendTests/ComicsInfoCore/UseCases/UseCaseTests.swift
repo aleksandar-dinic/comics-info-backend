@@ -23,7 +23,6 @@ final class UseCaseTests: XCTestCase {
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         logger = Logger(label: self.className)
-        sut = CharacterUseCaseFactoryMock(on: eventLoop, logger: logger).makeUseCase()
         table = String.tableName(for: "TEST")
     }
 
@@ -34,21 +33,11 @@ final class UseCaseTests: XCTestCase {
         table = nil
     }
 
-    func test_whenCrateCharacter_characterIsCreated() throws {
-        // Given
-
-        // When
-        let feature = sut.create(CharacterMock.makeCharacter(), in: table)
-
-        // Then
-        XCTAssertNoThrow(try feature.wait())
-    }
-
     func test_whenGetItemFromDatabase_returnsItem() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let feature = sut.create(givenItem, in: table)
-        try feature.wait()
+        let tables = CharacterMock.makeDatabaseTables(table)
+        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
 
         // When
         let featureGet = sut.getItem(withID: givenItem.id, fromDataSource: .database, from: table)
@@ -61,10 +50,8 @@ final class UseCaseTests: XCTestCase {
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
         let givenItems = CharacterMock.charactersList
-        for givenItem in givenItems {
-            let feature = sut.create(givenItem, in: table)
-            try feature.wait()
-        }
+        let tables = CharacterMock.makeDatabaseTablesList(table)
+        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
 
         // When
         let featureGet = sut.getAllItems(fromDataSource: .database, from: table)
@@ -77,8 +64,8 @@ final class UseCaseTests: XCTestCase {
     func test_whenGetMetadataFromDatabase_returnsMetadata() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let feature = sut.create(givenItem, in: table)
-        try feature.wait()
+        let tables = CharacterMock.makeDatabaseTables(table)
+        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
 
         // When
         let featureGet = sut.getMetadata(withID: givenItem.id, fromDataSource: .database, from: table)
@@ -91,10 +78,8 @@ final class UseCaseTests: XCTestCase {
     func test_whenGetAllMetadataFromDatabase_returnsAllMetadata() throws {
         // Given
         let givenItems = CharacterMock.charactersList
-        for givenItem in givenItems {
-            let feature = sut.create(givenItem, in: table)
-            try feature.wait()
-        }
+        let tables = CharacterMock.makeDatabaseTablesList(table)
+        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
 
         // When
         let featureGet = sut.getAllMetadata(withIDs: Set(givenItems.map { $0.id }), fromDataSource: .database, from: table)
@@ -102,20 +87,6 @@ final class UseCaseTests: XCTestCase {
 
         // Then
         XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
-    }
-
-    func test_whenUpdateItem_itemUpdated() throws {
-        // Given
-        let givenItem = CharacterMock.makeCharacter()
-        let feature = sut.create(givenItem, in: table)
-        try feature.wait()
-
-        let updateItem = CharacterMock.makeCharacter(name: "New name")
-        // When
-        let featureUpdate = sut.update(updateItem, in: table)
-
-        // Then
-        XCTAssertNoThrow(try featureUpdate.wait())
     }
 
 }

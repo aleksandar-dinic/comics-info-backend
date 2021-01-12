@@ -11,7 +11,7 @@ import AWSLambdaRuntime
 import Foundation
 import NIO
 
-public struct CreateLambdaHandler<UseCaseType: UseCase>: EventLoopLambdaHandler, LoggerProvider {
+public struct CreateLambdaHandler<UseCaseType: CreateUseCase>: EventLoopLambdaHandler, LoggerProvider {
 
     public typealias In = Request
     public typealias Out = APIGateway.V2.Response
@@ -32,9 +32,8 @@ public struct CreateLambdaHandler<UseCaseType: UseCase>: EventLoopLambdaHandler,
             on: context.eventLoop,
             request: event,
             environment: context.environment
-        )
-            .map { APIGateway.V2.Response(from: $0) }
-            .always { logResponse(context.logger, response: $0) }
+        ).map { APIGateway.V2.Response(from: $0) }
+        .always { logResponse(context.logger, response: $0) }
     }
 
 }

@@ -17,7 +17,7 @@ final class SeriesCreateAPIWrapperTests: XCTestCase, CreateCharacterProtocol, Cr
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
-        sut = SeriesCreateAPIWrapperMock.make()
+        sut = SeriesCreateAPIWrapperMock.make(tables: [:])
         table = String.tableName(for: "TEST")
     }
 

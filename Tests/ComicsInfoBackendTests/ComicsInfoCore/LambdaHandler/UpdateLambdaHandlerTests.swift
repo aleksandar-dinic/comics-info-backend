@@ -34,7 +34,7 @@ final class UpdateLambdaHandlerTests: XCTestCase, LambdaMockFactory, CreateChara
 
     func test_whenHandle_responseStatusIsOk() throws {
         // Given
-        let useCase = CharacterUseCaseFactoryMock(on: eventLoop, logger: logger).makeUseCase()
+        let useCase = CharacterUpdateUseCaseFactoryMock(tables: [:], on: eventLoop, logger: logger).makeUseCase()
         let updateResponseWrapper = CharacterUpdateResponseWrapper(characterUseCase: useCase)
         let sut = UpdateLambdaHandler(
             makeLambdaInitializationContext(logger: logger, on: eventLoop),
