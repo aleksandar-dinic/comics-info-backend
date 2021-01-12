@@ -279,5 +279,51 @@ final class CharacterDatabase_DatabaseMapperTests: XCTestCase {
         // Then
         XCTAssertEqual(sut.description, description)
     }
+    
+    // MARK: - Real Name
 
+    func testRealName_whenInitFromDatabaseItem_isEqualToRealName() throws {
+        // Given
+        let realName = "Character Real Name"
+        databaseItem.attributes["realName"] = realName
+
+        // When
+        sut = try makeCharacterDatabaseFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(sut.realName, realName)
+    }
+    
+    // MARK: - Aliases
+
+    func testAliases_whenInitFromDatabaseItem_isEqualToAliases() throws {
+        // Given
+        let aliases = ["Character Aliases"]
+        databaseItem.attributes["aliases"] = aliases
+
+        // When
+        sut = try makeCharacterDatabaseFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(sut.aliases, aliases)
+    }
+
+    // MARK: - Birth
+
+    func testBirth_whenInitFromDatabaseItem_isEqualToBirth() throws {
+        // Given
+        let birth = Date()
+        databaseItem.attributes["birth"] = DateFormatter.defaultString(from: birth)
+
+        // When
+        sut = try makeCharacterDatabaseFromDatabaseItem()
+
+        // Then
+        let sutBirth = try XCTUnwrap(sut.birth)
+        XCTAssertEqual(
+            Calendar.current.dateComponents([.year, .month, .day], from: sutBirth),
+            Calendar.current.dateComponents([.year, .month, .day], from: birth)
+        )
+    }
+    
 }

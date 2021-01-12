@@ -377,13 +377,17 @@ final class ComicDatabase_DatabaseMapperTests: XCTestCase {
     func testPublished_whenInitFromDatabaseItem_isEqualToPublished() throws {
         // Given
         let published = Date()
-        databaseItem.attributes["published"] = published
+        databaseItem.attributes["published"] = DateFormatter.defaultString(from: published)
 
         // When
         sut = try makeComicDatabaseFromDatabaseItem()
 
         // Then
-        XCTAssertEqual(sut.published, published)
+        let sutPublished = try XCTUnwrap(sut.published)
+        XCTAssertEqual(
+            Calendar.current.dateComponents([.year, .month, .day], from: sutPublished),
+            Calendar.current.dateComponents([.year, .month, .day], from: published)
+        )
     }
 
 }

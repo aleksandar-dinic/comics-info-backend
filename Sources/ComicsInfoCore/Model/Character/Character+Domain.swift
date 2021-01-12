@@ -21,6 +21,9 @@ extension Domain.Character {
             name: character.name,
             thumbnail: character.thumbnail,
             description: character.description,
+            realName: character.realName,
+            aliases: character.aliases,
+            birth: character.birth,
             series: series?.sorted(by: { $0.popularity < $1.popularity }),
             comics: comics?.sorted(by: { $0.popularity < $1.popularity })
         )

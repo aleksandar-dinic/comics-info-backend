@@ -23,6 +23,9 @@ final class Character_DatabaseItemMapperTests: XCTestCase {
             name: "Name",
             description: "Description",
             thumbnail: "Thumbnail",
+            realName: "Real Name",
+            aliases: ["Aliases"],
+            birth: Date(),
             seriesSummary: [SeriesSummaryMock.seriesSummary],
             comicsSummary: [ComicSummaryMock.comicSummary]
         )
@@ -52,6 +55,18 @@ final class Character_DatabaseItemMapperTests: XCTestCase {
 
     func testDescription_whenInitFromCharacterDatabase_isEqualToCharacterDatabaseDescription() {
         XCTAssertEqual(sut.description, characterDatabase.description)
+    }
+    
+    func testRealName_whenInitFromCharacterDatabase_isEqualToCharacterDatabaseRealName() {
+        XCTAssertEqual(sut.realName, characterDatabase.realName)
+    }
+    
+    func testAliases_whenInitFromCharacterDatabase_isEqualToCharacterDatabaseAliases() {
+        XCTAssertEqual(sut.aliases, characterDatabase.aliases)
+    }
+    
+    func testBirth_whenInitFromCharacterDatabase_isEqualToCharacterDatabaseBirth() {
+        XCTAssertEqual(sut.birth, characterDatabase.birth)
     }
 
     func testSeries_whenInitFromCharacterDatabase_isEqualToCharacterDatabaseSeriesSummary() {

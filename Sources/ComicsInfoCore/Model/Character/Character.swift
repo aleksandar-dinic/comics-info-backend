@@ -24,6 +24,15 @@ public struct Character: ComicsInfoItem {
 
     ///  A short bio or description of the character
     let description: String?
+    
+    /// Real name of the character.
+    let realName: String?
+    
+    /// List of aliases the character is known by.
+    let aliases: [String]?
+    
+    /// A date, that the character was born on. Not an origin date.
+    let birth: Date?
 
     /// A resource list of seriesID in which this character appears.
     var seriesID: Set<String>?

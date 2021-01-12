@@ -77,5 +77,26 @@ final class DatabaseDecoderTests: XCTestCase {
             XCTFail("Expected '.typeMismatch' but got \(error)")
         }
     }
+    
+    func test_whenDecodeWithDataCorrupted_throwsDataCorrupted() throws {
+        // Given
+        let givenData = "Invalid Data format"
+        let databaseItem = DatabasePutItem([CodingKeys.key.stringValue: givenData], table: "")
+        sut = DatabaseDecoder(from: databaseItem)
+        var thrownError: Error?
+
+        // When
+        XCTAssertThrowsError(try sut.decode(Date.self, forKey: CodingKeys.key)) {
+            thrownError = $0
+        }
+
+        // Then
+        let error = try XCTUnwrap(thrownError)
+        if case .dataCorrupted = error as? DecodingError {
+            XCTAssertTrue(error is DecodingError)
+        } else {
+            XCTFail("Expected '.dataCorupted' but got \(error)")
+        }
+    }
 
 }

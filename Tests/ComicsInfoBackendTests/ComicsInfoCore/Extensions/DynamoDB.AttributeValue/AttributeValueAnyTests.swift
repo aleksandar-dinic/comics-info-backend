@@ -30,6 +30,20 @@ final class AttributeValueAnyTests: XCTestCase {
         let data = try XCTUnwrap(anyData as? Data)
         XCTAssertEqual(data, givenData)
     }
+    
+    func testDate_whenMapToAny_isEqualToGivenDate() throws {
+        // Given
+        let date = Date()
+        let givenDate = DateFormatter.defaultString(from: date)
+        let attributeValue = DynamoDB.AttributeValue.s(givenDate)
+
+        // When
+        let anyData = attributeValue.value
+
+        // Then
+        let data = try XCTUnwrap(anyData as? String)
+        XCTAssertEqual(data, givenDate)
+    }
 
     func testBool_whenMapToAny_isEqualToGivenBool() throws {
         // Given

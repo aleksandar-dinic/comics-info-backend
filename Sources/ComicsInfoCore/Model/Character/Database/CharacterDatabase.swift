@@ -22,30 +22,11 @@ struct CharacterDatabase: DatabaseMapper {
     let name: String
     let description: String?
     let thumbnail: String?
+    let realName: String?
+    let aliases: [String]?
+    let birth: Date?
     var seriesSummary: [SeriesSummary]?
     var comicsSummary: [ComicSummary]?
-
-    init(
-        itemID: String,
-        summaryID: String,
-        itemName: String,
-        popularity: Int,
-        name: String,
-        description: String?,
-        thumbnail: String?,
-        seriesSummary: [SeriesSummary]?,
-        comicsSummary: [ComicSummary]?
-    ) {
-        self.itemID = itemID
-        self.summaryID = summaryID
-        self.itemName = itemName
-        self.popularity = popularity
-        self.name = name
-        self.description = description
-        self.thumbnail = thumbnail
-        self.seriesSummary = seriesSummary
-        self.comicsSummary = comicsSummary
-    }
 
     func getSeriesID() -> Set<String>? {
         guard let seriesSummary = seriesSummary else { return nil }
@@ -69,6 +50,9 @@ extension CharacterDatabase {
         name = item.name
         description = item.description
         thumbnail = item.thumbnail
+        realName = item.realName
+        aliases = item.aliases
+        birth = item.birth
         seriesSummary = item.series?.compactMap {
             SeriesSummary($0, id: item.id, itemName: .getType(from: Character.self))
         }
@@ -89,6 +73,9 @@ extension CharacterDatabase {
         case name
         case thumbnail
         case description
+        case realName
+        case aliases
+        case birth
     }
 
     public init(from item: DatabaseItem) throws {
@@ -109,6 +96,9 @@ extension CharacterDatabase {
         name = try decoder.decode(String.self, forKey: CodingKeys.name)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
+        realName = try? decoder.decode(String.self, forKey: CodingKeys.realName)
+        aliases = try? decoder.decode([String].self, forKey: CodingKeys.aliases)
+        birth = try? decoder.decode(Date.self, forKey: CodingKeys.birth)
     }
 
 }

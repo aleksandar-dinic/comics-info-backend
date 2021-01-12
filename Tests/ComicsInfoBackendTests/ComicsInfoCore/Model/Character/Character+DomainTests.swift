@@ -44,6 +44,18 @@ final class Character_DomainTests: XCTestCase {
     func testDescription_whenInitFromCharacter_isEqualToCharacterDescription() {
         XCTAssertEqual(sut.description, givenCharacter.description)
     }
+    
+    func testRealName_whenInitFromCharacter_isEqualToCharacterRealName() {
+        XCTAssertEqual(sut.realName, givenCharacter.realName)
+    }
+    
+    func testAliases_whenInitFromCharacter_isEqualToCharacterAliases() {
+        XCTAssertEqual(sut.aliases, givenCharacter.aliases)
+    }
+    
+    func testBirth_whenInitFromCharacter_isEqualToCharacterBirth() {
+        XCTAssertEqual(sut.birth, givenCharacter.birth)
+    }
 
     func testSeries_whenInitFromCharacter_isEqualToCharacterSeries() {
         XCTAssertEqual(sut.series?.compactMap { $0.identifier }, givenCharacter.series?.compactMap { $0.id })

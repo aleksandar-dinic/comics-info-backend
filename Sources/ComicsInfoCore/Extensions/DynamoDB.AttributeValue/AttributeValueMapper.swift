@@ -23,6 +23,14 @@ extension Data: AttributeValueMapper {
 
 }
 
+extension Date: AttributeValueMapper {
+    
+    var attributeValue: DynamoDB.AttributeValue {
+        return .s(DateFormatter.defaultString(from: self))
+    }
+    
+}
+
 extension Bool: AttributeValueMapper {
 
     var attributeValue: DynamoDB.AttributeValue {

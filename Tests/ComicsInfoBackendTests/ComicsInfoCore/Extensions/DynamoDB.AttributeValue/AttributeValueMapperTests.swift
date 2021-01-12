@@ -29,6 +29,18 @@ final class AttributeValueMapperTests: XCTestCase {
         // Then
         XCTAssertEqual(attributeValue, givenAttributeValue)
     }
+    
+    func testDate_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
+        // Given
+        let givenDate = Date()
+        let givenAttributeValue = DynamoDB.AttributeValue.s(DateFormatter.defaultString(from: givenDate))
+
+        // When
+        let attributeValue = givenDate.attributeValue
+
+        // Then
+        XCTAssertEqual(attributeValue, givenAttributeValue)
+    }
 
     func testBool_whenMapToAttributeValue_isEqualToGivenAttributeValue() {
         // Given
