@@ -183,16 +183,16 @@ final class AttributeValueAnyTests: XCTestCase {
         XCTAssertEqual(data, givenString)
     }
 
-    func testSS_whenMapToAny_isGivenStringList() throws {
+    func testSS_whenMapToAny_isGivenListString() throws {
         // Given
-        let givenListString: Set<String> = ["String1", "String2", "String3", "String4"]
-        let attributeValue = DynamoDB.AttributeValue.ss(Array(givenListString))
+        let givenListString = ["String1", "String2", "String3", "String4"]
+        let attributeValue = DynamoDB.AttributeValue.ss(givenListString)
 
         // When
         let anyData = attributeValue.value
 
         // Then
-        let data = try XCTUnwrap(anyData as? Set<String>)
+        let data = try XCTUnwrap(anyData as? [String])
         XCTAssertEqual(data, givenListString)
     }
 

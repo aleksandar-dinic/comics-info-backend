@@ -50,7 +50,7 @@ extension DynamoDB.AttributeValue {
             return value
 
         case let .ss(value):
-            return Set(value)
+            return value
         }
     }
 
