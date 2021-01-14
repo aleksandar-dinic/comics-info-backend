@@ -16,12 +16,12 @@ enum RepositoryMock {
     static func makeCharacterRepository(
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         cacheProvider: InMemoryCacheProvider<Character> = InMemoryCacheProvider<Character>(),
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> Repository<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
         let dataProvider = DataProviderMock.makeCharacterDataProvider(
             on: eventLoop,
             cacheProvider: cacheProvider,
-            tables: tables
+            items: items
         )
         return Repository(dataProvider: dataProvider)
     }
@@ -29,11 +29,11 @@ enum RepositoryMock {
     static func makeCharacterRepositoryUpdate(
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         cacheProvider: InMemoryCacheProvider<Character> = InMemoryCacheProvider<Character>(),
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> UpdateRepository<CharacterUpdateRepositoryAPIWrapper> {
         let dataProvider = DataProviderMock.makeCharacterUpdateDataProvider(
             on: eventLoop,
-            tables: tables
+            items: items
         )
         return UpdateRepository(dataProvider: dataProvider)
     }

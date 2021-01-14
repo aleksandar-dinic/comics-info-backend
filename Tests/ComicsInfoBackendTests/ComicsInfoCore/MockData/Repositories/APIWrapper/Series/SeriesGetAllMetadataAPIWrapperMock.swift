@@ -17,12 +17,12 @@ enum SeriesGetAllMetadataAPIWrapperMock {
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         logger: Logger = Logger(label: "SeriesCreateAPIWrapperMock"),
         decoderService: DecoderService = DecoderProvider(),
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> SeriesGetAllMetadataAPIWrapper {
         let repositoryAPIService = RepositoryAPIServiceMock.makeRepositoryAPIService(
             on: eventLoop,
             logger: logger,
-            tables: tables
+            items: items
         )
         return SeriesGetAllMetadataAPIWrapper(
             repositoryAPIService: repositoryAPIService,

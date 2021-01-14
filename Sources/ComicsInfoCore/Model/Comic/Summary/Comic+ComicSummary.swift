@@ -15,6 +15,8 @@ extension Comic {
             id: comic.id,
             popularity: comic.popularity,
             title: comic.title,
+            dateAdded: comic.dateAdded,
+            dateLastUpdated: comic.dateLastUpdated,
             thumbnail: comic.thumbnail,
             description: comic.description,
             issueNumber: nil,

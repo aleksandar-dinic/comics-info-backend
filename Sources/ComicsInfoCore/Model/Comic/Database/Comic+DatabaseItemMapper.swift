@@ -15,6 +15,8 @@ extension Comic: DatabaseItemMapper {
             id: item.id,
             popularity: item.popularity,
             title: item.title,
+            dateAdded: item.dateAdded,
+            dateLastUpdated: item.dateLastUpdated,
             thumbnail: item.thumbnail,
             description: item.description,
             issueNumber: item.issueNumber,

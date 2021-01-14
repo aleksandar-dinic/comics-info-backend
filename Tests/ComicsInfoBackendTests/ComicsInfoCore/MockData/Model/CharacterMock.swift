@@ -18,23 +18,24 @@ enum CharacterMock {
         return encoder.encode(characterDatabase, table: table)
     }
     
-    static func makeDatabaseTables(_ table: String) -> [String: TableMock] {
+    static func makeDatabaseItems(_ table: String) -> [String: TableMock] {
         let item = makeDatabasePutItem(table)
-        var tableMock = TableMock(name: table)
 
         guard
             let itemID = item["itemID"] as? String,
             let summaryID = item["summaryID"] as? String
         else { return [:] }
 
-        tableMock.items["\(itemID)|\(summaryID)"] = item
-        return [table: tableMock]
+        let id = "\(itemID)|\(summaryID)"
+        return [id: TableMock(id: id, attributes: item.attributeValues)]
     }
     
     static func makeCharacter(
         id: String = "1",
         popularity: Int = 0,
         name: String = "Character Name",
+        dateAdded: Date = Date(),
+        dateLastUpdated: Date = Date(),
         thumbnail: String? = nil,
         description: String? = nil,
         realName: String? = nil,
@@ -49,6 +50,8 @@ enum CharacterMock {
             id: id,
             popularity: popularity,
             name: name,
+            dateAdded: dateAdded,
+            dateLastUpdated: dateLastUpdated,
             thumbnail: thumbnail,
             description: description,
             realName: realName,
@@ -70,6 +73,8 @@ enum CharacterMock {
             id: "1",
             popularity: 0,
             name: "Character Name",
+            dateAdded: Date(),
+            dateLastUpdated: Date(),
             thumbnail: "Character Thumbnail",
             description: "Character Description",
             realName: "Character Real Name",
@@ -93,18 +98,19 @@ enum CharacterMock {
         return putItems
     }
     
-    static func makeDatabaseTablesList(_ table: String) -> [String: TableMock] {
+    static func makeDatabaseItemsList(_ table: String) -> [String: TableMock] {
         let putItems = makeDatabasePutItemsList(table)
-        var tableMock = TableMock(name: table)
+        var items = [String: TableMock]()
         for item in putItems {
             guard
                 let itemID = item["itemID"] as? String,
                 let summaryID = item["summaryID"] as? String
             else { continue }
 
-            tableMock.items["\(itemID)|\(summaryID)"] = item
+            let id = "\(itemID)|\(summaryID)"
+            items[id] = TableMock(id: id, attributes: item.attributeValues)
         }
-        return [table: tableMock]
+        return items
     }
 
     static var charactersList: [Character] {
@@ -113,6 +119,8 @@ enum CharacterMock {
                 id: "2",
                 popularity: 2,
                 name: "Character Name 2",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 thumbnail: "Character Thumbnail 2",
                 description: "Character Description 2",
                 realName: nil,
@@ -127,6 +135,8 @@ enum CharacterMock {
                 id: "3",
                 popularity: 3,
                 name: "Character Name 3",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 thumbnail: "Character Thumbnail 3",
                 description: "Character Description 3",
                 realName: nil,
@@ -141,6 +151,8 @@ enum CharacterMock {
                 id: "4",
                 popularity: 4,
                 name: "Character Name 4",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 thumbnail: "Character Thumbnail 4",
                 description: "Character Description 4",
                 realName: nil,
@@ -161,11 +173,13 @@ enum CharacterMock {
             "itemName": "character",
             "popularity": 0,
             "name": "Character Name",
+            "dateAdded": "January 01, 2000",
+            "dateLastUpdated": "January 01, 2020",
             "thumbnail": "Character Thumbnail",
             "description": "Character Description",
             "realName": "Character Real Name",
             "aliases": ["Character aliases"],
-            "birth": Date(),
+            "birth": "January 28, 1977",
         ]
     }
 

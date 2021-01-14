@@ -13,14 +13,14 @@ import NIO
 
 struct CharacterUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
 
-    let tables: [String: TableMock]
+    let items: [String: TableMock]
     var eventLoop: EventLoop
     var logger: Logger
 
     var isLocalServer: Bool
 
-    init(tables: [String: TableMock], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
-        self.tables = tables
+    init(items: [String: TableMock], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+        self.items = items
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         self.logger = logger ?? Logger(label: "CharacterUpdateUseCaseFactoryMock")
         isLocalServer = true
@@ -50,7 +50,7 @@ struct CharacterUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
 
     private func makeDatabase() -> DatabaseUpdate {
         DatabaseFectory(isLocalServer: isLocalServer)
-            .makeDatabaseUpdate(eventLoop: eventLoop, logger: logger, tables: tables)
+            .makeDatabaseUpdate(eventLoop: eventLoop, logger: logger, items: items)
     }
 
 }

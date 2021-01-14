@@ -17,14 +17,14 @@ enum RepositoryAPIServiceMock {
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> RepositoryAPIService {
         DatabaseProvider(
             database: makeDatabase(
                 isLocalServer: isLocalServer,
                 on: eventLoop,
                 logger: logger,
-                tables: tables
+                items: items
             )
         )
     }
@@ -33,14 +33,14 @@ enum RepositoryAPIServiceMock {
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> UpdateRepositoryAPIService {
         UpdateDatabaseProvider(
             database: makeUpdateDatabase(
                 isLocalServer: isLocalServer,
                 on: eventLoop,
                 logger: logger,
-                tables: tables
+                items: items
             )
         )
     }
@@ -63,20 +63,20 @@ enum RepositoryAPIServiceMock {
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> Database {
         DatabaseFectory(isLocalServer: isLocalServer)
-            .makeDatabase(eventLoop: eventLoop, logger: logger, tables: tables)
+            .makeDatabase(eventLoop: eventLoop, logger: logger, items: items)
     }
     
     static func makeUpdateDatabase(
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> DatabaseUpdate {
         DatabaseFectory(isLocalServer: isLocalServer)
-            .makeDatabaseUpdate(eventLoop: eventLoop, logger: logger, tables: tables)
+            .makeDatabaseUpdate(eventLoop: eventLoop, logger: logger, items: items)
     }
     
     static func makeCreateDatabase(

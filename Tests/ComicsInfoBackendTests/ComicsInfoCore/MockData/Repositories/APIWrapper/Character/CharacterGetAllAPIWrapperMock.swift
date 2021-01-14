@@ -16,13 +16,13 @@ enum CharacterGetAllAPIWrapperMock {
     static func make(
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         logger: Logger = Logger(label: "CharacterCreateAPIWrapperMock"),
-        tables: [String: TableMock],
+        items: [String: TableMock],
         decoderService: DecoderService = DecoderProvider()
     ) -> CharacterGetAllAPIWrapper {
         let repositoryAPIService = RepositoryAPIServiceMock.makeRepositoryAPIService(
             on: eventLoop,
             logger: logger,
-            tables: tables
+            items: items
         )
         return CharacterGetAllAPIWrapper(
             repositoryAPIService: repositoryAPIService,

@@ -18,6 +18,12 @@ public struct Series: ComicsInfoItem {
 
     /// The canonical title of the series.
     let title: String
+    
+    /// Date the series was added to Comic Info.
+    let dateAdded: Date
+    
+    /// Date the series was last updated on Comic Info.
+    let dateLastUpdated: Date
 
     /// The representative image for this series.
     let thumbnail: String?
@@ -56,4 +62,43 @@ public struct Series: ComicsInfoItem {
         }
     }
 
+}
+
+extension Series {
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case popularity
+        case title
+        case dateAdded
+        case dateLastUpdated
+        case thumbnail
+        case description
+        case startYear
+        case endYear
+        case nextIdentifier
+        case charactersID
+        case characters
+        case comicsID
+        case comics
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(String.self, forKey: .id)
+        popularity = try values.decode(Int.self, forKey: .popularity)
+        title = try values.decode(String.self, forKey: .title)
+        dateAdded = Date()
+        dateLastUpdated = Date()
+        thumbnail = try? values.decode(String.self, forKey: .thumbnail)
+        description = try? values.decode(String.self, forKey: .description)
+        startYear = try? values.decode(Int.self, forKey: .startYear)
+        endYear = try? values.decode(Int.self, forKey: .endYear)
+        nextIdentifier = try? values.decode(String.self, forKey: .nextIdentifier)
+        charactersID = try? values.decode(Set<String>.self, forKey: .charactersID)
+        characters = try? values.decode([Character].self, forKey: .characters)
+        comicsID = try? values.decode(Set<String>.self, forKey: .comicsID)
+        comics = try? values.decode([Comic].self, forKey: .comics)
+    }
+    
 }

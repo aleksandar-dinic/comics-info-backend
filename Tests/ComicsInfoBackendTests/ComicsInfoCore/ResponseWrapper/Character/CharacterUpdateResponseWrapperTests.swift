@@ -20,7 +20,7 @@ final class CharacterUpdateResponseWrapperTests: XCTestCase, CreateCharacterProt
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let useCase = CharacterUpdateUseCaseFactoryMock(tables: [:], on: eventLoop).makeUseCase()
+        let useCase = CharacterUpdateUseCaseFactoryMock(items: [:], on: eventLoop).makeUseCase()
         sut = CharacterUpdateResponseWrapper(characterUseCase: useCase)
         environment = "TEST"
     }

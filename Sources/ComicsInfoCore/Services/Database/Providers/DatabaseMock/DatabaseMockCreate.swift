@@ -32,11 +32,11 @@ struct DatabaseMockCreate: DatabaseCreate {
         }
 
         let id = "\(itemID)|\(summaryID)"
-        guard !DatabaseMock.tables[item.table, default: TableMock(name: item.table)].items.keys.contains(id) else {
+        guard DatabaseMock.items[id] == nil else {
             return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
         }
-
-        DatabaseMock.tables[item.table, default: TableMock(name: item.table)].items[id] = item
+        
+        DatabaseMock.items[id] = TableMock(id: id, attributes: item.attributeValues)
         return eventLoop.makeSucceededFuture(())
     }
 
@@ -53,11 +53,11 @@ struct DatabaseMockCreate: DatabaseCreate {
             }
 
             let id = "\(itemID)|\(summaryID)"
-            guard !DatabaseMock.tables[item.table, default: TableMock(name: item.table)].items.keys.contains(id) else {
+            guard DatabaseMock.items[id] == nil else {
                 return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
             }
-
-            DatabaseMock.tables[item.table, default: TableMock(name: item.table)].items[id] = item
+            
+            DatabaseMock.items[id] = TableMock(id: id, attributes: item.attributeValues)
         }
 
         return eventLoop.makeSucceededFuture(())

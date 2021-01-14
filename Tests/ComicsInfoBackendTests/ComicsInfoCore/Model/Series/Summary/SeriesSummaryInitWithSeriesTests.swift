@@ -41,6 +41,14 @@ final class SeriesSummaryInitWithSeriesTests: XCTestCase {
     func testTitle_whenInitWithSeries_isEqualToSeriesTitle() {
         XCTAssertEqual(sut.title, series.title)
     }
+    
+    func testDateAdded_whenInitWithSeries_isEqualToSeriesDateAdded() {
+        XCTAssertEqual(sut.dateAdded, series.dateAdded)
+    }
+    
+    func testDateLastUpdated_whenInitWithSeries_isEqualToSeriesDateLastUpdated() {
+        XCTAssertEqual(sut.dateLastUpdated, series.dateLastUpdated)
+    }
 
     func testThumbnail_whenInitWithSeries_isEqualToSeriesThumbnail() {
         XCTAssertEqual(sut.thumbnail, series.thumbnail)

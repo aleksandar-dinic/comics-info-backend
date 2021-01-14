@@ -18,8 +18,8 @@ final class RepositoryUpdateTests: XCTestCase {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         table = String.tableName(for: "TEST")
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = RepositoryMock.makeCharacterRepositoryUpdate(tables: tables)
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = RepositoryMock.makeCharacterRepositoryUpdate(items: items)
     }
 
     override func tearDownWithError() throws {

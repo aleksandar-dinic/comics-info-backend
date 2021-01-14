@@ -15,6 +15,8 @@ extension Series {
             id: series.id,
             popularity: series.popularity,
             title: series.title,
+            dateAdded: series.dateAdded,
+            dateLastUpdated: series.dateLastUpdated,
             thumbnail: series.thumbnail,
             description: series.description,
             startYear: nil,

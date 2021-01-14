@@ -231,6 +231,40 @@ final class ComicDatabase_DatabaseMapperTests: XCTestCase {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
     }
+    
+    // MARK: - Date Added
+
+    func testDateAdded_whenInitFromDatabaseItem_isEqualToDateAdded() throws {
+        // Given
+        let dateAdded = Date()
+        databaseItem.attributes["dateAdded"] = DateFormatter.defaultString(from: dateAdded)
+
+        // When
+        sut = try makeComicDatabaseFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(
+            Calendar.current.dateComponents([.year, .month, .day], from: sut.dateAdded),
+            Calendar.current.dateComponents([.year, .month, .day], from: dateAdded)
+        )
+    }
+    
+    // MARK: - Date Last Updated
+
+    func testDateLastUpdated_whenInitFromDatabaseItem_isEqualToDateLastUpdated() throws {
+        // Given
+        let dateLastUpdated = Date()
+        databaseItem.attributes["dateLastUpdated"] = DateFormatter.defaultString(from: dateLastUpdated)
+
+        // When
+        sut = try makeComicDatabaseFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(
+            Calendar.current.dateComponents([.year, .month, .day], from: sut.dateLastUpdated),
+            Calendar.current.dateComponents([.year, .month, .day], from: dateLastUpdated)
+        )
+    }
 
     // MARK: - Thumbnail
 

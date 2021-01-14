@@ -81,6 +81,14 @@ final class CharacterDatabaseTests: XCTestCase {
     func testName_whenInitFromCharacter_isEqualToCharacterName() {
         XCTAssertEqual(sut.name, givenCharacter.name)
     }
+    
+    func testDateAdded_whenInitFromCharacter_isEqualToCharacterDateAdded() {
+        XCTAssertEqual(sut.dateAdded, givenCharacter.dateAdded)
+    }
+    
+    func testDateLastUpdated_whenInitFromCharacter_isEqualToCharacterDateLastUpdated() {
+        XCTAssertEqual(sut.dateLastUpdated, givenCharacter.dateLastUpdated)
+    }
 
     func testThumbnail_whenInitFromCharacter_isEqualToCharacterThumbnail() {
         XCTAssertEqual(sut.thumbnail, givenCharacter.thumbnail)

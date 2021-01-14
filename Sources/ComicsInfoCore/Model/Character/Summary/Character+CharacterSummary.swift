@@ -15,6 +15,8 @@ extension Character {
             id: character.id,
             popularity: character.popularity,
             name: character.name,
+            dateAdded: character.dateAdded,
+            dateLastUpdated: character.dateLastUpdated,
             thumbnail: character.thumbnail,
             description: character.description,
             realName: nil,

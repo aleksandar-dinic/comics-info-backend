@@ -145,6 +145,40 @@ final class CharacterSummary_DatabaseItemTests: XCTestCase {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
     }
+    
+    // MARK: - Date Added
+
+    func testItemDateAdded_whenInitFromDatabaseItem_isEqualToItemDateAdded() throws {
+        // Given
+        let dateAdded = Date()
+        databaseItem.attributes["dateAdded"] = DateFormatter.defaultString(from: dateAdded)
+
+        // When
+        sut = try makeCharacterSummaryFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(
+            Calendar.current.dateComponents([.year, .month, .day], from: sut.dateAdded),
+            Calendar.current.dateComponents([.year, .month, .day], from: dateAdded)
+        )
+    }
+    
+    // MARK: - Date Last Updated
+
+    func testItemDateLastUpdated_whenInitFromDatabaseItem_isEqualToItemDateLastUpdated() throws {
+        // Given
+        let dateLastUpdated = Date()
+        databaseItem.attributes["dateLastUpdated"] = DateFormatter.defaultString(from: dateLastUpdated)
+
+        // When
+        sut = try makeCharacterSummaryFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(
+            Calendar.current.dateComponents([.year, .month, .day], from: sut.dateLastUpdated),
+            Calendar.current.dateComponents([.year, .month, .day], from: dateLastUpdated)
+        )
+    }
 
     // MARK: - Popularity
 

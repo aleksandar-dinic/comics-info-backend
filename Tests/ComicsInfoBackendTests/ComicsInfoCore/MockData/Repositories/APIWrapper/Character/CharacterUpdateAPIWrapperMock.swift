@@ -18,14 +18,14 @@ enum CharacterUpdateAPIWrapperMock {
         logger: Logger = Logger(label: "CharacterCreateAPIWrapperMock"),
         encoderService: EncoderService = EncoderProvider(),
         decoderService: DecoderService = DecoderProvider(),
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> CharacterUpdateAPIWrapper {
         CharacterUpdateAPIWrapper(
             eventLoop: eventLoop,
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryUpdateAPIService(
                 on: eventLoop,
                 logger: logger,
-                tables: tables
+                items: items
             ),
             encoderService: encoderService,
             decoderService: decoderService,

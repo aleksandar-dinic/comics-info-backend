@@ -17,7 +17,7 @@ enum SeriesCreateAPIWrapperMock {
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         logger: Logger = Logger(label: "SeriesCreateAPIWrapperMock"),
         encoderService: EncoderService = EncoderProvider(),
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> SeriesCreateAPIWrapper {
         SeriesCreateAPIWrapper(
             eventLoop: eventLoop,
@@ -26,7 +26,7 @@ enum SeriesCreateAPIWrapperMock {
                 logger: logger
             ),
             encoderService: encoderService,
-            characterUseCase: CharacterUseCaseFactoryMock(tables: tables).makeUseCase(),
+            characterUseCase: CharacterUseCaseFactoryMock(items: items).makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
         )
     }

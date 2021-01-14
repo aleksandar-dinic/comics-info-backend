@@ -41,6 +41,14 @@ final class ComicSummaryInitWithComicTests: XCTestCase {
     func testTitle_whenInitWithComic_isEqualToComicTitle() {
         XCTAssertEqual(sut.title, comic.title)
     }
+    
+    func testDateAdded_whenInitWithComic_isEqualToComicDateAdded() {
+        XCTAssertEqual(sut.dateAdded, comic.dateAdded)
+    }
+    
+    func testDateLastUpdated_whenInitWithComic_isEqualToComicDateLastUpdated() {
+        XCTAssertEqual(sut.dateLastUpdated, comic.dateLastUpdated)
+    }
 
     func testThumbnail_whenInitWithComic_isEqualToComicThumbnail() {
         XCTAssertEqual(sut.thumbnail, comic.thumbnail)

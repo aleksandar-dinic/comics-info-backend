@@ -17,7 +17,7 @@ final class ComicGetAPIWrapperTests: XCTestCase, CreateComicProtocol {
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
-        sut = ComicGetAPIWrapperMock.make(tables: [:])
+        sut = ComicGetAPIWrapperMock.make(items: [:])
         table = String.tableName(for: "TEST")
     }
 

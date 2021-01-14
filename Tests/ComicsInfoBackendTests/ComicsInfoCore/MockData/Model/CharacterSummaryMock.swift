@@ -17,6 +17,8 @@ enum CharacterSummaryMock {
         itemName: String = "character",
         popularity: Int = 0,
         name: String = "CharacterSummary 1 Name",
+        dateAdded: Date = Date(),
+        dateLastUpdated: Date = Date(),
         thumbnail: String? = nil,
         description: String? = nil
     ) -> CharacterSummary {
@@ -26,6 +28,8 @@ enum CharacterSummaryMock {
             itemName: itemName,
             popularity: popularity,
             name: name,
+            dateAdded: dateAdded,
+            dateLastUpdated: dateLastUpdated,
             thumbnail: thumbnail,
             description: description
         )
@@ -38,6 +42,8 @@ enum CharacterSummaryMock {
             itemName: "character",
             popularity: 0,
             name: "CharacterSummary 1 Name",
+            dateAdded: Date(),
+            dateLastUpdated: Date(),
             thumbnail: "CharacterSummary 1 Thumbnail",
             description: "CharacterSummary 1 Description"
         )

@@ -22,7 +22,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let useCase = CharacterUseCaseFactoryMock(tables: [:], on: eventLoop).makeUseCase()
+        let useCase = CharacterUseCaseFactoryMock(items: [:], on: eventLoop).makeUseCase()
         sut = CharacterReadResponseWrapper(characterUseCase: useCase)
         environment = "TEST"
     }

@@ -22,10 +22,10 @@ public struct DatabaseFectory {
     public func makeDatabase(
         eventLoop: EventLoop,
         logger: Logger,
-        tables: [String: TableMock] = [:]
+        items: [String: TableMock] = [:]
     ) -> Database {
         guard !isLocalServer else {
-            return DatabaseMock(eventLoop: eventLoop, logger: logger, tables: tables)
+            return DatabaseMock(eventLoop: eventLoop, logger: logger, items: items)
         }
 
         return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, logger: logger)
@@ -45,10 +45,10 @@ public struct DatabaseFectory {
     public func makeDatabaseUpdate(
         eventLoop: EventLoop,
         logger: Logger,
-        tables: [String: TableMock] = [:]
+        items: [String: TableMock] = [:]
     ) -> DatabaseUpdate {
         guard !isLocalServer else {
-            return DatabaseMockUpdate(eventLoop: eventLoop, logger: logger, tables: tables)
+            return DatabaseMockUpdate(eventLoop: eventLoop, logger: logger, items: items)
         }
 
         return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, logger: logger)

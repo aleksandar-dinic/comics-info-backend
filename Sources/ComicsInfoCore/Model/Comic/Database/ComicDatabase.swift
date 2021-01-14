@@ -20,6 +20,8 @@ struct ComicDatabase: DatabaseMapper {
 
     let popularity: Int
     let title: String
+    let dateAdded: Date
+    let dateLastUpdated: Date
     let description: String?
     let thumbnail: String?
     let issueNumber: String?
@@ -54,6 +56,8 @@ extension ComicDatabase {
         itemName = .getType(from: Comic.self)
         popularity = item.popularity
         title = item.title
+        dateAdded = item.dateAdded
+        dateLastUpdated = item.dateLastUpdated
         description = item.description
         thumbnail = item.thumbnail
         issueNumber = item.issueNumber
@@ -83,6 +87,8 @@ extension ComicDatabase {
         case itemName
         case popularity
         case title
+        case dateAdded
+        case dateLastUpdated
         case thumbnail
         case description
         case issueNumber
@@ -112,6 +118,8 @@ extension ComicDatabase {
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
         popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
         title = try decoder.decode(String.self, forKey: CodingKeys.title)
+        dateAdded = try decoder.decode(Date.self, forKey: CodingKeys.dateAdded)
+        dateLastUpdated = try decoder.decode(Date.self, forKey: CodingKeys.dateLastUpdated)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
         issueNumber = try? decoder.decode(String.self, forKey: CodingKeys.issueNumber)

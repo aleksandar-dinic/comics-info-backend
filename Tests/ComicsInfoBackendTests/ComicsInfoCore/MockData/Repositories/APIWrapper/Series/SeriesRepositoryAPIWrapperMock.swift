@@ -17,13 +17,13 @@ enum SeriesRepositoryAPIWrapperMock {
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         logger: Logger = Logger(label: "SeriesRepositoryAPIWrapperMock"),
         decoderService: DecoderService = DecoderProvider(),
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> SeriesRepositoryAPIWrapper {
         SeriesRepositoryAPIWrapper(
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryAPIService(
                 on: eventLoop,
                 logger: logger,
-                tables: tables
+                items: items
             ),
             decoderService: decoderService
         )

@@ -36,8 +36,8 @@ final class UseCaseTests: XCTestCase {
     func test_whenGetItemFromDatabase_returnsItem() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
 
         // When
         let featureGet = sut.getItem(withID: givenItem.id, fromDataSource: .database, from: table)
@@ -49,23 +49,23 @@ final class UseCaseTests: XCTestCase {
 
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
-        let givenItems = CharacterMock.charactersList
-        let tables = CharacterMock.makeDatabaseTablesList(table)
-        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
+        let givenCharacters = CharacterMock.charactersList
+        let givenItems = CharacterMock.makeDatabaseItemsList(table)
+        sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop, logger: logger).makeUseCase()
 
         // When
         let featureGet = sut.getAllItems(fromDataSource: .database, from: table)
         let items = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
+        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenCharacters.map { $0.id }.sorted(by: <))
     }
 
     func test_whenGetMetadataFromDatabase_returnsMetadata() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
 
         // When
         let featureGet = sut.getMetadata(withID: givenItem.id, fromDataSource: .database, from: table)
@@ -77,16 +77,16 @@ final class UseCaseTests: XCTestCase {
 
     func test_whenGetAllMetadataFromDatabase_returnsAllMetadata() throws {
         // Given
-        let givenItems = CharacterMock.charactersList
-        let tables = CharacterMock.makeDatabaseTablesList(table)
-        sut = CharacterUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
+        let givenCharacters = CharacterMock.charactersList
+        let givenItems = CharacterMock.makeDatabaseItemsList(table)
+        sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop, logger: logger).makeUseCase()
 
         // When
-        let featureGet = sut.getAllMetadata(withIDs: Set(givenItems.map { $0.id }), fromDataSource: .database, from: table)
+        let featureGet = sut.getAllMetadata(withIDs: Set(givenCharacters.map { $0.id }), fromDataSource: .database, from: table)
         let items = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
+        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenCharacters.map { $0.id }.sorted(by: <))
     }
 
 }

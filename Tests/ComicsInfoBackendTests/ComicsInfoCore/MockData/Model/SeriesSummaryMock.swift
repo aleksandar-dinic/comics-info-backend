@@ -17,6 +17,8 @@ enum SeriesSummaryMock {
         itemName: String = "series",
         popularity: Int = 0,
         title: String = "SeriesSummary 1 Title",
+        dateAdded: Date = Date(),
+        dateLastUpdated: Date = Date(),
         thumbnail: String? = nil,
         description: String? = nil
     ) -> SeriesSummary {
@@ -26,6 +28,8 @@ enum SeriesSummaryMock {
             itemName: itemName,
             popularity: popularity,
             title: title,
+            dateAdded: dateAdded,
+            dateLastUpdated: dateLastUpdated,
             thumbnail: thumbnail,
             description: description
         )
@@ -38,6 +42,8 @@ enum SeriesSummaryMock {
             itemName: "series",
             popularity: 0,
             title: "SeriesSummary 1 Title",
+            dateAdded: Date(),
+            dateLastUpdated: Date(),
             thumbnail: "SeriesSummary 1 Thumbnail",
             description: "SeriesSummary 1 Description"
         )

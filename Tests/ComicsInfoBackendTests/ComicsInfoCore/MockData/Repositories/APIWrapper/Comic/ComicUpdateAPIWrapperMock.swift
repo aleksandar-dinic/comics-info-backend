@@ -18,18 +18,18 @@ enum ComicUpdateAPIWrapperMock {
         logger: Logger = Logger(label: "ComicCreateAPIWrapperMock"),
         encoderService: EncoderService = EncoderProvider(),
         decoderService: DecoderService = DecoderProvider(),
-        tables: [String: TableMock]
+        items: [String: TableMock]
     ) -> ComicUpdateAPIWrapper {
         ComicUpdateAPIWrapper(
             eventLoop: eventLoop,
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryUpdateAPIService(
                 on: eventLoop,
                 logger: logger,
-                tables: tables
+                items: items
             ),
             encoderService: encoderService,
             decoderService: decoderService,
-            characterUseCase: CharacterUseCaseFactoryMock(tables: tables).makeUseCase(),
+            characterUseCase: CharacterUseCaseFactoryMock(items: items).makeUseCase(),
             seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase()
         )
     }

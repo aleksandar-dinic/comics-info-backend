@@ -20,6 +20,8 @@ struct SeriesDatabase: DatabaseMapper {
 
     let popularity: Int
     let title: String
+    let dateAdded: Date
+    let dateLastUpdated: Date
     let description: String?
     let thumbnail: String?
     let startYear: Int?
@@ -48,6 +50,8 @@ extension SeriesDatabase {
         itemName = .getType(from: Series.self)
         popularity = item.popularity
         title = item.title
+        dateAdded = item.dateAdded
+        dateLastUpdated = item.dateLastUpdated
         description = item.description
         thumbnail = item.thumbnail
         startYear = item.startYear
@@ -71,6 +75,8 @@ extension SeriesDatabase {
         case itemName
         case popularity
         case title
+        case dateAdded
+        case dateLastUpdated
         case description
         case startYear
         case endYear
@@ -94,6 +100,8 @@ extension SeriesDatabase {
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
         popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
         title = try decoder.decode(String.self, forKey: CodingKeys.title)
+        dateAdded = try decoder.decode(Date.self, forKey: CodingKeys.dateAdded)
+        dateLastUpdated = try decoder.decode(Date.self, forKey: CodingKeys.dateLastUpdated)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
         startYear = try? decoder.decode(Int.self, forKey: CodingKeys.startYear)
         endYear = try? decoder.decode(Int.self, forKey: CodingKeys.endYear)

@@ -29,30 +29,30 @@ final class DataProviderTests: XCTestCase {
 
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
-        let givenItems = CharacterMock.charactersList
-        let tables = CharacterMock.makeDatabaseTablesList(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let givenCharacters = CharacterMock.charactersList
+        let givenItems = CharacterMock.makeDatabaseItemsList(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: givenItems)
 
         // When
         let featureGet = sut.getAllItems(fromDataSource: .database, from: table)
         let items = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
+        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenCharacters.map { $0.id }.sorted(by: <))
     }
 
     func test_whenGetAllItemsFromMemoryWithEmptyMomory_returnsItems() throws {
         // Given
-        let givenItems = CharacterMock.charactersList
-        let tables = CharacterMock.makeDatabaseTablesList(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let givenCharacters = CharacterMock.charactersList
+        let givenItems = CharacterMock.makeDatabaseItemsList(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: givenItems)
 
         // When
         let featureGet = sut.getAllItems(fromDataSource: .memory, from: table)
         let items = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
+        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenCharacters.map { $0.id }.sorted(by: <))
     }
 
     func test_whenGetAllItemsFromMemory_returnsItems() throws {
@@ -60,7 +60,7 @@ final class DataProviderTests: XCTestCase {
         let givenItems = CharacterMock.charactersList
         let cache = InMemoryCacheProvider<Character>()
         cache.save(items: givenItems, in: table)
-        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, tables: [:])
+        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, items: [:])
 
         // When
         let featureGet = sut.getAllItems(fromDataSource: .memory, from: table)
@@ -75,8 +75,8 @@ final class DataProviderTests: XCTestCase {
     func test_whenGetItemFromDatabase_returnsItem() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: items)
 
         // When
         let featureGet = sut.getItem(withID: givenItem.id, fromDataSource: .database, from: table)
@@ -89,8 +89,8 @@ final class DataProviderTests: XCTestCase {
     func test_whenGetItemFromMemoryWithEmptyMomory_returnsItem() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: items)
 
         // When
         let featureGet = sut.getItem(withID: givenItem.id, fromDataSource: .memory, from: table)
@@ -105,7 +105,7 @@ final class DataProviderTests: XCTestCase {
         let givenItem = CharacterMock.makeCharacter()
         let cache = InMemoryCacheProvider<Character>()
         cache.save(items: [givenItem], in: table)
-        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, tables: [:])
+        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, items: [:])
 
         // When
         let featureGet = sut.getItem(withID: givenItem.id, fromDataSource: .memory, from: table)
@@ -120,8 +120,8 @@ final class DataProviderTests: XCTestCase {
     func test_whenGetMetadataFromDatabase_returnsMetadata() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: items)
 
         // When
         let featureGet = sut.getMetadata(withID: givenItem.id, fromDataSource: .database, from: table)
@@ -134,8 +134,8 @@ final class DataProviderTests: XCTestCase {
     func test_whenGetMetadataFromMemoryWithEmptyMomory_returnsMetadata() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: items)
 
         // When
         let featureGet = sut.getMetadata(withID: givenItem.id, fromDataSource: .memory, from: table)
@@ -150,7 +150,7 @@ final class DataProviderTests: XCTestCase {
         let givenItem = CharacterMock.makeCharacter()
         let cache = InMemoryCacheProvider<Character>()
         cache.save(items: [givenItem], in: table)
-        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, tables: [:])
+        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, items: [:])
 
         // When
         let featureGet = sut.getMetadata(withID: givenItem.id, fromDataSource: .memory, from: table)
@@ -164,30 +164,30 @@ final class DataProviderTests: XCTestCase {
 
     func test_whenGetAllMetadataFromDatabase_returnsAllMetadata() throws {
         // Given
-        let givenItems = CharacterMock.charactersList
-        let tables = CharacterMock.makeDatabaseTablesList(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let givenCharacters = CharacterMock.charactersList
+        let givenItems = CharacterMock.makeDatabaseItemsList(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: givenItems)
 
         // When
-        let featureGet = sut.getAllMetadata(withIDs: Set(givenItems.map { $0.id }), fromDataSource: .database, from: table)
+        let featureGet = sut.getAllMetadata(withIDs: Set(givenCharacters.map { $0.id }), fromDataSource: .database, from: table)
         let items = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
+        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenCharacters.map { $0.id }.sorted(by: <))
     }
 
     func test_whenGetAllMetadataFromMemoryWithEmptyMomory_returnsAllMetata() throws {
         // Given
-        let givenItems = CharacterMock.charactersList
-        let tables = CharacterMock.makeDatabaseTablesList(table)
-        sut = DataProviderMock.makeCharacterDataProvider(tables: tables)
+        let givenCharacters = CharacterMock.charactersList
+        let givenItems = CharacterMock.makeDatabaseItemsList(table)
+        sut = DataProviderMock.makeCharacterDataProvider(items: givenItems)
 
         // When
-        let featureGet = sut.getAllMetadata(withIDs: Set(givenItems.map { $0.id }), fromDataSource: .memory, from: table)
+        let featureGet = sut.getAllMetadata(withIDs: Set(givenCharacters.map { $0.id }), fromDataSource: .memory, from: table)
         let items = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenItems.map { $0.id }.sorted(by: <))
+        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenCharacters.map { $0.id }.sorted(by: <))
     }
 
     func test_whenGetAllMetadataFromMemory_returnsMetadata() throws {
@@ -195,7 +195,7 @@ final class DataProviderTests: XCTestCase {
         let givenItems = CharacterMock.charactersList
         let cache = InMemoryCacheProvider<Character>()
         cache.save(items: givenItems, in: table)
-        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, tables: [:])
+        sut = DataProviderMock.makeCharacterDataProvider(cacheProvider: cache, items: [:])
 
         // When
         let featureGet = sut.getAllMetadata(withIDs: Set(givenItems.map { $0.id }), fromDataSource: .memory, from: table)

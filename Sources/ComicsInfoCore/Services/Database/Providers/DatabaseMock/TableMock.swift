@@ -6,16 +6,25 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
+import struct SotoDynamoDB.DynamoDB
 import Foundation
 
 public struct TableMock {
     
-    let name: String
-    var items: [String: DatabaseItem]
+    private var id: String
+    private var attributes: [String: Any]
 
-    init(name: String) {
-        self.name = name
-        items = [String: DatabaseItem]()
+    init(id: String, attributes: [String: DynamoDB.AttributeValue] = [:]) {
+        self.id = id
+        self.attributes = attributes.compactMapValues { $0.value }
     }
-
+    
+    func getAllAttributes() -> [String: Any] {
+        attributes
+    }
+    
+    func getItemID() -> String {
+        attributes["itemID"] as? String ?? ""
+    }
+    
 }

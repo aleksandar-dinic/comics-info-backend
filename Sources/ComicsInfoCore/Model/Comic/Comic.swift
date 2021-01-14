@@ -18,6 +18,12 @@ public struct Comic: ComicsInfoItem {
 
     /// The canonical title of the comic.
     let title: String
+    
+    /// Date the comic was added to Comic Info.
+    let dateAdded: Date
+    
+    /// Date the comic was last updated on Comic Info.
+    let dateLastUpdated: Date
 
     /// The representative image for this comics.
     let thumbnail: String?
@@ -78,4 +84,53 @@ public struct Comic: ComicsInfoItem {
         }
     }
 
+}
+
+extension Comic {
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case popularity
+        case title
+        case thumbnail
+        case description
+        case issueNumber
+        case variantDescription
+        case format
+        case pageCount
+        case variantsIdentifier
+        case collectionsIdentifier
+        case collectedIssuesIdentifier
+        case images
+        case published
+        case charactersID
+        case characters
+        case seriesID
+        case series
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(String.self, forKey: .id)
+        popularity = try values.decode(Int.self, forKey: .popularity)
+        title = try values.decode(String.self, forKey: .title)
+        dateAdded = Date()
+        dateLastUpdated = Date()
+        thumbnail = try? values.decode(String.self, forKey: .thumbnail)
+        description = try? values.decode(String.self, forKey: .description)
+        issueNumber = try? values.decode(String.self, forKey: .issueNumber)
+        variantDescription = try? values.decode(String.self, forKey: .variantDescription)
+        format = try? values.decode(String.self, forKey: .format)
+        pageCount = try? values.decode(Int.self, forKey: .pageCount)
+        variantsIdentifier = try? values.decode([String].self, forKey: .variantsIdentifier)
+        collectionsIdentifier = try? values.decode([String].self, forKey: .collectionsIdentifier)
+        collectedIssuesIdentifier = try? values.decode([String].self, forKey: .collectedIssuesIdentifier)
+        images = try? values.decode([String].self, forKey: .images)
+        published = try? values.decode(Date.self, forKey: .published)
+        charactersID = try? values.decode(Set<String>.self, forKey: .charactersID)
+        characters = try? values.decode([Character].self, forKey: .characters)
+        seriesID = try? values.decode(Set<String>.self, forKey: .seriesID)
+        series = try? values.decode([Series].self, forKey: .series)
+    }
+    
 }

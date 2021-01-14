@@ -35,8 +35,8 @@ final class UpdateUseCaseTests: XCTestCase {
 
     func test_whenUpdateItem_itemUpdated() throws {
         // Given
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = CharacterUpdateUseCaseFactoryMock(tables: tables, on: eventLoop, logger: logger).makeUseCase()
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = CharacterUpdateUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
 
         let updateItem = CharacterMock.makeCharacter(name: "New name")
         // When

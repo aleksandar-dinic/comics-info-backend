@@ -27,8 +27,8 @@ final class UpdateDataProviderTests: XCTestCase {
 
     func test_whenUpdateItem_itemUpdated() throws {
         // Given
-        let tables = CharacterMock.makeDatabaseTables(table)
-        sut = DataProviderMock.makeCharacterUpdateDataProvider(tables: tables)
+        let items = CharacterMock.makeDatabaseItems(table)
+        sut = DataProviderMock.makeCharacterUpdateDataProvider(items: items)
 
         let updateItem = CharacterMock.makeCharacter(name: "New name")
         // When

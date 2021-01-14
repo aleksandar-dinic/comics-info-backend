@@ -15,14 +15,12 @@ struct DatabaseMockUpdate: DatabaseUpdate {
     private let eventLoop: EventLoop
     private let logger: Logger
 
-    init(eventLoop: EventLoop, logger: Logger, tables: [String: TableMock]) {
+    init(eventLoop: EventLoop, logger: Logger, items: [String: TableMock]) {
         self.eventLoop = eventLoop
         self.logger = logger
         
-        for (_, el) in tables.enumerated() {
-            for item in el.value.items {
-                DatabaseMock.tables[el.key, default: TableMock(name: el.key)].items[item.key] = item.value
-            }
+        for (_, el) in items.enumerated() {
+            DatabaseMock.items[el.key] = el.value
         }
     }
 
@@ -30,7 +28,10 @@ struct DatabaseMockUpdate: DatabaseUpdate {
         logger.log(level: .info, "GetAllSummaries summaryID: \(summaryID))")
 
         var items = [DatabaseItem]()
-        items = DatabaseMock.tables[tableName]?.items.values.map { $0 } ?? []
+        for key in DatabaseMock.items.keys where key.hasSuffix(summaryID) {
+            guard let item = DatabaseMock.items[key] else { continue }
+            items.append(DatabasePutItem(item.getAllAttributes(), table: tableName))
+        }
 
         guard !items.isEmpty else {
             return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: summaryID))
@@ -53,14 +54,11 @@ struct DatabaseMockUpdate: DatabaseUpdate {
 
             let id = "\(itemID)|\(summaryID)"
 
-            guard
-                item.conditionExpression == nil ||
-                DatabaseMock.tables[item.table]?.items.keys.contains(id) ?? false else {
+            guard item.conditionExpression == nil || DatabaseMock.items[id] != nil else {
                 return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: id))
             }
 
-            let updatedItem = DatabasePutItem(item.attributes, table: item.table)
-            DatabaseMock.tables[item.table, default: TableMock(name: item.table)].items[id] = updatedItem
+            DatabaseMock.items[id] = TableMock(id: id, attributes: item.attributeValues)
         }
 
         return eventLoop.makeSucceededFuture(())

@@ -15,6 +15,8 @@ extension Character: DatabaseItemMapper {
             id: item.id,
             popularity: item.popularity,
             name: item.name,
+            dateAdded: item.dateAdded,
+            dateLastUpdated: item.dateLastUpdated,
             thumbnail: item.thumbnail,
             description: item.description,
             realName: item.realName,

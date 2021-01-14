@@ -20,6 +20,8 @@ struct CharacterSummary: ItemSummary {
 
     var popularity: Int
     var name: String
+    let dateAdded: Date
+    let dateLastUpdated: Date
     var thumbnail: String?
     var description: String?
 
@@ -53,6 +55,8 @@ extension CharacterSummary {
         self.itemName = itemName
         popularity = character.popularity
         name = character.name
+        dateAdded = character.dateAdded
+        dateLastUpdated = character.dateLastUpdated
         description = character.description
         thumbnail = character.thumbnail
     }
@@ -67,6 +71,8 @@ extension CharacterSummary {
         case itemName
         case popularity
         case name
+        case dateAdded
+        case dateLastUpdated
         case thumbnail
         case description
     }
@@ -83,6 +89,8 @@ extension CharacterSummary {
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
         popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
         name = try decoder.decode(String.self, forKey: CodingKeys.name)
+        dateAdded = try decoder.decode(Date.self, forKey: CodingKeys.dateAdded)
+        dateLastUpdated = try decoder.decode(Date.self, forKey: CodingKeys.dateLastUpdated)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
     }

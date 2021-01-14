@@ -21,6 +21,8 @@ final class Series_DatabaseItemMapperTests: XCTestCase {
             itemName: "series",
             popularity: 0,
             title: "Title",
+            dateAdded: Date(),
+            dateLastUpdated: Date(),
             description: "Description",
             thumbnail: "Thumbnail",
             startYear: 1,
@@ -47,6 +49,14 @@ final class Series_DatabaseItemMapperTests: XCTestCase {
 
     func testTitle_whenInitFromSeriesDatabase_isEqualToSeriesDatabaseTitle() {
         XCTAssertEqual(sut.title, seriesDatabase.title)
+    }
+    
+    func testDateAdded_whenInitFromSeriesDatabase_isEqualToSeriesDatabaseDateAdded() {
+        XCTAssertEqual(sut.dateAdded, seriesDatabase.dateAdded)
+    }
+    
+    func testDateLastUpdated_whenInitFromSeriesDatabase_isEqualToSeriesDatabaseDateLastUpdated() {
+        XCTAssertEqual(sut.dateLastUpdated, seriesDatabase.dateLastUpdated)
     }
 
     func testThumbnail_whenInitFromSeriesDatabase_isEqualToSeriesDatabaseThumbnail() {

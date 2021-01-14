@@ -35,6 +35,14 @@ final class Character_CharacterSummaryTests: XCTestCase {
     func testName_whenInitFromCharacterSummary_isEqualToCharacterSummaryName() {
         XCTAssertEqual(sut.name, characterSummary.name)
     }
+    
+    func testDateAdded_whenInitFromCharacterSummary_isEqualToCharacterSummaryDateAdded() {
+        XCTAssertEqual(sut.dateAdded, characterSummary.dateAdded)
+    }
+    
+    func testDateLastUpdated_whenInitFromCharacterSummary_isEqualToCharacterSummaryDateLastUpdated() {
+        XCTAssertEqual(sut.dateLastUpdated, characterSummary.dateLastUpdated)
+    }
 
     func testThumbnail_whenInitFromCharacterSummary_isEqualToCharacterSummaryThumbnail() {
         XCTAssertEqual(sut.thumbnail, characterSummary.thumbnail)

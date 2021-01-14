@@ -17,7 +17,7 @@ final class SeriesGetAPIWrapperTests: XCTestCase, CreateSeriesProtocol {
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
-        sut = SeriesGetAPIWrapperMock.make(tables: [:])
+        sut = SeriesGetAPIWrapperMock.make(items: [:])
         table = String.tableName(for: "TEST")
     }
 
