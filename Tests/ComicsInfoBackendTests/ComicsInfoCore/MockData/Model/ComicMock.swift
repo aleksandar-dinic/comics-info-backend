@@ -164,8 +164,8 @@ enum ComicMock {
             "itemName": "comic",
             "popularity": 0,
             "title": "Comic Title",
-            "dateAdded": "January 01, 2000",
-            "dateLastUpdated": "January 01, 2000",
+            "dateAdded": "14 January 2021 23:27:03",
+            "dateLastUpdated": "14 January 2021 23:27:03",
             "thumbnail": "Comic Thumbnail",
             "description": "Comic Description"
         ]

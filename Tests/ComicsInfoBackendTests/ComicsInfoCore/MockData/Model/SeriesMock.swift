@@ -128,8 +128,8 @@ enum SeriesMock {
             "itemName": "series",
             "popularity": 0,
             "title": "Series Title",
-            "dateAdded": "January 01, 2000",
-            "dateLastUpdated": "January 01, 2000",
+            "dateAdded": "14 January 2021 23:27:03",
+            "dateLastUpdated": "14 January 2021 23:27:03",
             "thumbnail": "Series Thumbnail",
             "description": "Series Description"
         ]

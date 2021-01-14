@@ -173,13 +173,13 @@ enum CharacterMock {
             "itemName": "character",
             "popularity": 0,
             "name": "Character Name",
-            "dateAdded": "January 01, 2000",
-            "dateLastUpdated": "January 01, 2020",
+            "dateAdded": "14 January 2021 23:27:03",
+            "dateLastUpdated": "14 January 2021 23:27:03",
             "thumbnail": "Character Thumbnail",
             "description": "Character Description",
             "realName": "Character Real Name",
             "aliases": ["Character aliases"],
-            "birth": "January 28, 1977",
+            "birth": "14 January 2021 23:27:03",
         ]
     }
 

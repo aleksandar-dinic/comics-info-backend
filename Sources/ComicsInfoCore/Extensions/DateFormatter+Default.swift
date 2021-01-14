@@ -12,7 +12,7 @@ extension DateFormatter {
     
     static func `default`() -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM dd, yyyy"
+        formatter.dateFormat = "dd MMMM yyyy HH:mm:ss"
         return formatter
     }
     
