@@ -27,7 +27,7 @@ enum CharacterMock {
         else { return [:] }
 
         let id = "\(itemID)|\(summaryID)"
-        return [id: TableMock(id: id, attributes: item.attributeValues)]
+        return [id: TableMock(id: id, attributesValue: item.attributeValues)]
     }
     
     static func makeCharacter(
@@ -108,7 +108,7 @@ enum CharacterMock {
             else { continue }
 
             let id = "\(itemID)|\(summaryID)"
-            items[id] = TableMock(id: id, attributes: item.attributeValues)
+            items[id] = TableMock(id: id, attributesValue: item.attributeValues)
         }
         return items
     }

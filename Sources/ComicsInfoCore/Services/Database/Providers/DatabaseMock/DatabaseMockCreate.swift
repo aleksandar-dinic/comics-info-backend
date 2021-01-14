@@ -36,7 +36,7 @@ struct DatabaseMockCreate: DatabaseCreate {
             return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
         }
         
-        DatabaseMock.items[id] = TableMock(id: id, attributes: item.attributeValues)
+        DatabaseMock.items[id] = TableMock(id: id, attributesValue: item.attributeValues)
         return eventLoop.makeSucceededFuture(())
     }
 
@@ -57,7 +57,7 @@ struct DatabaseMockCreate: DatabaseCreate {
                 return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
             }
             
-            DatabaseMock.items[id] = TableMock(id: id, attributes: item.attributeValues)
+            DatabaseMock.items[id] = TableMock(id: id, attributesValue: item.attributeValues)
         }
 
         return eventLoop.makeSucceededFuture(())

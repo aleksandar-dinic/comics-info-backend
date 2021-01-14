@@ -11,7 +11,7 @@ import NIO
 
 public protocol DatabaseUpdate {
 
-    func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseItem]>
+    func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]>
     
     mutating func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void>
     

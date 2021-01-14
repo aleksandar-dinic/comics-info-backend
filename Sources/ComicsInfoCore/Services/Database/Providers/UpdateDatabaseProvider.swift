@@ -17,7 +17,7 @@ public final class UpdateDatabaseProvider: UpdateRepositoryAPIService {
         self.database = database
     }
     
-    public func getAllSummaries(forID summaryID: String, from table: String) -> EventLoopFuture<[DatabaseItem]> {
+    public func getAllSummaries(forID summaryID: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]> {
         database.getAllSummaries(forID: summaryID, tableName: table)
     }
 

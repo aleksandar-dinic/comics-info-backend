@@ -30,7 +30,7 @@ extension DynamoDB: Database {
 // Read item.
 extension DynamoDB {
 
-    public func getItem(withID itemID: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    public func getItem(withID itemID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         let input = QueryInput(
             expressionAttributeValues: [":itemID": .s(itemID)],
             keyConditionExpression: "itemID = :itemID",
@@ -40,14 +40,14 @@ extension DynamoDB {
         DynamoDB.logger.log(level: .info, "GetItem input: \(input)")
         return query(input).flatMapThrowing {
             DynamoDB.logger.log(level: .info, "GetItem output: \($0)")
-            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
+            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0 } }), !items.isEmpty else {
                 throw DatabaseError.itemNotFound(withID: itemID)
             }
-            return items.map { DatabasePutItem($0, table: tableName) }
+            return items.map { DatabaseGetItem($0, table: tableName) }
         }
     }
 
-    public func getAll(_ items: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    public func getAll(_ items: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         let input = QueryInput(
             expressionAttributeValues: [":itemName": .s(items)],
             indexName: "itemName-summaryID-index",
@@ -58,10 +58,10 @@ extension DynamoDB {
         DynamoDB.logger.log(level: .info, "GetAll input: \(input)")
         return query(input).flatMapThrowing {
             DynamoDB.logger.log(level: .info, "GetAll output: \($0)")
-            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
+            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0 } }), !items.isEmpty else {
                 throw DatabaseError.itemsNotFound(withIDs: nil)
             }
-            return items.map { DatabasePutItem($0, table: tableName) }
+            return items.map { DatabaseGetItem($0, table: tableName) }
         }
     }
 
@@ -70,7 +70,7 @@ extension DynamoDB {
 // Read item metadata.
 extension DynamoDB {
 
-    public func getMetadata(withID id: String, tableName: String) -> EventLoopFuture<DatabaseItem> {
+    public func getMetadata(withID id: String, tableName: String) -> EventLoopFuture<DatabaseGetItem> {
         let input = GetItemInput(
             key: ["itemID": .s(id), "summaryID": .s(id)],
             tableName: tableName
@@ -79,14 +79,14 @@ extension DynamoDB {
         DynamoDB.logger.log(level: .info, "GetMetadata input: \(input)")
         return getItem(input).flatMapThrowing {
             DynamoDB.logger.log(level: .info, "GetMetadata output: \($0)")
-            guard let item = $0.item?.compactMapValues({ $0.value }) else {
+            guard let item = $0.item?.compactMapValues({ $0 }) else {
                 throw DatabaseError.itemNotFound(withID: id)
             }
-            return DatabasePutItem(item, table: tableName)
+            return DatabaseGetItem(item, table: tableName)
         }
     }
 
-    public func getAllMetadata(withIDs ids: Set<String>, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    public func getAllMetadata(withIDs ids: Set<String>, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         var keys = [[String: AttributeValue]]()
 
         for id in ids {
@@ -102,12 +102,12 @@ extension DynamoDB {
         DynamoDB.logger.log(level: .info, "GetAllMetadata input: \(input)")
         return batchGetItem(input).flatMapThrowing {
             DynamoDB.logger.log(level: .info, "GetAllMetadata output: \($0)")
-            guard let items = $0.responses?[tableName]?.compactMap({ $0.compactMapValues { $0.value } }),
+            guard let items = $0.responses?[tableName]?.compactMap({ $0.compactMapValues { $0 } }),
                   !items.isEmpty else {
                 let ids = Set(ids.compactMap({ $0.split(separator: "#").last }).map { String($0) })
                 throw DatabaseError.itemsNotFound(withIDs: ids)
             }
-            return items.map { DatabasePutItem($0, table: tableName) }
+            return items.map { DatabaseGetItem($0, table: tableName) }
         }
     }
 

@@ -12,15 +12,13 @@ import Foundation
 public struct TableMock {
     
     private var id: String
-    private var attributes: [String: Any]
+    private(set) var attributesValue: [String: DynamoDB.AttributeValue]
+    private(set) var attributes: [String: Any]
 
-    init(id: String, attributes: [String: DynamoDB.AttributeValue] = [:]) {
+    init(id: String, attributesValue: [String: DynamoDB.AttributeValue]) {
         self.id = id
-        self.attributes = attributes.compactMapValues { $0.value }
-    }
-    
-    func getAllAttributes() -> [String: Any] {
-        attributes
+        self.attributesValue = attributesValue
+        self.attributes = attributesValue.compactMapValues { $0.value }
     }
     
     func getItemID() -> String {

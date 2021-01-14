@@ -36,7 +36,7 @@ extension DynamoDB: DatabaseUpdate {
                 }
     }
     
-    public func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    public func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         let input = QueryInput(
             expressionAttributeValues: [":summaryID": .s(summaryID)],
             indexName: "summaryID-itemID-index",
@@ -47,10 +47,10 @@ extension DynamoDB: DatabaseUpdate {
         DynamoDB.logger.log(level: .info, "GetAllSummaries input:\(input)")
         return query(input).flatMapThrowing {
             DynamoDB.logger.log(level: .info, "GetAllSummaries output: \($0)")
-            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0.value } }), !items.isEmpty else {
+            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0 } }), !items.isEmpty else {
                 throw DatabaseError.itemsNotFound(withIDs: nil)
             }
-            return items.map { DatabasePutItem($0, table: tableName) }
+            return items.map { DatabaseGetItem($0, table: tableName) }
         }
     }
 

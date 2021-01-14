@@ -30,13 +30,13 @@ struct DatabaseMock: Database {
         }
     }
 
-    func getItem(withID itemID: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    func getItem(withID itemID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         logger.log(level: .info, "GetItem withID: \(itemID))")
 
-        var items = [DatabaseItem]()
+        var items = [DatabaseGetItem]()
         for value in DatabaseMock.items.values {
             guard value.getItemID() == itemID else { continue }
-            items.append(DatabasePutItem(value.getAllAttributes(), table: tableName))
+            items.append(DatabaseGetItem(value.attributesValue, table: tableName))
         }
 
         guard !items.isEmpty else {
@@ -46,12 +46,12 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(items)
     }
 
-    func getAll(_ items: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    func getAll(_ items: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         logger.log(level: .info, "GetAll items: \(items))")
 
-        var items = [DatabaseItem]()
+        var items = [DatabaseGetItem]()
         for value in DatabaseMock.items.values {
-            items.append(DatabasePutItem(value.getAllAttributes(), table: tableName))
+            items.append(DatabaseGetItem(value.attributesValue, table: tableName))
         }
 
         guard !items.isEmpty else {
@@ -61,13 +61,13 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(items)
     }
 
-    func getMetadata(withID id: String, tableName: String) -> EventLoopFuture<DatabaseItem> {
+    func getMetadata(withID id: String, tableName: String) -> EventLoopFuture<DatabaseGetItem> {
         logger.log(level: .info, "GetMetadata withID: \(id))")
 
-        var items = [DatabaseItem]()
+        var items = [DatabaseGetItem]()
         for key in DatabaseMock.items.keys where key.hasPrefix(id) {
             guard let item = DatabaseMock.items[key] else { continue }
-            items.append(DatabasePutItem(item.getAllAttributes(), table: tableName))
+            items.append(DatabaseGetItem(item.attributesValue, table: tableName))
         }
 
         guard let item = items.first else {
@@ -77,13 +77,13 @@ struct DatabaseMock: Database {
         return eventLoop.makeSucceededFuture(item)
     }
 
-    func getAllMetadata(withIDs ids: Set<String>, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    func getAllMetadata(withIDs ids: Set<String>, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         logger.log(level: .info, "GetAllMetadata withIDs: \(ids))")
 
-        var items = [DatabaseItem]()
+        var items = [DatabaseGetItem]()
         for id in ids {
             guard let item = DatabaseMock.items["\(id)|\(id)"] else { continue }
-            items.append(DatabasePutItem(item.getAllAttributes(), table: tableName))
+            items.append(DatabaseGetItem(item.attributesValue, table: tableName))
         }
 
         return eventLoop.makeSucceededFuture(items)

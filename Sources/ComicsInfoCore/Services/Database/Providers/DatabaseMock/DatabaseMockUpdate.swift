@@ -24,13 +24,13 @@ struct DatabaseMockUpdate: DatabaseUpdate {
         }
     }
 
-    func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseItem]> {
+    func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
         logger.log(level: .info, "GetAllSummaries summaryID: \(summaryID))")
 
-        var items = [DatabaseItem]()
+        var items = [DatabaseGetItem]()
         for key in DatabaseMock.items.keys where key.hasSuffix(summaryID) {
             guard let item = DatabaseMock.items[key] else { continue }
-            items.append(DatabasePutItem(item.getAllAttributes(), table: tableName))
+            items.append(DatabaseGetItem(item.attributesValue, table: tableName))
         }
 
         guard !items.isEmpty else {
@@ -58,7 +58,7 @@ struct DatabaseMockUpdate: DatabaseUpdate {
                 return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: id))
             }
 
-            DatabaseMock.items[id] = TableMock(id: id, attributes: item.attributeValues)
+            DatabaseMock.items[id] = TableMock(id: id, attributesValue: item.attributeValues)
         }
 
         return eventLoop.makeSucceededFuture(())

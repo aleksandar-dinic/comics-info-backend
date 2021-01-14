@@ -19,22 +19,22 @@ public final class DatabaseProvider: RepositoryAPIService {
 
     // Read
 
-    public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<[DatabaseItem]> {
+    public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]> {
         database.getItem(withID: itemID, tableName: table)
     }
 
-    public func getAll(_ items: String, from table: String) -> EventLoopFuture<[DatabaseItem]> {
+    public func getAll(_ items: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]> {
         database.getAll(items, tableName: table)
     }
 
-    public func getMetadata(withID id: String, from table: String) -> EventLoopFuture<DatabaseItem> {
+    public func getMetadata(withID id: String, from table: String) -> EventLoopFuture<DatabaseGetItem> {
         database.getMetadata(withID: id, tableName: table)
     }
 
     public func getAllMetadata(
         withIDs ids: Set<String>,
         from table: String
-    ) -> EventLoopFuture<[DatabaseItem]> {
+    ) -> EventLoopFuture<[DatabaseGetItem]> {
         database.getAllMetadata(withIDs: ids, tableName: table)
     }
 

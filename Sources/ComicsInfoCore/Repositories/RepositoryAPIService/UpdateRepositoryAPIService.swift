@@ -13,6 +13,6 @@ public protocol UpdateRepositoryAPIService {
 
     func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void>
 
-    func getAllSummaries(forID summaryID: String, from table: String) -> EventLoopFuture<[DatabaseItem]>
+    func getAllSummaries(forID summaryID: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]>
     
 }
