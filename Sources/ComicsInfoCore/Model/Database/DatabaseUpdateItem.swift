@@ -39,7 +39,6 @@ public struct DatabaseUpdateItem: DatabaseItem {
         var expression = "SET"
 
         for attribute in attributes.keys {
-            guard attribute != "dateAdded" else { continue }
             expression = "\(expression) #\(attribute) = :\(attribute),"
         }
         expression.removeLast()
