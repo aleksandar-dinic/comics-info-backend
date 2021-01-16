@@ -23,6 +23,7 @@ extension Domain.Series {
             description: series.description,
             startYear: series.startYear,
             endYear: series.endYear,
+            aliases: series.aliases,
             nextIdentifier: series.nextIdentifier,
             characters: characters?.sorted(by: { $0.popularity < $1.popularity }),
             comics: comics?.sorted(by: { $0.popularity < $1.popularity })

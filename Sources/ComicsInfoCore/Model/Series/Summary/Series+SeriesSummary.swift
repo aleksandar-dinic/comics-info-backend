@@ -21,6 +21,7 @@ extension Series {
             description: series.description,
             startYear: nil,
             endYear: nil,
+            aliases: nil,
             nextIdentifier: nil,
             charactersID: nil,
             characters: nil,

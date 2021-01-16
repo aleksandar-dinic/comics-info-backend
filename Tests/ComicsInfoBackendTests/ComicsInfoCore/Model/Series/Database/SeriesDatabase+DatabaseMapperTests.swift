@@ -322,6 +322,20 @@ final class SeriesDatabase_DatabaseMapperTests: XCTestCase {
         XCTAssertEqual(sut.endYear, endYear)
     }
 
+    // MARK: - Aliases
+
+    func testAliases_whenInitFromDatabaseItem_isEqualToAliases() throws {
+        // Given
+        let aliases = ["Series Aliases"]
+        databaseItem.attributes["aliases"] = aliases
+
+        // When
+        sut = try makeSeriesDatabaseFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(sut.aliases, aliases)
+    }
+
     // MARK: - Next Identifier
 
     func testNextIdentifier_whenInitFromDatabaseItem_isEqualToNextIdentifier() throws {

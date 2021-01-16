@@ -26,6 +26,7 @@ struct SeriesDatabase: DatabaseMapper {
     let thumbnail: String?
     let startYear: Int?
     let endYear: Int?
+    let aliases: [String]?
     let nextIdentifier: String?
     var charactersSummary: [CharacterSummary]?
     var comicsSummary: [ComicSummary]?
@@ -56,6 +57,7 @@ extension SeriesDatabase {
         thumbnail = item.thumbnail
         startYear = item.startYear
         endYear = item.endYear
+        aliases = item.aliases
         nextIdentifier = item.nextIdentifier
         charactersSummary = item.characters?.compactMap {
             CharacterSummary($0, id: item.id, itemName: .getType(from: Series.self))
@@ -80,6 +82,7 @@ extension SeriesDatabase {
         case description
         case startYear
         case endYear
+        case aliases
         case thumbnail
         case nextIdentifier
     }
@@ -105,6 +108,7 @@ extension SeriesDatabase {
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
         startYear = try? decoder.decode(Int.self, forKey: CodingKeys.startYear)
         endYear = try? decoder.decode(Int.self, forKey: CodingKeys.endYear)
+        aliases = try? decoder.decode([String].self, forKey: CodingKeys.aliases)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         nextIdentifier = try? decoder.decode(String.self, forKey: CodingKeys.nextIdentifier)
     }

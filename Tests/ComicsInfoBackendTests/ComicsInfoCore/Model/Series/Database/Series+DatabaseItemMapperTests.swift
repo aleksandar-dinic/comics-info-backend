@@ -27,6 +27,7 @@ final class Series_DatabaseItemMapperTests: XCTestCase {
             thumbnail: "Thumbnail",
             startYear: 1,
             endYear: 2,
+            aliases: ["Series aliases"],
             nextIdentifier: "Next Identifier",
             charactersSummary: [CharacterSummaryMock.characterSummary],
             comicsSummary: [ComicSummaryMock.comicSummary]
@@ -73,6 +74,10 @@ final class Series_DatabaseItemMapperTests: XCTestCase {
 
     func testEndYear_whenInitFromSeriesDatabase_isEqualToSeriesDatabaseEndYear() {
         XCTAssertEqual(sut.endYear, seriesDatabase.endYear)
+    }
+    
+    func testAliases_whenInitFromSeriesDatabase_isEqualToSeriesDatabaseAliases() {
+        XCTAssertEqual(sut.aliases, seriesDatabase.aliases)
     }
 
     func testNextIdentifier_whenInitFromSeriesDatabase_isEqualToSeriesDatabaseNextIdentifier() {

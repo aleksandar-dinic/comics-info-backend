@@ -59,6 +59,10 @@ final class Series_SeriesSummaryTests: XCTestCase {
     func testEndYear_whenInitFromSeriesSummary_isNil() {
         XCTAssertNil(sut.endYear)
     }
+    
+    func testAliases_whenInitFromSeriesSummary_isNil() {
+        XCTAssertNil(sut.aliases)
+    }
 
     func testNextIdentifier_whenInitFromSeriesSummary_isNil() {
         XCTAssertNil(sut.nextIdentifier)

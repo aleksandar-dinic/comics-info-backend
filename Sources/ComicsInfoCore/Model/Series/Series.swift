@@ -36,6 +36,9 @@ public struct Series: ComicsInfoItem {
 
     /// The last year of publication for the series (conventionally, nil for ongoing series) .
     let endYear: Int?
+    
+    /// List of aliases the series is known by.
+    let aliases: [String]?
 
     /// ID of the series which follows this series.
     let nextIdentifier: String?
@@ -76,6 +79,7 @@ extension Series {
         case description
         case startYear
         case endYear
+        case aliases
         case nextIdentifier
         case charactersID
         case characters
@@ -94,6 +98,7 @@ extension Series {
         description = try? values.decode(String.self, forKey: .description)
         startYear = try? values.decode(Int.self, forKey: .startYear)
         endYear = try? values.decode(Int.self, forKey: .endYear)
+        aliases = try? values.decode([String].self, forKey: .aliases)
         nextIdentifier = try? values.decode(String.self, forKey: .nextIdentifier)
         charactersID = try? values.decode(Set<String>.self, forKey: .charactersID)
         characters = try? values.decode([Character].self, forKey: .characters)

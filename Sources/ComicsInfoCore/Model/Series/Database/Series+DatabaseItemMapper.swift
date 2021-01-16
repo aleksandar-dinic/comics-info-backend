@@ -21,6 +21,7 @@ extension Series: DatabaseItemMapper  {
             description: item.description,
             startYear: item.startYear,
             endYear: item.endYear,
+            aliases: item.aliases,
             nextIdentifier: item.nextIdentifier,
             charactersID: item.getCharactersID(),
             characters: item.charactersSummary?.compactMap { Character(fromSummary: $0) },

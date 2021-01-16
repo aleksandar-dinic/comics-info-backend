@@ -52,6 +52,10 @@ final class Series_DomainTests: XCTestCase {
     func testEndYear_whenInitFromSeries_isEqualToSeriesEndYear() {
         XCTAssertEqual(sut.endYear, givenSeries.endYear)
     }
+    
+    func testAliases_whenInitFromSeries_isEqualToSeriesAliases() {
+        XCTAssertEqual(sut.aliases, givenSeries.aliases)
+    }
 
     func testNextIdentifier_whenInitFromSeries_isEqualToSeriesNextIdentifier() {
         XCTAssertEqual(sut.nextIdentifier, givenSeries.nextIdentifier)
