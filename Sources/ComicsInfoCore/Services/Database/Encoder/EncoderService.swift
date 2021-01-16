@@ -50,11 +50,7 @@ extension EncoderService {
         )
 
         for child in mirror.children {
-            guard let label = child.label,
-                  label != "itemID",
-                  label != "summaryID",
-                  label != "dateAdded"
-            else { continue }
+            guard let label = child.label, !item.notUpdatableFields.contains(label) else { continue }
             if case Optional<Any>.none = child.value { continue }
             databaseItem[label] = child.value
         }

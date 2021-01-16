@@ -12,9 +12,18 @@ public protocol DatabaseDecodable {
 
     var itemID: String { get }
     var summaryID: String { get }
+    var notUpdatableFields: Set<String> { get }
 
     init(from item: DatabaseItem) throws
 
+}
+
+extension DatabaseDecodable {
+    
+    var notUpdatableFields: Set<String> {
+        ["itemID", "summaryID", "dateAdded"]
+    }
+    
 }
 
 protocol DatabaseMapper: DatabaseDecodable {

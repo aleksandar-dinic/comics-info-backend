@@ -55,8 +55,8 @@ extension CharacterSummary {
         self.itemName = itemName
         popularity = character.popularity
         name = character.name
-        dateAdded = character.dateAdded
-        dateLastUpdated = character.dateLastUpdated
+        dateAdded = Date()
+        dateLastUpdated = Date()
         description = character.description
         thumbnail = character.thumbnail
     }

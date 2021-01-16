@@ -18,3 +18,11 @@ protocol ItemSummary: DatabaseDecodable {
     func shouldBeUpdated(with item: Item) -> Bool
 
 }
+
+extension ItemSummary {
+    
+    var notUpdatableFields: Set<String> {
+        ["itemID", "summaryID"]
+    }
+    
+}

@@ -55,8 +55,8 @@ extension ComicSummary {
         self.itemName = itemName
         popularity = comic.popularity
         title = comic.title
-        dateAdded = comic.dateAdded
-        dateLastUpdated = comic.dateLastUpdated
+        dateAdded = Date()
+        dateLastUpdated = Date()
         description = comic.description
         thumbnail = comic.thumbnail
     }

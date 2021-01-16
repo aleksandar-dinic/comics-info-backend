@@ -55,8 +55,8 @@ extension SeriesSummary {
         self.itemName = itemName
         popularity = series.popularity
         title = series.title
-        dateAdded = series.dateAdded
-        dateLastUpdated = series.dateLastUpdated
+        dateAdded = Date()
+        dateLastUpdated = Date()
         thumbnail = series.thumbnail
         description = series.description
     }
