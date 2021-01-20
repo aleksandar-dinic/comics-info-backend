@@ -307,6 +307,20 @@ final class ComicDatabase_DatabaseMapperTests: XCTestCase {
         // Then
         XCTAssertEqual(sut.issueNumber, issueNumber)
     }
+    
+    // MARK: - Aliases
+
+    func testAliases_whenInitFromDatabaseItem_isEqualToAliases() throws {
+        // Given
+        let aliases = ["Comic Aliases"]
+        databaseItem.attributes["aliases"] = aliases
+
+        // When
+        sut = try makeComicDatabaseFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(sut.aliases, aliases)
+    }
 
     // MARK: - Variant Description
 

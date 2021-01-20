@@ -20,6 +20,7 @@ extension Comic: DatabaseItemMapper {
             thumbnail: item.thumbnail,
             description: item.description,
             issueNumber: item.issueNumber,
+            aliases: item.aliases,
             variantDescription: item.variantDescription,
             format: item.format,
             pageCount: item.pageCount,

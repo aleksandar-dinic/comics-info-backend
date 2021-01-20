@@ -101,6 +101,10 @@ final class ComicDatabaseTests: XCTestCase {
     func testIssueNumber_whenInitFromComic_isEqualToComicIssueNumber() {
         XCTAssertEqual(sut.issueNumber, givenComic.issueNumber)
     }
+    
+    func testAliases_whenInitFromComic_isEqualToComicAliases() {
+        XCTAssertEqual(sut.aliases, givenComic.aliases)
+    }
 
     func testVariantDescription_whenInitFromComic_isEqualToComicVariantDescription() {
         XCTAssertEqual(sut.variantDescription, givenComic.variantDescription)

@@ -26,6 +26,7 @@ final class Comic_DatabaseItemMapperTests: XCTestCase {
             description: "Description",
             thumbnail: "Thumbnail",
             issueNumber: "IssueNumber",
+            aliases: ["Comic Aliases"],
             variantDescription: "VariantDescription",
             format: "Format",
             pageCount: 1,
@@ -75,6 +76,10 @@ final class Comic_DatabaseItemMapperTests: XCTestCase {
 
     func testIssueNumber_whenInitFromComicDatabase_isEqualToComicDatabaseIssueNumber() {
         XCTAssertEqual(sut.issueNumber, comicDatabase.issueNumber)
+    }
+    
+    func testAliases_whenInitFromComicDatabase_isEqualToComicDatabaseAliases() {
+        XCTAssertEqual(sut.aliases, comicDatabase.aliases)
     }
 
     func testVariantDescription_whenInitFromComicDatabase_isEqualToComicDatabaseVariantDescription() {

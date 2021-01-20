@@ -33,6 +33,9 @@ public struct Comic: ComicsInfoItem {
 
     /// The number of the issue in the series.
     let issueNumber: String?
+    
+    /// List of aliases the comic is known by.
+    let aliases: [String]?
 
     /// If the issue is a variant (e.g. an alternate cover, second printing, or director’s cut),
     /// a text description of the variant.
@@ -95,6 +98,7 @@ extension Comic {
         case thumbnail
         case description
         case issueNumber
+        case aliases
         case variantDescription
         case format
         case pageCount
@@ -119,6 +123,7 @@ extension Comic {
         thumbnail = try? values.decode(String.self, forKey: .thumbnail)
         description = try? values.decode(String.self, forKey: .description)
         issueNumber = try? values.decode(String.self, forKey: .issueNumber)
+        aliases = try? values.decode([String].self, forKey: .aliases)
         variantDescription = try? values.decode(String.self, forKey: .variantDescription)
         format = try? values.decode(String.self, forKey: .format)
         pageCount = try? values.decode(Int.self, forKey: .pageCount)

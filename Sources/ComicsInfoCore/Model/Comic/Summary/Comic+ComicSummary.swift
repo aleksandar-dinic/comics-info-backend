@@ -20,6 +20,7 @@ extension Comic {
             thumbnail: comic.thumbnail,
             description: comic.description,
             issueNumber: nil,
+            aliases: nil,
             variantDescription: nil,
             format: nil,
             pageCount: nil,

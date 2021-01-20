@@ -25,6 +25,7 @@ struct ComicDatabase: DatabaseMapper {
     let description: String?
     let thumbnail: String?
     let issueNumber: String?
+    let aliases: [String]?
     let variantDescription: String?
     let format: String?
     let pageCount: Int?
@@ -61,6 +62,7 @@ extension ComicDatabase {
         description = item.description
         thumbnail = item.thumbnail
         issueNumber = item.issueNumber
+        aliases = item.aliases
         variantDescription = item.variantDescription
         format = item.format
         pageCount = item.pageCount
@@ -92,6 +94,7 @@ extension ComicDatabase {
         case thumbnail
         case description
         case issueNumber
+        case aliases
         case variantDescription
         case format
         case pageCount
@@ -123,6 +126,7 @@ extension ComicDatabase {
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
         issueNumber = try? decoder.decode(String.self, forKey: CodingKeys.issueNumber)
+        aliases = try? decoder.decode([String].self, forKey: CodingKeys.aliases)
         variantDescription = try? decoder.decode(String.self, forKey: CodingKeys.variantDescription)
         format = try? decoder.decode(String.self, forKey: CodingKeys.format)
         pageCount = try? decoder.decode(Int.self, forKey: CodingKeys.pageCount)

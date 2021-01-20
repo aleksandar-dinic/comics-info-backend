@@ -22,6 +22,7 @@ extension Domain.Comic {
             thumbnail: comic.thumbnail,
             description: comic.description,
             issueNumber: comic.issueNumber,
+            aliases: comic.aliases,
             variantDescription: comic.variantDescription,
             format: comic.format,
             pageCount: comic.pageCount,

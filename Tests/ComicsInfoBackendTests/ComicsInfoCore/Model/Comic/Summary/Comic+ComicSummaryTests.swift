@@ -55,6 +55,10 @@ final class Comic_ComicSummaryTests: XCTestCase {
     func testIssueNumber_whenInitFromComicSummary_isNil() {
         XCTAssertNil(sut.issueNumber)
     }
+    
+    func testAliases_whenInitFromComicSummary_isNil() {
+        XCTAssertNil(sut.aliases)
+    }
 
     func testVariantDescription_whenInitFromComicSummary_isNil() {
         XCTAssertNil(sut.variantDescription)
