@@ -13,12 +13,14 @@ final class CharacterSummaryInitWithCharacterTests: XCTestCase {
 
     private var character: Character!
     private var itemName: String!
+    private var summaryName: String!
     private var id: String!
     private var sut: CharacterSummary!
 
     override func setUpWithError() throws {
         character = CharacterMock.character
         itemName = "series"
+        summaryName = "character"
         id = "2"
         sut = CharacterSummary(character, id: id, itemName: itemName)
     }
@@ -60,6 +62,10 @@ final class CharacterSummaryInitWithCharacterTests: XCTestCase {
 
     func testItemName_whenInitWithCharacter_isEqualToItemName() {
         XCTAssertEqual(sut.itemName, itemName)
+    }
+    
+    func testSummaryName_whenInitWithCharacter_isEqualToSummaryName() {
+        XCTAssertEqual(sut.summaryName, summaryName)
     }
 
     func testItemID_whenInitWithCharacter_isEqualToItemID() throws {

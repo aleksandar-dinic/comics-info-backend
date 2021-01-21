@@ -13,12 +13,14 @@ final class SeriesSummaryInitWithSeriesTests: XCTestCase {
 
     private var series: Series!
     private var itemName: String!
+    private var summaryName: String!
     private var id: String!
     private var sut: SeriesSummary!
 
     override func setUpWithError() throws {
         series = SeriesMock.series
         itemName = "character"
+        summaryName = "series"
         id = "2"
         sut = SeriesSummary(series, id: id, itemName: itemName)
     }
@@ -60,6 +62,10 @@ final class SeriesSummaryInitWithSeriesTests: XCTestCase {
 
     func testItemName_whenInitWithSeries_isEqualToItemName() {
         XCTAssertEqual(sut.itemName, itemName)
+    }
+    
+    func testSummaryName_whenInitWithSeries_isEqualToSummaryName() {
+        XCTAssertEqual(sut.summaryName, summaryName)
     }
 
     func testItemID_whenInitWithSeries_isEqualToItemID() throws {

@@ -13,12 +13,14 @@ final class ComicSummaryInitWithComicTests: XCTestCase {
 
     private var comic: Comic!
     private var itemName: String!
+    private var summaryName: String!
     private var id: String!
     private var sut: ComicSummary!
 
     override func setUpWithError() throws {
         comic = ComicMock.comic
         itemName = "comic"
+        summaryName = "comic"
         id = "2"
         sut = ComicSummary(comic, id: id, itemName: itemName)
     }
@@ -60,6 +62,10 @@ final class ComicSummaryInitWithComicTests: XCTestCase {
 
     func testItemName_whenInitWithComic_isEqualToItemName() {
         XCTAssertEqual(sut.itemName, itemName)
+    }
+    
+    func testSummaryName_whenInitWithComic_isEqualToSummaryName() {
+        XCTAssertEqual(sut.summaryName, summaryName)
     }
 
     func testItemID_whenInitWithComic_isEqualToItemID() throws {

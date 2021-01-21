@@ -171,6 +171,7 @@ enum CharacterMock {
             "itemID": "character#1",
             "summaryID": "character#1",
             "itemName": "character",
+            "summaryName": "character",
             "popularity": 0,
             "name": "Character Name",
             "dateAdded": "14 January 2021 23:27:03",

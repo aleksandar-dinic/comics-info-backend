@@ -17,6 +17,7 @@ struct SeriesSummary: ItemSummary {
     let itemID: String
     let summaryID: String
     let itemName: String
+    let summaryName: String
 
     var popularity: Int
     var title: String
@@ -53,6 +54,7 @@ extension SeriesSummary {
         itemID = "\(itemName)#\(id)"
         summaryID = "\(String.getType(from: Series.self))#\(series.id)"
         self.itemName = itemName
+        summaryName = .getType(from: Series.self)
         popularity = series.popularity
         title = series.title
         dateAdded = Date()
@@ -69,6 +71,7 @@ extension SeriesSummary {
         case itemID
         case summaryID
         case itemName
+        case summaryName
         case popularity
         case title
         case dateAdded
@@ -87,6 +90,7 @@ extension SeriesSummary {
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
+        summaryName = try decoder.decode(String.self, forKey: CodingKeys.summaryName)
         popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
         title = try decoder.decode(String.self, forKey: CodingKeys.title)
         dateAdded = try decoder.decode(Date.self, forKey: CodingKeys.dateAdded)

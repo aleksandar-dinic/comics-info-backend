@@ -17,6 +17,7 @@ struct CharacterSummary: ItemSummary {
     let itemID: String
     let summaryID: String
     let itemName: String
+    let summaryName: String
 
     var popularity: Int
     var name: String
@@ -53,6 +54,7 @@ extension CharacterSummary {
         itemID = "\(itemName)#\(id)"
         summaryID = "\(String.getType(from: Character.self))#\(character.id)"
         self.itemName = itemName
+        summaryName = .getType(from: Character.self)
         popularity = character.popularity
         name = character.name
         dateAdded = Date()
@@ -69,6 +71,7 @@ extension CharacterSummary {
         case itemID
         case summaryID
         case itemName
+        case summaryName
         case popularity
         case name
         case dateAdded
@@ -87,6 +90,7 @@ extension CharacterSummary {
         }
 
         itemName = try decoder.decode(String.self, forKey: CodingKeys.itemName)
+        summaryName = try decoder.decode(String.self, forKey: CodingKeys.summaryName)
         popularity = try decoder.decode(Int.self, forKey: CodingKeys.popularity)
         name = try decoder.decode(String.self, forKey: CodingKeys.name)
         dateAdded = try decoder.decode(Date.self, forKey: CodingKeys.dateAdded)

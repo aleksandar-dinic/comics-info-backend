@@ -168,6 +168,7 @@ enum ComicMock {
             "itemID": "comic#1",
             "summaryID": "comic#1",
             "itemName": "comic",
+            "summaryName": "comic",
             "popularity": 0,
             "title": "Comic Title",
             "dateAdded": "14 January 2021 23:27:03",

@@ -146,6 +146,39 @@ final class ComicSummary_DatabaseItemTests: XCTestCase {
         }
     }
     
+    // MARK: - Summary Name
+
+    func testSummaryName_whenInitFromDatabaseItem_isEqualToSummaryName() throws {
+        // Given
+        let summaryName = "series"
+        databaseItem.attributes["summaryName"] = summaryName
+
+        // When
+        sut = try makeComicSummaryFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(sut.summaryName, summaryName)
+    }
+
+    func testComicDatabase_whenInitFromDatabaseItemWithMissingSummaryName_throwsKeyNotFound() throws {
+        // Given
+        databaseItem.attributes["summaryName"] = nil
+        var thrownError: Error?
+
+        // When
+        XCTAssertThrowsError(try makeComicSummaryFromDatabaseItem()) {
+            thrownError = $0
+        }
+
+        // Then
+        let error = try XCTUnwrap(thrownError)
+        if case .keyNotFound(let key, _) = error as? DecodingError {
+            XCTAssertEqual(key.stringValue, ComicSummary.CodingKeys.summaryName.stringValue)
+        } else {
+            XCTFail("Expected '.keyNotFound' but got \(error)")
+        }
+    }
+    
     // MARK: - Date Added
 
     func testItemDateAdded_whenInitFromDatabaseItem_isEqualToItemDateAdded() throws {

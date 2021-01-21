@@ -132,6 +132,7 @@ enum SeriesMock {
             "itemID": "series#1",
             "summaryID": "series#1",
             "itemName": "series",
+            "summaryName": "series",
             "popularity": 0,
             "title": "Series Title",
             "dateAdded": "14 January 2021 23:27:03",

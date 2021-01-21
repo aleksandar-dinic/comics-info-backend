@@ -11,6 +11,8 @@ import Foundation
 protocol ItemSummary: DatabaseDecodable {
 
     associatedtype Item: Identifiable
+    
+    var summaryName: String { get }
 
     init(_ item: Item, id: String, itemName: String)
 
