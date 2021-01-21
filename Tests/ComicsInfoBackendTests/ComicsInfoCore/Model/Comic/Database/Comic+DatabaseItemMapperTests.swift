@@ -25,14 +25,14 @@ final class Comic_DatabaseItemMapperTests: XCTestCase {
             dateLastUpdated: Date(),
             description: "Description",
             thumbnail: "Thumbnail",
-            issueNumber: "IssueNumber",
+            number: "IssueNumber",
             aliases: ["Comic Aliases"],
             variantDescription: "VariantDescription",
             format: "Format",
             pageCount: 1,
             variantsIdentifier: ["VariantsIdentifier"],
             collectionsIdentifier: ["CollectionsIdentifier"],
-            collectedIssuesIdentifier: ["CollectedIssuesIdentifier"],
+            collectedIdentifiers: ["CollectedIssuesIdentifier"],
             images: ["Images"],
             published: Date(),
             charactersSummary: [CharacterSummaryMock.characterSummary],
@@ -74,8 +74,8 @@ final class Comic_DatabaseItemMapperTests: XCTestCase {
         XCTAssertEqual(sut.description, comicDatabase.description)
     }
 
-    func testIssueNumber_whenInitFromComicDatabase_isEqualToComicDatabaseIssueNumber() {
-        XCTAssertEqual(sut.issueNumber, comicDatabase.issueNumber)
+    func testNumber_whenInitFromComicDatabase_isEqualToComicDatabaseNumber() {
+        XCTAssertEqual(sut.number, comicDatabase.number)
     }
     
     func testAliases_whenInitFromComicDatabase_isEqualToComicDatabaseAliases() {
@@ -102,8 +102,8 @@ final class Comic_DatabaseItemMapperTests: XCTestCase {
         XCTAssertEqual(sut.collectionsIdentifier, comicDatabase.collectionsIdentifier)
     }
 
-    func testCollectedIssuesIdentifier_whenInitFromComicDatabase_isEqualToComicDatabaseCollectedIssuesIdentifier() {
-        XCTAssertEqual(sut.collectedIssuesIdentifier, comicDatabase.collectedIssuesIdentifier)
+    func testCollectedIdentifiers_whenInitFromComicDatabase_isEqualToComicDatabaseCollectedIdentifiers() {
+        XCTAssertEqual(sut.collectedIdentifiers, comicDatabase.collectedIdentifiers)
     }
 
     func testImages_whenInitFromComicDatabase_isEqualToComicDatabaseImages() {

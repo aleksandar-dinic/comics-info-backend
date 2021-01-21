@@ -6,14 +6,15 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import Domain
+import struct Domain.Series
+import struct Domain.ItemSummary
 import Foundation
 
 extension Domain.Series {
 
     init(from series: Series) {
-        let characters = series.characters?.compactMap { Domain.Character(from: $0) }
-        let comics = series.comics?.compactMap { Domain.Comic(from: $0) }
+        let characters = series.characters?.compactMap { Domain.ItemSummary(from: $0) }
+        let comics = series.comics?.compactMap { Domain.ItemSummary(from: $0) }
 
         self.init(
             identifier: series.id,
@@ -25,8 +26,8 @@ extension Domain.Series {
             endYear: series.endYear,
             aliases: series.aliases,
             nextIdentifier: series.nextIdentifier,
-            characters: characters?.sorted(by: { $0.popularity < $1.popularity }),
-            comics: comics?.sorted(by: { $0.popularity < $1.popularity })
+            characters: characters?.sorted(by: { $0.popularity > $1.popularity }),
+            comics: comics?.sorted(by: { $0.popularity > $1.popularity })
         )
     }
 

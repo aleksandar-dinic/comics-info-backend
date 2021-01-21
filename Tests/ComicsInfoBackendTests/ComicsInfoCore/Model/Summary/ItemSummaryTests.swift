@@ -1,5 +1,5 @@
 //
-//  CharacterSummaryTests.swift
+//  ItemSummaryTests.swift
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 13/10/2020.
@@ -9,9 +9,9 @@
 @testable import ComicsInfoCore
 import XCTest
 
-final class CharacterSummaryTests: XCTestCase {
+final class ItemSummaryTests: XCTestCase {
 
-    private var sut: CharacterSummary!
+    private var sut: ItemSummary<Character>!
 
     override func setUpWithError() throws {
         sut = CharacterSummaryMock.characterSummary

@@ -1,5 +1,5 @@
 //
-//  CharacterSummaryInitWithCharacterTests.swift
+//  ItemSummaryInitWithCharacterTests.swift
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 14/10/2020.
@@ -9,20 +9,20 @@
 @testable import ComicsInfoCore
 import XCTest
 
-final class CharacterSummaryInitWithCharacterTests: XCTestCase {
+final class ItemSummaryInitWithCharacterTests: XCTestCase {
 
     private var character: Character!
     private var itemName: String!
     private var summaryName: String!
     private var id: String!
-    private var sut: CharacterSummary!
+    private var sut: ItemSummary<Character>!
 
     override func setUpWithError() throws {
         character = CharacterMock.character
         itemName = "series"
         summaryName = "character"
         id = "2"
-        sut = CharacterSummary(character, id: id, itemName: itemName)
+        sut = ItemSummary(character, id: id, itemName: itemName)
     }
 
     override func tearDownWithError() throws {

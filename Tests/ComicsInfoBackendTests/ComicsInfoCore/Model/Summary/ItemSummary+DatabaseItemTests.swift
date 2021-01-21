@@ -1,21 +1,21 @@
 //
-//  SeriesSummary+DatabaseItemTests.swift
+//  ItemSummary+DatabaseItemTests.swift
 //  ComicsInfoBackendTests
 //
-//  Created by Aleksandar Dinic on 15/10/2020.
+//  Created by Aleksandar Dinic on 14/10/2020.
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
 @testable import ComicsInfoCore
 import XCTest
 
-final class SeriesSummary_DatabaseItemTests: XCTestCase {
-
+final class ItemSummary_DatabaseItemTests: XCTestCase {
+    
     private var databaseItem: DatabasePutItem!
-    private var sut: SeriesSummary!
+    private var sut: ItemSummary<Character>!
 
     override func setUpWithError() throws {
-        databaseItem = DatabasePutItem(SeriesMock.items, table: String.tableName(for: "TEST"))
+        databaseItem = DatabasePutItem(CharacterMock.items, table: .tableName(for: "TEST"))
     }
 
     override func tearDownWithError() throws {
@@ -23,38 +23,38 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
         sut = nil
     }
 
-    private func makeSeriesSummaryFromDatabaseItem() throws -> SeriesSummary {
-        try SeriesSummary(from: databaseItem)
+    private func makeItemSummaryFromDatabaseItem() throws -> ItemSummary<Character> {
+        try ItemSummary(from: databaseItem)
     }
 
     // MARK: - Item ID
 
     func testItemID_whenInitFromDatabaseItem_isEqualToItemID() throws {
         // Given
-        let itemID = "character#1"
+        let itemID = "series#1"
         databaseItem.attributes["itemID"] = itemID
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(sut.itemID, itemID)
     }
 
-    func testSeriesDatabase_whenInitFromDatabaseItemWithMissingItemID_throwsKeyNotFound() throws {
+    func testItemDatabase_whenInitFromDatabaseItemWithMissingItemID_throwsKeyNotFound() throws {
         // Given
         databaseItem.attributes["itemID"] = nil
         var thrownError: Error?
 
         // When
-        XCTAssertThrowsError(try makeSeriesSummaryFromDatabaseItem()) {
+        XCTAssertThrowsError(try makeItemSummaryFromDatabaseItem()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .keyNotFound(let key, _) = error as? DecodingError {
-            XCTAssertEqual(key.stringValue, SeriesSummary.CodingKeys.itemID.stringValue)
+            XCTAssertEqual(key.stringValue, ItemSummary<Character>.CodingKeys.itemID.stringValue)
         } else {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
@@ -64,42 +64,42 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
 
     func testSummaryID_whenInitFromDatabaseItem_isEqualToSummaryID() throws {
         // Given
-        let summaryID = "series#1"
+        let summaryID = "character#1"
         databaseItem.attributes["summaryID"] = summaryID
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(sut.summaryID, summaryID)
     }
 
-    func testSeriesDatabase_whenInitFromDatabaseItemWithMissingSummaryID_throwsKeyNotFound() throws {
+    func testItemDatabase_whenInitFromDatabaseItemWithMissingSummaryID_throwsKeyNotFound() throws {
         // Given
         databaseItem.attributes["summaryID"] = nil
         var thrownError: Error?
 
         // When
-        XCTAssertThrowsError(try makeSeriesSummaryFromDatabaseItem()) {
+        XCTAssertThrowsError(try makeItemSummaryFromDatabaseItem()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .keyNotFound(let key, _) = error as? DecodingError {
-            XCTAssertEqual(key.stringValue, SeriesSummary.CodingKeys.summaryID.stringValue)
+            XCTAssertEqual(key.stringValue, ItemSummary<Character>.CodingKeys.summaryID.stringValue)
         } else {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
     }
 
-    func testSeriesDatabase_whenInitFromDatabaseItemWithInvalidSummaryID_throwsInvalidSummaryID() throws {
+    func testItemDatabase_whenInitFromDatabaseItemWithInvalidSummaryID_throwsInvalidSummaryID() throws {
         // Given
         databaseItem.attributes["summaryID"] = "1"
         var thrownError: Error?
 
         // When
-        XCTAssertThrowsError(try makeSeriesSummaryFromDatabaseItem()) {
+        XCTAssertThrowsError(try makeItemSummaryFromDatabaseItem()) {
             thrownError = $0
         }
 
@@ -107,7 +107,7 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
         let error = try XCTUnwrap(thrownError)
         if case .invalidSummaryID(let itemID, let itemType) = error as? APIError {
             XCTAssertEqual(itemID, "1")
-            XCTAssertEqual(itemType, "series")
+            XCTAssertEqual(itemType, "character")
         } else {
             XCTFail("Expected '.invalidItemID' but got \(error)")
         }
@@ -121,26 +121,26 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
         databaseItem.attributes["itemName"] = itemName
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(sut.itemName, itemName)
     }
 
-    func testSeriesDatabase_whenInitFromDatabaseItemWithMissingItemName_throwsKeyNotFound() throws {
+    func testItemDatabase_whenInitFromDatabaseItemWithMissingItemName_throwsKeyNotFound() throws {
         // Given
         databaseItem.attributes["itemName"] = nil
         var thrownError: Error?
 
         // When
-        XCTAssertThrowsError(try makeSeriesSummaryFromDatabaseItem()) {
+        XCTAssertThrowsError(try makeItemSummaryFromDatabaseItem()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .keyNotFound(let key, _) = error as? DecodingError {
-            XCTAssertEqual(key.stringValue, SeriesSummary.CodingKeys.itemName.stringValue)
+            XCTAssertEqual(key.stringValue, ItemSummary<Character>.CodingKeys.itemName.stringValue)
         } else {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
@@ -150,30 +150,30 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
 
     func testSummaryName_whenInitFromDatabaseItem_isEqualToSummaryName() throws {
         // Given
-        let summaryName = "series"
+        let summaryName = "Item"
         databaseItem.attributes["summaryName"] = summaryName
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(sut.summaryName, summaryName)
     }
 
-    func testSeriesDatabase_whenInitFromDatabaseItemWithMissingSummaryName_throwsKeyNotFound() throws {
+    func testItemDatabase_whenInitFromDatabaseItemWithMissingSummaryName_throwsKeyNotFound() throws {
         // Given
         databaseItem.attributes["summaryName"] = nil
         var thrownError: Error?
 
         // When
-        XCTAssertThrowsError(try makeSeriesSummaryFromDatabaseItem()) {
+        XCTAssertThrowsError(try makeItemSummaryFromDatabaseItem()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .keyNotFound(let key, _) = error as? DecodingError {
-            XCTAssertEqual(key.stringValue, SeriesSummary.CodingKeys.summaryName.stringValue)
+            XCTAssertEqual(key.stringValue, ItemSummary<Character>.CodingKeys.summaryName.stringValue)
         } else {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
@@ -187,7 +187,7 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
         databaseItem.attributes["dateAdded"] = DateFormatter.defaultString(from: dateAdded)
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(
@@ -204,7 +204,7 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
         databaseItem.attributes["dateLastUpdated"] = DateFormatter.defaultString(from: dateLastUpdated)
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(
@@ -221,59 +221,59 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
         databaseItem.attributes["popularity"] = popularity
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(sut.popularity, popularity)
     }
 
-    func testSeriesDatabase_whenInitFromDatabaseItemWithMissingPopularity_throwsKeyNotFound() throws {
+    func testItemDatabase_whenInitFromDatabaseItemWithMissingPopularity_throwsKeyNotFound() throws {
         // Given
         databaseItem.attributes["popularity"] = nil
         var thrownError: Error?
 
         // When
-        XCTAssertThrowsError(try makeSeriesSummaryFromDatabaseItem()) {
+        XCTAssertThrowsError(try makeItemSummaryFromDatabaseItem()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .keyNotFound(let key, _) = error as? DecodingError {
-            XCTAssertEqual(key.stringValue, SeriesSummary.CodingKeys.popularity.stringValue)
+            XCTAssertEqual(key.stringValue, ItemSummary<Character>.CodingKeys.popularity.stringValue)
         } else {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
     }
 
-    // MARK: - Title
+    // MARK: - Name
 
-    func testTitle_whenInitFromDatabaseItem_isEqualToTitle() throws {
+    func testName_whenInitFromDatabaseItem_isEqualToName() throws {
         // Given
-        let title = "Series Title"
-        databaseItem.attributes["title"] = title
+        let name = "Item Name"
+        databaseItem.attributes["name"] = name
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
-        XCTAssertEqual(sut.title, title)
+        XCTAssertEqual(sut.name, name)
     }
 
-    func testSeriesDatabase_whenInitFromDatabaseItemWithMissingTitle_throwsKeyNotFound() throws {
+    func testItemDatabase_whenInitFromDatabaseItemWithMissingName_throwsKeyNotFound() throws {
         // Given
-        databaseItem.attributes["title"] = nil
+        databaseItem.attributes["name"] = nil
         var thrownError: Error?
 
         // When
-        XCTAssertThrowsError(try makeSeriesSummaryFromDatabaseItem()) {
+        XCTAssertThrowsError(try makeItemSummaryFromDatabaseItem()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .keyNotFound(let key, _) = error as? DecodingError {
-            XCTAssertEqual(key.stringValue, SeriesSummary.CodingKeys.title.stringValue)
+            XCTAssertEqual(key.stringValue, ItemSummary<Character>.CodingKeys.name.stringValue)
         } else {
             XCTFail("Expected '.keyNotFound' but got \(error)")
         }
@@ -283,11 +283,11 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
 
     func testThumbnail_whenInitFromDatabaseItem_isEqualToThumbnail() throws {
         // Given
-        let thumbnail = "Series Thumbnail"
+        let thumbnail = "Item Thumbnail"
         databaseItem.attributes["thumbnail"] = thumbnail
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(sut.thumbnail, thumbnail)
@@ -297,14 +297,29 @@ final class SeriesSummary_DatabaseItemTests: XCTestCase {
 
     func testDescription_whenInitFromDatabaseItem_isEqualToDescription() throws {
         // Given
-        let description = "Series Description"
+        let description = "Item Description"
         databaseItem.attributes["description"] = description
 
         // When
-        sut = try makeSeriesSummaryFromDatabaseItem()
+        sut = try makeItemSummaryFromDatabaseItem()
 
         // Then
         XCTAssertEqual(sut.description, description)
     }
+    
+    // MARK: - Count
 
+    func testCount_whenInitFromDatabaseItem_isEqualToCount() throws {
+        // Given
+        let count = 1
+        databaseItem.attributes["count"] = count
+
+        // When
+        sut = try makeItemSummaryFromDatabaseItem()
+
+        // Then
+        XCTAssertEqual(sut.count, count)
+    }
+    
+    
 }

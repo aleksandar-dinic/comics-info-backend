@@ -294,18 +294,18 @@ final class ComicDatabase_DatabaseMapperTests: XCTestCase {
         XCTAssertEqual(sut.description, description)
     }
 
-    // MARK: - Issue Number
+    // MARK: - Number
 
-    func testIssueNumber_whenInitFromDatabaseItem_isEqualToIssueNumber() throws {
+    func testNumber_whenInitFromDatabaseItem_isEqualToNumber() throws {
         // Given
-        let issueNumber = "Comic Issue Number"
-        databaseItem.attributes["issueNumber"] = issueNumber
+        let number = "Comic Number"
+        databaseItem.attributes["number"] = number
 
         // When
         sut = try makeComicDatabaseFromDatabaseItem()
 
         // Then
-        XCTAssertEqual(sut.issueNumber, issueNumber)
+        XCTAssertEqual(sut.number, number)
     }
     
     // MARK: - Aliases
@@ -392,18 +392,18 @@ final class ComicDatabase_DatabaseMapperTests: XCTestCase {
         XCTAssertEqual(sut.collectionsIdentifier, collectionsIdentifier)
     }
 
-    // MARK: - Collected Issues Identifier
+    // MARK: - Collected Identifiers
 
-    func testCollectedIssuesIdentifier_whenInitFromDatabaseItem_isEqualToCollectedIssuesIdentifier() throws {
+    func testCollectedIdentifiers_whenInitFromDatabaseItem_isEqualToCollectedIdentifiers() throws {
         // Given
-        let collectedIssuesIdentifier = ["Comic Collected Issues Identifier"]
-        databaseItem.attributes["collectedIssuesIdentifier"] = collectedIssuesIdentifier
+        let collectedIdentifiers = ["Comic Collected Identifiers"]
+        databaseItem.attributes["collectedIdentifiers"] = collectedIdentifiers
 
         // When
         sut = try makeComicDatabaseFromDatabaseItem()
 
         // Then
-        XCTAssertEqual(sut.collectedIssuesIdentifier, collectedIssuesIdentifier)
+        XCTAssertEqual(sut.collectedIdentifiers, collectedIdentifiers)
     }
 
     // MARK: - Images

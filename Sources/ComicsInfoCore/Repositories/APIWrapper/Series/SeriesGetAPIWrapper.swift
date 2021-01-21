@@ -17,8 +17,8 @@ struct SeriesGetAPIWrapper: GetAPIWrapper {
     func handleItem(_ items: [DatabaseItem], id: String) throws -> Series {
         var dbSeries: SeriesDatabase = try handleDatabaseItem(items, id: id)
 
-        dbSeries.charactersSummary = handleCharactersSummary(items)
-        dbSeries.comicsSummary = handleComicsSummary(items)
+        dbSeries.charactersSummary = handleItemSummary(items)
+        dbSeries.comicsSummary = handleItemSummary(items)
 
         return Series(from: dbSeries)
     }

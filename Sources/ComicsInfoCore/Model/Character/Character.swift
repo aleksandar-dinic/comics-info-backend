@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Character: ComicsInfoItem {
+public struct Character: ComicsInfoItem, SummaryMapper {
 
     /// The unique ID of the character resource.
     public let id: String
@@ -44,13 +44,13 @@ public struct Character: ComicsInfoItem {
     var seriesID: Set<String>?
 
     /// A resource list of series in which this character appears.
-    let series: [Series]?
+    let series: [ItemSummary<Series>]?
 
     /// A resource list containing comicsID which feature this character.
     var comicsID: Set<String>?
 
     /// A resource list containing comics which feature this character.
-    let comics: [Comic]?
+    let comics: [ItemSummary<Comic>]?
 
     mutating func removeID(_ itemID: String) {
         if itemID.starts(with: String.getType(from: Series.self)) {
@@ -94,9 +94,9 @@ extension Character {
         aliases = try? values.decode([String].self, forKey: .aliases)
         birth = try? values.decode(Date.self, forKey: .birth)
         seriesID = try? values.decode(Set<String>.self, forKey: .seriesID)
-        series = try? values.decode([Series].self, forKey: .series)
+        series = try? values.decode([ItemSummary<Series>].self, forKey: .series)
         comicsID = try? values.decode(Set<String>.self, forKey: .comicsID)
-        comics = try? values.decode([Comic].self, forKey: .comics)
+        comics = try? values.decode([ItemSummary<Comic>].self, forKey: .comics)
     }
     
 }

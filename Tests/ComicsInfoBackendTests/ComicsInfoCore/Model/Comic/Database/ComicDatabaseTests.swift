@@ -98,8 +98,8 @@ final class ComicDatabaseTests: XCTestCase {
         XCTAssertEqual(sut.description, givenComic.description)
     }
 
-    func testIssueNumber_whenInitFromComic_isEqualToComicIssueNumber() {
-        XCTAssertEqual(sut.issueNumber, givenComic.issueNumber)
+    func testNumber_whenInitFromComic_isEqualToComicNumber() {
+        XCTAssertEqual(sut.number, givenComic.number)
     }
     
     func testAliases_whenInitFromComic_isEqualToComicAliases() {
@@ -126,8 +126,8 @@ final class ComicDatabaseTests: XCTestCase {
         XCTAssertEqual(sut.collectionsIdentifier, givenComic.collectionsIdentifier)
     }
 
-    func testCollectedIssuesIdentifier_whenInitFromComic_isEqualToComicCollectedIssuesIdentifier() {
-        XCTAssertEqual(sut.collectedIssuesIdentifier, givenComic.collectedIssuesIdentifier)
+    func testCollectedIdentifiers_whenInitFromComic_isEqualToComicCollectedIdentifiers() {
+        XCTAssertEqual(sut.collectedIdentifiers, givenComic.collectedIdentifiers)
     }
 
     func testImages_whenInitFromComic_isEqualToComicImages() {

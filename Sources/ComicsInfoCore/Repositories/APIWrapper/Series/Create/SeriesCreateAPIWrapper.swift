@@ -11,7 +11,7 @@ import NIO
 
 struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory, ComicSummaryFuturesFactory {
 
-    typealias Summary = SeriesSummary
+    typealias Summary = ItemSummary<Series>
     typealias ItemDatabase = SeriesDatabase
 
     let eventLoop: EventLoop
@@ -37,7 +37,7 @@ struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory,
     ) -> EventLoopFuture<[DatabasePutItem]> {
         getCharacters(charactersID, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeCharactersSummary($0, item: series, in: table)
+            var dbItems: [DatabasePutItem] = makeItemSummary($0, item: series, in: table)
             return appendItemSummary($0, item: series, dbItems: &dbItems, tableName: table)
         }
     }
@@ -51,7 +51,7 @@ struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory,
     ) -> EventLoopFuture<[DatabasePutItem]> {
         getComics(comicsId, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeComicsSummary($0, item: series, in: table)
+            var dbItems: [DatabasePutItem] = makeItemSummary($0, item: series, in: table)
             return appendItemSummary($0, item: series, dbItems: &dbItems, tableName: table)
         }
     }

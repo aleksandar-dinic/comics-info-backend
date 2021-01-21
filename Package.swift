@@ -27,7 +27,7 @@ let package = Package(
         .package(
             name: "Domain",
             url: "https://github.com/AleksandarDinic/comics-info-domain.git",
-            from: "0.1.3"
+            from: "0.2.0"
         ),
         .package(
             url: "https://github.com/swift-server/swift-aws-lambda-runtime.git",

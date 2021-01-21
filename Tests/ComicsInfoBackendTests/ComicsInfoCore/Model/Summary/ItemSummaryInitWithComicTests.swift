@@ -1,5 +1,5 @@
 //
-//  ComicSummaryInitWithComicTests.swift
+//  ItemSummaryInitWithComicTests.swift
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 15/10/2020.
@@ -9,20 +9,20 @@
 @testable import ComicsInfoCore
 import XCTest
 
-final class ComicSummaryInitWithComicTests: XCTestCase {
+final class ItemSummaryInitWithComicTests: XCTestCase {
 
     private var comic: Comic!
     private var itemName: String!
     private var summaryName: String!
     private var id: String!
-    private var sut: ComicSummary!
+    private var sut: ItemSummary<Comic>!
 
     override func setUpWithError() throws {
         comic = ComicMock.comic
         itemName = "comic"
         summaryName = "comic"
         id = "2"
-        sut = ComicSummary(comic, id: id, itemName: itemName)
+        sut = ItemSummary(comic, id: id, itemName: itemName)
     }
 
     override func tearDownWithError() throws {
@@ -40,8 +40,8 @@ final class ComicSummaryInitWithComicTests: XCTestCase {
         XCTAssertEqual(sut.popularity, comic.popularity)
     }
 
-    func testTitle_whenInitWithComic_isEqualToComicTitle() {
-        XCTAssertEqual(sut.title, comic.title)
+    func testName_whenInitWithComic_isEqualToComicTitle() {
+        XCTAssertEqual(sut.name, comic.title)
     }
     
     func testDateAdded_whenInitWithComic_isEqualToComicDateAdded() {

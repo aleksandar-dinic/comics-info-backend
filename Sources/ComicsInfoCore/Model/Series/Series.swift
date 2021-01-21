@@ -47,13 +47,13 @@ public struct Series: ComicsInfoItem {
     var charactersID: Set<String>?
 
     /// A resource list containing characters which appear in comics in this series.
-    let characters: [Character]?
+    let characters: [ItemSummary<Character>]?
 
     /// A resource list containing comicsID in this series.
     var comicsID: Set<String>?
 
     /// A resource list containing comics in this series.
-    let comics: [Comic]?
+    let comics: [ItemSummary<Comic>]?
 
     mutating func removeID(_ itemID: String) {
         if itemID.starts(with: String.getType(from: Character.self)) {
@@ -65,6 +65,14 @@ public struct Series: ComicsInfoItem {
         }
     }
 
+}
+
+extension Series: SummaryMapper {
+    
+    var name: String {
+        title
+    }
+    
 }
 
 extension Series {
@@ -101,9 +109,9 @@ extension Series {
         aliases = try? values.decode([String].self, forKey: .aliases)
         nextIdentifier = try? values.decode(String.self, forKey: .nextIdentifier)
         charactersID = try? values.decode(Set<String>.self, forKey: .charactersID)
-        characters = try? values.decode([Character].self, forKey: .characters)
+        characters = try? values.decode([ItemSummary<Character>].self, forKey: .characters)
         comicsID = try? values.decode(Set<String>.self, forKey: .comicsID)
-        comics = try? values.decode([Comic].self, forKey: .comics)
+        comics = try? values.decode([ItemSummary<Comic>].self, forKey: .comics)
     }
     
 }

@@ -58,11 +58,17 @@ final class Character_DomainTests: XCTestCase {
     }
 
     func testSeries_whenInitFromCharacter_isEqualToCharacterSeries() {
-        XCTAssertEqual(sut.series?.compactMap { $0.identifier }, givenCharacter.series?.compactMap { $0.id })
+        XCTAssertEqual(
+            sut.series?.compactMap { $0.identifier },
+            givenCharacter.series?.compactMap { $0.id }.sorted(by: >)
+        )
     }
 
     func testComics_whenInitFromCharacter_isEqualToCharacterComics() {
-        XCTAssertEqual(sut.comics?.compactMap { $0.identifier }, givenCharacter.comics?.compactMap { $0.id })
+        XCTAssertEqual(
+            sut.comics?.compactMap { $0.identifier },
+            givenCharacter.comics?.compactMap { $0.id }.sorted(by: >)
+        )
     }
 
 }

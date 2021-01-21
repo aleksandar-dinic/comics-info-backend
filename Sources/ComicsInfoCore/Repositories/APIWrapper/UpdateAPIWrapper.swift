@@ -12,7 +12,7 @@ import NIO
 protocol UpdateAPIWrapper {
 
     associatedtype Item: ComicsInfoItem
-    associatedtype Summary: ItemSummary where Summary.Item == Item
+    associatedtype Summary: DatabaseItemSummary where Summary.Item == Item
     associatedtype ItemDatabase: DatabaseMapper where ItemDatabase.Item == Item
 
     var eventLoop: EventLoop { get }

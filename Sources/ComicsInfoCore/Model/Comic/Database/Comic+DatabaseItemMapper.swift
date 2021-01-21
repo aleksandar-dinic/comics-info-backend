@@ -19,20 +19,20 @@ extension Comic: DatabaseItemMapper {
             dateLastUpdated: item.dateLastUpdated,
             thumbnail: item.thumbnail,
             description: item.description,
-            issueNumber: item.issueNumber,
+            number: item.number,
             aliases: item.aliases,
             variantDescription: item.variantDescription,
             format: item.format,
             pageCount: item.pageCount,
             variantsIdentifier: item.variantsIdentifier,
             collectionsIdentifier: item.collectionsIdentifier,
-            collectedIssuesIdentifier: item.collectedIssuesIdentifier,
+            collectedIdentifiers: item.collectedIdentifiers,
             images: item.images,
             published: item.published,
             charactersID: item.getCharactersID(),
-            characters: item.charactersSummary?.compactMap { Character(fromSummary: $0) },
+            characters: item.charactersSummary,
             seriesID: item.getSeriesID(),
-            series: item.seriesSummary?.compactMap { Series(fromSummary: $0) }
+            series: item.seriesSummary
         )
     }
 

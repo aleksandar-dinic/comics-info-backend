@@ -1,5 +1,5 @@
 //
-//  ItemSummary.swift
+//  DatabaseItemSummary.swift
 //  ComicsInfoCore
 //
 //  Created by Aleksandar Dinic on 07/10/2020.
@@ -8,9 +8,9 @@
 
 import Foundation
 
-protocol ItemSummary: DatabaseDecodable {
+protocol DatabaseItemSummary: DatabaseDecodable {
 
-    associatedtype Item: Identifiable
+    associatedtype Item: SummaryMapper
     
     var summaryName: String { get }
 
@@ -21,7 +21,7 @@ protocol ItemSummary: DatabaseDecodable {
 
 }
 
-extension ItemSummary {
+extension DatabaseItemSummary {
     
     var notUpdatableFields: Set<String> {
         ["itemID", "summaryID"]

@@ -24,7 +24,7 @@ struct SeriesGetAllAPIWrapper: GetAllAPIWrapper {
     }
 
     private func appendCharactersSummary(_ items: [DatabaseItem], series: inout [String: SeriesDatabase]) {
-        let charactersSummary = handleCharactersSummary(items)
+        let charactersSummary: [ItemSummary<Character>]? = handleItemSummary(items)
 
         guard let characters = charactersSummary, !characters.isEmpty else { return }
 
@@ -38,7 +38,7 @@ struct SeriesGetAllAPIWrapper: GetAllAPIWrapper {
     }
 
     private func appendComicsSummary(_ items: [DatabaseItem], series: inout [String: SeriesDatabase]) {
-        let comicsSummary = handleComicsSummary(items)
+        let comicsSummary: [ItemSummary<Comic>]? = handleItemSummary(items)
 
         guard let comics = comicsSummary, !comics.isEmpty else { return }
 

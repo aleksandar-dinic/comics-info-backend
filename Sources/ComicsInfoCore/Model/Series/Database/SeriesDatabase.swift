@@ -28,8 +28,8 @@ struct SeriesDatabase: DatabaseMapper {
     let endYear: Int?
     let aliases: [String]?
     let nextIdentifier: String?
-    var charactersSummary: [CharacterSummary]?
-    var comicsSummary: [ComicSummary]?
+    var charactersSummary: [ItemSummary<Character>]?
+    var comicsSummary: [ItemSummary<Comic>]?
 
     func getCharactersID() -> Set<String>? {
         guard let charactersSummary = charactersSummary else { return nil }
@@ -59,12 +59,8 @@ extension SeriesDatabase {
         endYear = item.endYear
         aliases = item.aliases
         nextIdentifier = item.nextIdentifier
-        charactersSummary = item.characters?.compactMap {
-            CharacterSummary($0, id: item.id, itemName: .getType(from: Series.self))
-        }
-        comicsSummary = item.comics?.compactMap {
-            ComicSummary($0, id: item.id, itemName: .getType(from: Series.self))
-        }
+        charactersSummary = item.characters
+        comicsSummary = item.comics
     }
 
 }

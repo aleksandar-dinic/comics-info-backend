@@ -11,7 +11,7 @@ import NIO
 
 struct ComicCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory, SeriesSummaryFuturesFactory {
 
-    typealias Summary = ComicSummary
+    typealias Summary = ItemSummary<Comic>
     typealias ItemDatabase = ComicDatabase
     
     let eventLoop: EventLoop
@@ -21,10 +21,7 @@ struct ComicCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory, 
     let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
     let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
 
-    func getSummaryFutures(
-        for item: Comic,
-        in table: String
-    ) -> [EventLoopFuture<[DatabasePutItem]>] {
+    func getSummaryFutures(for item: Comic, in table: String) -> [EventLoopFuture<[DatabasePutItem]>] {
         [
             getCharactersSummary(forIDs: item.charactersID, comic: item, from: table),
             getSeriesSummary(forIDs: item.seriesID, comic: item, from: table)
@@ -40,7 +37,7 @@ struct ComicCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory, 
     ) -> EventLoopFuture<[DatabasePutItem]> {
         getCharacters(charactersID, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeCharactersSummary($0, item: comic, in: table)
+            var dbItems: [DatabasePutItem] = makeItemSummary($0, item: comic, in: table)
             return appendItemSummary($0, item: comic, dbItems: &dbItems, tableName: table)
         }
     }
@@ -54,7 +51,7 @@ struct ComicCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory, 
     ) -> EventLoopFuture<[DatabasePutItem]> {
         getSeries(seriesID, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeSeriesSummary($0, item: comic, in: table)
+            var dbItems: [DatabasePutItem] = makeItemSummary($0, item: comic, in: table)
             return appendItemSummary($0, item: comic, dbItems: &dbItems, tableName: table)
         }
     }

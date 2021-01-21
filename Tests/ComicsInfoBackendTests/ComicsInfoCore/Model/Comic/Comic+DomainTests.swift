@@ -45,8 +45,8 @@ final class Comic_DomainTests: XCTestCase {
         XCTAssertEqual(sut.description, givenComic.description)
     }
 
-    func testIssueNumber_whenInitFromComic_isEqualToComicIssueNumber() {
-        XCTAssertEqual(sut.issueNumber, givenComic.issueNumber)
+    func testNumber_whenInitFromComic_isEqualToComicNumber() {
+        XCTAssertEqual(sut.number, givenComic.number)
     }
     
     func testAliases_whenInitFromComic_isEqualToComicAliases() {
@@ -73,8 +73,8 @@ final class Comic_DomainTests: XCTestCase {
         XCTAssertEqual(sut.collectionsIdentifier, givenComic.collectionsIdentifier)
     }
 
-    func testCollectedIssuesIdentifier_whenInitFromComic_isEqualToComicCollectedIssuesIdentifier() {
-        XCTAssertEqual(sut.collectedIssuesIdentifier, givenComic.collectedIssuesIdentifier)
+    func testCollectedIdentifiers_whenInitFromComic_isEqualToComicCollectedIdentifiers() {
+        XCTAssertEqual(sut.collectedIdentifiers, givenComic.collectedIdentifiers)
     }
 
     func testImages_whenInitFromComic_isEqualToComicImages() {
@@ -86,11 +86,17 @@ final class Comic_DomainTests: XCTestCase {
     }
 
     func testCharacters_whenInitFromComic_isEqualToComicCharacters() {
-        XCTAssertEqual(sut.characters?.compactMap { $0.identifier }, givenComic.characters?.compactMap { $0.id })
+        XCTAssertEqual(
+            sut.characters?.compactMap { $0.identifier },
+            givenComic.characters?.compactMap { $0.id }.sorted(by: >)
+        )
     }
 
     func testSeries_whenInitFromComic_isEqualToComicSeries() {
-        XCTAssertEqual(sut.series?.compactMap { $0.identifier }, givenComic.series?.compactMap { $0.id })
+        XCTAssertEqual(
+            sut.series?.compactMap { $0.identifier },
+            givenComic.series?.compactMap { $0.id }.sorted(by: >)
+        )
     }
 
 }

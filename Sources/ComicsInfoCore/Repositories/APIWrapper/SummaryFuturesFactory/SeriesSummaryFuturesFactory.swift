@@ -7,7 +7,25 @@
 //
 
 import Foundation
+import NIO
 
-protocol SeriesSummaryFuturesFactory: SeriesSummaryDatabaseItemFactory, SeriesMetadataHandler {
+protocol SeriesSummaryFuturesFactory: ItemSummaryDatabaseItemFactory, ItemMetadataHandler {
+    
+    var seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> { get }
+
+    func getSeries(_ seriesIDs: Set<String>?, from table: String) -> EventLoopFuture<[Series]>
+    
+}
+
+extension SeriesSummaryFuturesFactory {
+
+    func getSeries(_ seriesIDs: Set<String>?, from table: String) -> EventLoopFuture<[Series]> {
+        guard let seriesIDs = seriesIDs, !seriesIDs.isEmpty else {
+            return handleEmptyItems()
+        }
+
+        return seriesUseCase.getAllMetadata(withIDs: seriesIDs, fromDataSource: .memory, from: table)
+                .flatMapThrowing { try handleItems($0, itemsID: seriesIDs) }
+    }
 
 }

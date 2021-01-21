@@ -17,8 +17,8 @@ struct CharacterGetAPIWrapper: GetAPIWrapper {
     func handleItem(_ items: [DatabaseItem], id: String) throws -> Character {
         var dbCharacter: CharacterDatabase = try handleDatabaseItem(items, id: id)
 
-        dbCharacter.seriesSummary = handleSeriesSummary(items)
-        dbCharacter.comicsSummary = handleComicsSummary(items)
+        dbCharacter.seriesSummary = handleItemSummary(items)
+        dbCharacter.comicsSummary = handleItemSummary(items)
 
         return Character(from: dbCharacter)
     }

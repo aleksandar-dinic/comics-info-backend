@@ -23,9 +23,9 @@ extension Character: DatabaseItemMapper {
             aliases: item.aliases,
             birth: item.birth,
             seriesID: item.getSeriesID(),
-            series: item.seriesSummary?.compactMap { Series(fromSummary: $0) },
+            series: item.seriesSummary,
             comicsID: item.getComicsID(),
-            comics: item.comicsSummary?.compactMap { Comic(fromSummary: $0) }
+            comics: item.comicsSummary
         )
     }
 

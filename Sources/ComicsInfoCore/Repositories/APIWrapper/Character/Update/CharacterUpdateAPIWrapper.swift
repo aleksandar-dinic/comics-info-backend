@@ -11,7 +11,7 @@ import NIO
 
 struct CharacterUpdateAPIWrapper: UpdateAPIWrapper, SeriesSummaryFuturesFactory, ComicSummaryFuturesFactory {
 
-    typealias Summary = CharacterSummary
+    typealias Summary = ItemSummary<Character>
     typealias ItemDatabase = CharacterDatabase
     
     let eventLoop: EventLoop
@@ -22,10 +22,7 @@ struct CharacterUpdateAPIWrapper: UpdateAPIWrapper, SeriesSummaryFuturesFactory,
     let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
     let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
 
-    func getSummaryFutures(
-        for item: Character,
-        from table: String
-    ) -> [EventLoopFuture<[DatabaseUpdateItem]>] {
+    func getSummaryFutures(for item: Character, from table: String) -> [EventLoopFuture<[DatabaseUpdateItem]>] {
         [
             getSeriesSummary(forIDs: item.seriesID, character: item, from: table),
             getComicsSummary(forIDs: item.comicsID, character: item, from: table)
@@ -41,7 +38,7 @@ struct CharacterUpdateAPIWrapper: UpdateAPIWrapper, SeriesSummaryFuturesFactory,
     ) -> EventLoopFuture<[DatabaseUpdateItem]> {
         getSeries(seriesID, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabaseUpdateItem] = makeSeriesSummary($0, item: character, in: table)
+            var dbItems: [DatabaseUpdateItem] = makeItemSummary($0, item: character, in: table)
             return appendItemSummary($0, item: character, dbItems: &dbItems, tableName: table)
         }
     }
@@ -55,7 +52,7 @@ struct CharacterUpdateAPIWrapper: UpdateAPIWrapper, SeriesSummaryFuturesFactory,
     ) -> EventLoopFuture<[DatabaseUpdateItem]> {
         getComics(comicsId, from: table).flatMapThrowing {
             guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabaseUpdateItem] = makeComicsSummary($0, item: character, in: table)
+            var dbItems: [DatabaseUpdateItem] = makeItemSummary($0, item: character, in: table)
             return appendItemSummary($0, item: character, dbItems: &dbItems, tableName: table)
         }
     }

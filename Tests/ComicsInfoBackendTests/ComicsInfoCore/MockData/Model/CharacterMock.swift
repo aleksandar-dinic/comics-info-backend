@@ -42,9 +42,9 @@ enum CharacterMock {
         aliases: [String]? = nil,
         birth: Date? = nil,
         seriesID: Set<String>? = nil,
-        series: [Series]? = nil,
+        series: [ItemSummary<Series>]? = nil,
         comicsID: Set<String>? = nil,
-        comics: [Comic]? = nil
+        comics: [ItemSummary<Comic>]? = nil
     ) -> Character {
         Character(
             id: id,
@@ -81,9 +81,9 @@ enum CharacterMock {
             aliases: ["Character Aliases"],
             birth: Date(),
             seriesID: ["1"],
-            series: SeriesMock.seriesList,
+            series: SeriesSummaryMock.seriesSummaryList,
             comicsID: ["1"],
-            comics: ComicMock.comicList
+            comics: ComicSummaryMock.comicSummaryList
         )
     }
     

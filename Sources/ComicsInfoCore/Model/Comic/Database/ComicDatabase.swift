@@ -24,18 +24,18 @@ struct ComicDatabase: DatabaseMapper {
     let dateLastUpdated: Date
     let description: String?
     let thumbnail: String?
-    let issueNumber: String?
+    let number: String?
     let aliases: [String]?
     let variantDescription: String?
     let format: String?
     let pageCount: Int?
     let variantsIdentifier: [String]?
     let collectionsIdentifier: [String]?
-    let collectedIssuesIdentifier: [String]?
+    let collectedIdentifiers: [String]?
     let images: [String]?
     let published: Date?
-    var charactersSummary: [CharacterSummary]?
-    var seriesSummary: [SeriesSummary]?
+    var charactersSummary: [ItemSummary<Character>]?
+    var seriesSummary: [ItemSummary<Series>]?
 
     func getCharactersID() -> Set<String>? {
         guard let charactersSummary = charactersSummary else { return nil }
@@ -61,22 +61,18 @@ extension ComicDatabase {
         dateLastUpdated = item.dateLastUpdated
         description = item.description
         thumbnail = item.thumbnail
-        issueNumber = item.issueNumber
+        number = item.number
         aliases = item.aliases
         variantDescription = item.variantDescription
         format = item.format
         pageCount = item.pageCount
         variantsIdentifier = item.variantsIdentifier
         collectionsIdentifier = item.collectionsIdentifier
-        collectedIssuesIdentifier = item.collectedIssuesIdentifier
+        collectedIdentifiers = item.collectedIdentifiers
         images = item.images
         published = item.published
-        charactersSummary = item.characters?.compactMap {
-            CharacterSummary($0, id: item.id, itemName: .getType(from: Comic.self))
-        }
-        seriesSummary = item.series?.compactMap {
-            SeriesSummary($0, id: item.id, itemName: .getType(from: Comic.self))
-        }
+        charactersSummary = item.characters
+        seriesSummary = item.series
     }
 
 }
@@ -93,14 +89,14 @@ extension ComicDatabase {
         case dateLastUpdated
         case thumbnail
         case description
-        case issueNumber
+        case number
         case aliases
         case variantDescription
         case format
         case pageCount
         case variantsIdentifier
         case collectionsIdentifier
-        case collectedIssuesIdentifier
+        case collectedIdentifiers
         case images
         case published
     }
@@ -125,14 +121,14 @@ extension ComicDatabase {
         dateLastUpdated = try decoder.decode(Date.self, forKey: CodingKeys.dateLastUpdated)
         thumbnail = try? decoder.decode(String.self, forKey: CodingKeys.thumbnail)
         description = try? decoder.decode(String.self, forKey: CodingKeys.description)
-        issueNumber = try? decoder.decode(String.self, forKey: CodingKeys.issueNumber)
+        number = try? decoder.decode(String.self, forKey: CodingKeys.number)
         aliases = try? decoder.decode([String].self, forKey: CodingKeys.aliases)
         variantDescription = try? decoder.decode(String.self, forKey: CodingKeys.variantDescription)
         format = try? decoder.decode(String.self, forKey: CodingKeys.format)
         pageCount = try? decoder.decode(Int.self, forKey: CodingKeys.pageCount)
         variantsIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.variantsIdentifier)
         collectionsIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.collectionsIdentifier)
-        collectedIssuesIdentifier = try? decoder.decode([String].self, forKey: CodingKeys.collectedIssuesIdentifier)
+        collectedIdentifiers = try? decoder.decode([String].self, forKey: CodingKeys.collectedIdentifiers)
         images = try? decoder.decode([String].self, forKey: CodingKeys.images)
         published = try? decoder.decode(Date.self, forKey: CodingKeys.published)
     }
