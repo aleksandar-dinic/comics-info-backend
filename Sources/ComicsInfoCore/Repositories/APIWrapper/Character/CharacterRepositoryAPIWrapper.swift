@@ -10,51 +10,29 @@ import Foundation
 import NIO
 
 public struct CharacterRepositoryAPIWrapper: RepositoryAPIWrapper {
-
+    
     public let repositoryAPIService: RepositoryAPIService
-    public let decoderService: DecoderService
-
-    public init(
-        repositoryAPIService: RepositoryAPIService,
-        decoderService: DecoderService = DecoderProvider()
-    ) {
+    private let characterGetAPIWrapper: CharacterGetAPIWrapper
+    
+    init(repositoryAPIService: RepositoryAPIService) {
         self.repositoryAPIService = repositoryAPIService
-        self.decoderService = decoderService
+        characterGetAPIWrapper = CharacterGetAPIWrapper(repositoryAPIService: repositoryAPIService)
     }
 
-    // MARK: - Get item
-
-    public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<Character> {
-        CharacterGetAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).get(withID: itemID, from: table)
+    public func getItem(withID ID: String, from table: String) -> EventLoopFuture<Character> {
+        characterGetAPIWrapper.get(withID: ID, from: table)
+    }
+    
+    public func getItems(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Character]> {
+        characterGetAPIWrapper.getItems(withIDs: IDs, from: table)
     }
 
     public func getAllItems(from table: String) -> EventLoopFuture<[Character]> {
-        CharacterGetAllAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).getAll(from: table)
+        characterGetAPIWrapper.getAll(from: table)
     }
-
-    // MARK: - Get metadata
-
-    public func getMetadata(id: String, from table: String) -> EventLoopFuture<Character> {
-        repositoryAPIService.getMetadata(withID: mapItemID(id), from: table)
-            .flatMapThrowing { Character(from: try decoderService.decode(from: $0)) }
-            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Character.self) }
-    }
-
-    private func mapItemID(_ id: String) -> String {
-        "\(String.getType(from: Item.self))#\(id)"
-    }
-
-    public func getAllMetadata(ids: Set<String>, from table: String) -> EventLoopFuture<[Character]> {
-        CharacterGetAllMetadataAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).getAllMetadata(ids: ids, from: table)
+    
+    public func getSummaries<Summary: ItemSummary>(_ type: Summary.Type, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?> {
+        characterGetAPIWrapper.getSummaries(type, forID: ID, from: table)
     }
 
 }

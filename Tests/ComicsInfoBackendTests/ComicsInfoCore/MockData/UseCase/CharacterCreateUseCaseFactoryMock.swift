@@ -25,21 +25,20 @@ struct CharacterCreateUseCaseFactoryMock: CreateUseCaseFactory {
     }
 
     func makeUseCase() -> CharacterCreateUseCase<CharacterCreateRepositoryAPIWrapper> {
-        CharacterCreateUseCase(repository: makeCharacterRepository())
+        CharacterCreateUseCase(
+            repository: makeCharacterRepository(),
+            seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
+            comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
+        )
     }
 
     private func makeCharacterRepository() -> CreateRepository<CharacterCreateRepositoryAPIWrapper> {
-        CreateRepositoryFactory(
-            repositoryAPIWrapper: makeRepositoryAPIWrapper()
-        ).makeRepository()
+        CreateRepositoryFactory(repositoryAPIWrapper: makeRepositoryAPIWrapper())
+            .makeRepository()
     }
 
     private func makeRepositoryAPIWrapper() -> CharacterCreateRepositoryAPIWrapper {
-        CharacterCreateRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        CharacterCreateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
 
 }

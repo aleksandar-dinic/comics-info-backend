@@ -9,7 +9,7 @@
 @testable import ComicsInfoCore
 import XCTest
 
-final class CharacterGetAPIWrapperTests: XCTestCase, CreateCharacterProtocol {
+final class CharacterGetAPIWrapperTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var sut: CharacterGetAPIWrapper!
     private var table: String!
@@ -51,10 +51,49 @@ final class CharacterGetAPIWrapperTests: XCTestCase, CreateCharacterProtocol {
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .itemNotFound(let itemID, let itemType) = error as? APIError {
-            XCTAssertEqual(itemID, "character#\(givenItemID)")
+            XCTAssertEqual(itemID, givenItemID)
             XCTAssertTrue(itemType == Character.self)
         } else {
             XCTFail("Expected '.itemNotFound' but got \(error)")
+        }
+    }
+    
+    // Get All
+    
+    func test_whenGetAllItems_returnsAllItems() throws {
+        // Given
+        let series = SeriesMock.makeSeries(id: "1")
+        try createSeries(series)
+        let comic = ComicMock.makeComic(id: "1")
+        try createComic(comic)
+        try createCharacter(CharacterMock.makeCharacter(id: "1", seriesID: [series.id]))
+        try createCharacter(CharacterMock.makeCharacter(id: "2", comicsID: [comic.id]))
+
+        // When
+        let feature = sut.getAll(from: table)
+        let characters = try feature.wait()
+
+        // Then
+        XCTAssertEqual(characters.map { $0.id }.sorted(by: <), ["1", "2"])
+    }
+
+    func test_whenGetAllItems_throwsItemsNotFound() throws {
+        // Given
+        var thrownError: Error?
+
+        // When
+        let feature = sut.getAll(from: table)
+        XCTAssertThrowsError(try feature.wait()) {
+            thrownError = $0
+        }
+
+        // Then
+        let error = try XCTUnwrap(thrownError)
+        if case .itemsNotFound(let itemIDs, let itemType) = error as? APIError {
+            XCTAssertNil(itemIDs)
+            XCTAssertTrue(itemType == Character.self)
+        } else {
+            XCTFail("Expected '.itemsNotFound' but got \(error)")
         }
     }
 

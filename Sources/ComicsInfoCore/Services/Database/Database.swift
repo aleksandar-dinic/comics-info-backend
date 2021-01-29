@@ -11,11 +11,10 @@ import NIO
 
 public protocol Database {
 
-    func getItem(withID itemID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]>
-    func getAll(_ items: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]>
-
-    func getMetadata(withID id: String, tableName: String) -> EventLoopFuture<DatabaseGetItem>
-    func getAllMetadata(withIDs ids: Set<String>, tableName: String) -> EventLoopFuture<[DatabaseGetItem]>
+    func getItem<Item: Codable>(withID ID: String, from table: String) -> EventLoopFuture<Item>
+    func getItems<Item: ComicInfoItem>(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Item]>
+    func getAll<Item: ComicInfoItem>(_ items: String, from table: String) -> EventLoopFuture<[Item]>
+    func getSummaries<Summary: ItemSummary>(_ itemName: String, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?>
 
 }
 

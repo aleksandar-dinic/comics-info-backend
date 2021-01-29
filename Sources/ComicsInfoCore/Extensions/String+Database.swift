@@ -16,7 +16,7 @@ public extension String {
     }
 
     static func getType(from item: Any.Type) -> String {
-        "\(item.self)".lowercased()
+        "\(item.self)"
     }
 
 }

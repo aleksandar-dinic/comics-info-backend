@@ -12,53 +12,20 @@ import NIO
 
 public struct SeriesUpdateRepositoryAPIWrapper: UpdateRepositoryAPIWrapper {
 
-    public let eventLoop: EventLoop
     public let repositoryAPIService: UpdateRepositoryAPIService
-    public let logger: Logger
-    public let decoderService: DecoderService
-    public let encoderService: EncoderService
-
-    init(
-        on eventLoop: EventLoop,
-        repositoryAPIService: UpdateRepositoryAPIService,
-        logger: Logger,
-        decoderService: DecoderService = DecoderProvider(),
-        encoderService: EncoderService = EncoderProvider()
-    ) {
-        self.eventLoop = eventLoop
+    private let seriesUpdateAPIWrapper: SeriesUpdateAPIWrapper
+    
+    init(repositoryAPIService: UpdateRepositoryAPIService) {
         self.repositoryAPIService = repositoryAPIService
-        self.logger = logger
-        self.decoderService = decoderService
-        self.encoderService = encoderService
+        seriesUpdateAPIWrapper = SeriesUpdateAPIWrapper(repositoryAPIService: repositoryAPIService)
     }
 
-    public func update(_ item: Series, in table: String) -> EventLoopFuture<Void> {
-        SeriesUpdateAPIWrapper(
-            eventLoop: eventLoop,
-            repositoryAPIService: repositoryAPIService,
-            encoderService: encoderService,
-            decoderService: decoderService,
-            characterUseCase: makeCharacterUseCase(),
-            comicUseCase: makeComicUseCase()
-        ).update(item, in: table)
+    public func update(_ item: Series, in table: String) -> EventLoopFuture<Set<String>> {
+        seriesUpdateAPIWrapper.update(item, in: table)
     }
-
-    private func makeCharacterUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
-        CharacterUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.characterInMemoryCache,
-            logger: logger
-        ).makeUseCase()
-    }
-
-    private func makeComicUseCase() -> ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>> {
-        ComicUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.comicInMemoryCache,
-            logger: logger
-        ).makeUseCase()
+    
+    public func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        seriesUpdateAPIWrapper.updateSummaries(summaries, in: table)
     }
 
 }

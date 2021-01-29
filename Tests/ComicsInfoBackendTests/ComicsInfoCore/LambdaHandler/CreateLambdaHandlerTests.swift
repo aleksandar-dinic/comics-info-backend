@@ -33,7 +33,10 @@ final class CreateLambdaHandlerTests: XCTestCase, LambdaMockFactory {
     func test_whenHandle_responseStatusIsBadRequest() throws {
         // Given
         let useCase = CharacterCreateUseCaseFactoryMock(on: eventLoop, logger: logger).makeUseCase()
-        let sut = CreateLambdaHandler(makeLambdaInitializationContext(logger: logger, on: eventLoop), useCase: useCase)
+        let sut = CreateLambdaHandler(
+            makeLambdaInitializationContext(logger: logger, on: eventLoop),
+            createResponseWrapper: CharacterCreateResponseWrapper(useCase: useCase)
+        )
 
         // When
         let responseFuture = sut.handle(context: makeLambdaContext(logger: logger, on: eventLoop), event: request)

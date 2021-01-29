@@ -62,11 +62,25 @@ final class APIErrorTests: XCTestCase {
             "Invalid SummaryID: Expected to decode character# but found a 1 instead."
         )
     }
+    
+    func testLocalizedDescription_invalidFields() throws {
+        XCTAssertEqual(
+            APIError.invalidFields(["UnknownField"]).localizedDescription,
+            "Invalid fields: [\"UnknownField\"]"
+        )
+    }
 
     func testLocalizedDescription_handlerUnknown() throws {
         XCTAssertEqual(
             APIError.handlerUnknown.localizedDescription,
             "Handler Unknown"
+        )
+    }
+    
+    func testLocalizedDescription_internalServerError() throws {
+        XCTAssertEqual(
+            APIError.internalServerError.localizedDescription,
+            "Internal Server Error"
         )
     }
 

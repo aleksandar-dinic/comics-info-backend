@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Response {
+public struct Response: Codable {
 
     public static let defaultHeaders = [
         "Content-Type": "application/json",
@@ -41,8 +41,6 @@ public struct Response {
     }
 
 }
-
-extension Response: Codable { }
 
 extension Response {
 

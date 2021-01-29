@@ -12,49 +12,20 @@ import NIO
 
 public struct ComicCreateRepositoryAPIWrapper: CreateRepositoryAPIWrapper {
 
-    public let eventLoop: EventLoop
     public let repositoryAPIService: CreateRepositoryAPIService
-    public let logger: Logger
-    public let encoderService: EncoderService
-
-    public init(
-        on eventLoop: EventLoop,
-        repositoryAPIService: CreateRepositoryAPIService,
-        logger: Logger,
-        encoderService: EncoderService = EncoderProvider()
-    ) {
-        self.eventLoop = eventLoop
+    private let comicCreateAPIWrapper: ComicCreateAPIWrapper
+    
+    init(repositoryAPIService: CreateRepositoryAPIService) {
         self.repositoryAPIService = repositoryAPIService
-        self.logger = logger
-        self.encoderService = encoderService
-    }
-
-    public func create(_ item: Comic, in table: String) -> EventLoopFuture<Void> {
-        ComicCreateAPIWrapper(
-            eventLoop: eventLoop,
-            repositoryAPIService: repositoryAPIService,
-            encoderService: encoderService,
-            characterUseCase: makeCharacterUseCase(),
-            seriesUseCase: makeSeriesUseCase()
-        ).create(item, in: table)
+        comicCreateAPIWrapper = ComicCreateAPIWrapper(repositoryAPIService: repositoryAPIService)
     }
     
-    private func makeCharacterUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
-        CharacterUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.characterInMemoryCache,
-            logger: logger
-        ).makeUseCase()
+    public func create(_ item: Comic, in table: String) -> EventLoopFuture<Void> {
+        comicCreateAPIWrapper.create(item, in: table)
     }
-
-    private func makeSeriesUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> {
-        SeriesUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.seriesInMemoryCache,
-            logger: logger
-        ).makeUseCase()
+    
+    public func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        comicCreateAPIWrapper.createSummaries(summaries, in: table)
     }
-
+    
 }

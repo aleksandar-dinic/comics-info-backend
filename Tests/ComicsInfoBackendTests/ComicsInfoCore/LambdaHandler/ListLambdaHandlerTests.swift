@@ -33,7 +33,7 @@ final class ListLambdaHandlerTests: XCTestCase, LambdaMockFactory {
 
     func test_whenHandle_responseStatusIsOK() throws {
         // Given
-        let items = CharacterMock.makeDatabaseItems(String.tableName(for: "TEST"))
+        let items = CharacterMock.makeDatabaseItems()
         let useCase = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
         let listResponseWrapper = CharacterListResponseWrapper(characterUseCase: useCase)
         let sut = ListLambdaHandler(

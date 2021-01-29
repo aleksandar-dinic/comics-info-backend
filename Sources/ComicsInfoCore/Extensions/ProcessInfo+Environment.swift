@@ -10,8 +10,8 @@ import Foundation
 
 public extension ProcessInfo {
 
-    static var isLocalServerEnabled: Bool {
-        processInfo.environment["LOCAL_LAMBDA_SERVER_ENABLED"].flatMap(Bool.init) ?? false
+    static func isLocalServerEnabled(_ key: String = "LOCAL_LAMBDA_SERVER_ENABLED") -> Bool {
+        processInfo.environment[key].flatMap(Bool.init) ?? false
     }
 
 }

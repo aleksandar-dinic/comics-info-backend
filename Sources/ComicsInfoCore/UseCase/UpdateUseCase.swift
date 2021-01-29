@@ -17,14 +17,43 @@ public protocol UpdateUseCase {
 
     var repository: UpdateRepository<APIWrapper> { get }
 
-    func update(_ item: Item, in table: String) -> EventLoopFuture<Void>
+    func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
+    
+    func appendItemSummary(
+        _ item: Item,
+        on eventLoop: EventLoop,
+        from table: String
+    ) -> EventLoopFuture<Item>
+    
+    func updateSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
+    func updateExistingSummaries(for item: Item, on eventLoop: EventLoop, fields: Set<String>, in table: String) -> EventLoopFuture<Void>
 
 }
 
-public extension UpdateUseCase {
-
-    func update(_ item: Item, in table: String) -> EventLoopFuture<Void> {
-        repository.update(item, in: table)
+extension UpdateUseCase {
+    
+    public func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
+        appendItemSummary(item, on: eventLoop, from: table)
+            .flatMap { updateItem($0, on: eventLoop, in: table) }
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
-
+    
+    func updateItem(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
+        repository.update(item, in: table)
+            .flatMap { fields in
+                updateSummaries(for: item, on: eventLoop, in: table)
+                    .and(updateExistingSummaries(for: item, on: eventLoop, fields: fields, in: table))
+                    .flatMap { _ in eventLoop.makeSucceededFuture(()) }
+            }
+    }
+    
+    func updateSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary]?,
+        on eventLoop: EventLoop,
+        in table: String
+    ) -> EventLoopFuture<Void> {
+        guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
+        return repository.updateSummaries(summaries, in: table)
+    }
+    
 }

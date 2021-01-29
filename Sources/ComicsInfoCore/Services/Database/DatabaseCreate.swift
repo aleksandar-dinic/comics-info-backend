@@ -11,7 +11,7 @@ import NIO
 
 public protocol DatabaseCreate {
 
-    mutating func create(_ item: DatabasePutItem) -> EventLoopFuture<Void>
-    mutating func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void>
-
+    mutating func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void>
+    mutating func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void>
+    
 }

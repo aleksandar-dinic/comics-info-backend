@@ -10,7 +10,7 @@ import Logging
 import Foundation
 import NIO
 
-public struct ComicCreateUseCaseFactory: CreateUseCaseFactory {
+public struct ComicCreateUseCaseFactory: CreateUseCaseFactory, CharacterUseCaseBuilder, SeriesUseCaseBuilder {
 
     public let eventLoop: EventLoop
     public let isLocalServer: Bool
@@ -27,21 +27,20 @@ public struct ComicCreateUseCaseFactory: CreateUseCaseFactory {
     }
 
     public func makeUseCase() -> ComicCreateUseCase<ComicCreateRepositoryAPIWrapper> {
-        ComicCreateUseCase(repository: makecomicRepository())
+        ComicCreateUseCase(
+            repository: makecomicRepository(),
+            characterUseCase: buildCharacterUseCase(),
+            seriesUseCase: buildSeriesUseCase()
+        )
     }
 
     private func makecomicRepository() -> CreateRepository<ComicCreateRepositoryAPIWrapper> {
-        CreateRepositoryFactory(
-            repositoryAPIWrapper: makeRepositoryAPIWrapper()
-        ).makeRepository()
+        CreateRepositoryFactory(repositoryAPIWrapper: makeRepositoryAPIWrapper())
+            .makeRepository()
     }
 
     private func makeRepositoryAPIWrapper() -> ComicCreateRepositoryAPIWrapper {
-        ComicCreateRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        ComicCreateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
 
 }

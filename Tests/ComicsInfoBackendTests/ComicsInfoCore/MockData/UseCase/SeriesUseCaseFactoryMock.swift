@@ -13,13 +13,15 @@ import NIO
 
 struct SeriesUseCaseFactoryMock: UseCaseFactory {
 
+    private let items: [String: Data]
     let eventLoop: EventLoop
     let logger: Logger
 
     let isLocalServer: Bool
     let cacheProvider: InMemoryCacheProvider<Series>
 
-    init(on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+    init(items: [String: Data] = [:], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+        self.items = items
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         self.logger = logger ?? Logger(label: "SeriesUseCaseFactoryMock")
         isLocalServer = true
@@ -32,7 +34,7 @@ struct SeriesUseCaseFactoryMock: UseCaseFactory {
 
     private func makeSeriesRepository() -> Repository<SeriesRepositoryAPIWrapper, CacheProvider> {
         RepositoryFactory(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: makeRepositoryAPIWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()
@@ -42,6 +44,15 @@ struct SeriesUseCaseFactoryMock: UseCaseFactory {
         SeriesRepositoryAPIWrapper(
             repositoryAPIService: makeRepositoryAPIService()
         )
+    }
+    
+    func makeRepositoryAPIService() -> RepositoryAPIService {
+        DatabaseProvider(database: makeDatabase())
+    }
+
+    private func makeDatabase() -> Database {
+        DatabaseFectory(isLocalServer: isLocalServer)
+            .makeDatabase(eventLoop: eventLoop, logger: logger, items: items)
     }
 
 }

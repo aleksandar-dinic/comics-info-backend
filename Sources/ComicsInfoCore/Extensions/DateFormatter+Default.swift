@@ -12,7 +12,8 @@ extension DateFormatter {
     
     static func `default`() -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMMM yyyy HH:mm:ss"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "dd MMMM yyyy HH:mm:ss Z"
         return formatter
     }
     

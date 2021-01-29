@@ -9,52 +9,10 @@
 import Foundation
 import NIO
 
-struct CharacterUpdateAPIWrapper: UpdateAPIWrapper, SeriesSummaryFuturesFactory, ComicSummaryFuturesFactory {
-
-    typealias Summary = ItemSummary<Character>
-    typealias ItemDatabase = CharacterDatabase
+struct CharacterUpdateAPIWrapper: UpdateAPIWrapper {
     
-    let eventLoop: EventLoop
+    typealias Item = Character
+    
     let repositoryAPIService: UpdateRepositoryAPIService
-    let encoderService: EncoderService
-    let decoderService: DecoderService
     
-    let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
-    let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
-
-    func getSummaryFutures(for item: Character, from table: String) -> [EventLoopFuture<[DatabaseUpdateItem]>] {
-        [
-            getSeriesSummary(forIDs: item.seriesID, character: item, from: table),
-            getComicsSummary(forIDs: item.comicsID, character: item, from: table)
-        ]
-    }
-
-    // MARK: SeriesSummary
-
-    private func getSeriesSummary(
-        forIDs seriesID: Set<String>?,
-        character: Character,
-        from table: String
-    ) -> EventLoopFuture<[DatabaseUpdateItem]> {
-        getSeries(seriesID, from: table).flatMapThrowing {
-            guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabaseUpdateItem] = makeItemSummary($0, item: character, in: table)
-            return appendItemSummary($0, item: character, dbItems: &dbItems, tableName: table)
-        }
-    }
-
-    // MARK: ComicsSummary
-
-    private func getComicsSummary(
-        forIDs comicsId: Set<String>?,
-        character: Character,
-        from table: String
-    ) -> EventLoopFuture<[DatabaseUpdateItem]> {
-        getComics(comicsId, from: table).flatMapThrowing {
-            guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabaseUpdateItem] = makeItemSummary($0, item: character, in: table)
-            return appendItemSummary($0, item: character, dbItems: &dbItems, tableName: table)
-        }
-    }
-
 }

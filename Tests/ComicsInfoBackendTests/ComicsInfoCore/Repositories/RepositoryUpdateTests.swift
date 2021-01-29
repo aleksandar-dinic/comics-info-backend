@@ -18,7 +18,7 @@ final class RepositoryUpdateTests: XCTestCase {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         table = String.tableName(for: "TEST")
-        let items = CharacterMock.makeDatabaseItems(table)
+        let items = CharacterMock.makeDatabaseItems()
         sut = RepositoryMock.makeCharacterRepositoryUpdate(items: items)
     }
 

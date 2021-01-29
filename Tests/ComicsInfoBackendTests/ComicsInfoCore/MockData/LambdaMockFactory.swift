@@ -14,14 +14,28 @@ import NIO
 
 protocol LambdaMockFactory {
 
-    func makeLambdaInitializationContext(logger: Logger, on eventLoop: EventLoop) -> Lambda.InitializationContext
-    func makeLambdaContext(logger: Logger, on eventLoop: EventLoop) -> Lambda.Context
+    func makeLambdaInitializationContext(
+        logger: Logger,
+        on eventLoop: EventLoop
+    ) -> Lambda.InitializationContext
+
+    func makeLambdaContext(
+        requestID: String,
+        traceID: String,
+        invokedFunctionARN: String,
+        deadline: DispatchWallTime,
+        logger: Logger,
+        on eventLoop: EventLoop
+    ) -> Lambda.Context
 
 }
 
 extension LambdaMockFactory {
 
-    func makeLambdaInitializationContext(logger: Logger, on eventLoop: EventLoop) -> Lambda.InitializationContext {
+    func makeLambdaInitializationContext(
+        logger: Logger,
+        on eventLoop: EventLoop
+    ) -> Lambda.InitializationContext {
         Lambda.InitializationContext(
             logger: logger,
             eventLoop: eventLoop,
@@ -29,12 +43,19 @@ extension LambdaMockFactory {
         )
     }
 
-    func makeLambdaContext(logger: Logger, on eventLoop: EventLoop) -> Lambda.Context {
+    func makeLambdaContext(
+        requestID: String = "requestID",
+        traceID: String = "traceID",
+        invokedFunctionARN: String = "invokedFunctionARN",
+        deadline: DispatchWallTime = DispatchWallTime(millisSinceEpoch: 0),
+        logger: Logger,
+        on eventLoop: EventLoop
+    ) -> Lambda.Context {
         Lambda.Context(
-            requestID: "requestID",
-            traceID: "traceID",
-            invokedFunctionARN: "invokedFunctionARN",
-            deadline: DispatchWallTime(millisSinceEpoch: 0),
+            requestID: requestID,
+            traceID: traceID,
+            invokedFunctionARN: invokedFunctionARN,
+            deadline: deadline,
             logger: logger,
             eventLoop: eventLoop,
             allocator: ByteBufferAllocator()

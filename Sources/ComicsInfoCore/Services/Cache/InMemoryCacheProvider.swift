@@ -7,99 +7,46 @@
 //
 
 import Foundation
-import NIO
 
-public final class InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheable {
+public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
 
     private var itemsCaches: [String: InMemoryCache<Item.ID, Item>]
-    private var metadataCaches: [String: InMemoryCache<Item.ID, Item>]
+    private var itemsSummaries: [String: [String: Codable]]
 
     public init(
         itemsCaches: [String: InMemoryCache<Item.ID, Item>] = [:],
-        metadataCaches: [String: InMemoryCache<Item.ID, Item>] = [:]
+        itemsSummaries: [String: [String: Codable]] = [:]
     ) {
         self.itemsCaches = itemsCaches
-        self.metadataCaches = metadataCaches
+        self.itemsSummaries = itemsSummaries
     }
 
-    public func getItem(
-        withID itemID: Item.ID,
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<Item> {
-        let promise = eventLoop.makePromise(of: Item.self)
-
-        eventLoop.execute {
-            guard let cache = self.itemsCaches[table], let item = cache[itemID] else {
-                return promise.fail(CacheError.itemNotFound(withID: itemID, itemType: Item.self))
-            }
-
-            promise.succeed(item)
+    public func getItem(withID itemID: Item.ID, from table: String) -> Result<Item, CacheError<Item>> {
+        guard let cache = itemsCaches[table], let item = cache[itemID] else {
+            return .failure(.itemNotFound(withID: itemID, itemType: Item.self))
         }
 
-        return promise.futureResult
+        return .success(item)
     }
 
-    public func getAllItems(
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[Item]> {
-        let promise = eventLoop.makePromise(of: [Item].self)
-
-        eventLoop.execute {
-            guard let cache = self.itemsCaches[table], !cache.isEmpty else {
-                return promise.fail(CacheError.itemsNotFound(itemType: Item.self))
-            }
-
-            promise.succeed(cache.values)
+    public func getItems(withIDs IDs: Set<Item.ID>, from table: String) -> (items: [Item], missingIDs: Set<Item.ID>) {
+        var items = [Item]()
+        guard let cache = itemsCaches[table], !cache.isEmpty else { return (items, IDs) }
+        
+        for id in IDs {
+            guard let item = cache[id] else { continue }
+            items.append(item)
         }
 
-        return promise.futureResult
+        return (items, Set(items.map({ $0.id })).symmetricDifference(IDs))
     }
-
-    public func getMetadata(
-        withID id: Item.ID,
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<Item> {
-        let promise = eventLoop.makePromise(of: Item.self)
-
-        eventLoop.execute {
-            guard let cache = self.metadataCaches[table], let item = cache[id] else {
-                return promise.fail(CacheError.itemNotFound(withID: id, itemType: Item.self))
-            }
-            promise.succeed(item)
+    
+    public func getAllItems(from table: String) -> Result<[Item], CacheError<Item>> {
+        guard let cache = itemsCaches[table], !cache.isEmpty else {
+            return .failure(.itemsNotFound(itemType: Item.self))
         }
 
-        return promise.futureResult
-    }
-
-    public func getAllMetadata(
-        withIDs ids: Set<Item.ID>,
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[Item]> {
-        let promise = eventLoop.makePromise(of: [Item].self)
-
-        eventLoop.execute {
-            guard !ids.isEmpty else {
-                return promise.fail(CacheError.itemsNotFound(itemType: Item.self))
-            }
-
-            var items = [Item]()
-            for id in ids {
-                guard let cache = self.metadataCaches[table], let item = cache[id] else { continue }
-                items.append(item)
-            }
-
-            if items.count == ids.count {
-                promise.succeed(items)
-            } else {
-                promise.fail(CacheError.itemsNotFound(itemType: Item.self))
-            }
-        }
-
-        return promise.futureResult
+        return .success(cache.values)
     }
 
     public func save(items: [Item], in table: String) {
@@ -108,20 +55,31 @@ public final class InMemoryCacheProvider<Item: Codable & Identifiable>: Cacheabl
                 itemsCaches[table] = InMemoryCache<Item.ID, Item>()
             }
             itemsCaches[table]?[item.id] = item
-
-            if metadataCaches[table] == nil {
-                metadataCaches[table] = InMemoryCache<Item.ID, Item>()
-            }
-            metadataCaches[table]?[item.id] = item
         }
     }
+    
+    public func getSummaries<Summary: ItemSummary>(
+        _ type: Summary.Type,
+        forID ID: String,
+        from table: String
+    ) -> Result<[Summary], CacheError<Item>> {
+        guard let cache = itemsSummaries[table], !cache.isEmpty else {
+            return .failure(.summariesNotFound(String.getType(from: Summary.self)))
+        }
+        
+        var items = [Summary]()
+        for (_, el) in cache.enumerated() {
+            guard el.key.hasSuffix(ID), let item = el.value as? Summary else { continue }
+            items.append(item)
+        }
 
-    public func saveMetadata(items: [Item], in table: String) {
-        for item in items {
-            if metadataCaches[table] == nil {
-                metadataCaches[table] = InMemoryCache<Item.ID, Item>()
-            }
-            metadataCaches[table]?[item.id] = item
+        return !items.isEmpty ? .success(items) : .failure(.summariesNotFound(String.getType(from: Summary.self)))
+    }
+    
+    public func save<Summary: ItemSummary>(summaries: [Summary], in table: String) {
+        for summary in summaries {
+            let id = "\(summary.itemID)|\(summary.summaryID)"
+            itemsSummaries[table, default: [:]][id] = summary
         }
     }
 

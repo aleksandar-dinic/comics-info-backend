@@ -12,46 +12,34 @@ import SotoDynamoDB
 
 extension DynamoDB: DatabaseUpdate {
 
-    public func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void> {
-        var transactItems = [TransactWriteItem]()
-
-        for item in items {
-            let update = Update(
-                conditionExpression: item.conditionExpression,
-                expressionAttributeNames: item.attributeNames,
-                expressionAttributeValues: item.attributeValues,
-                key: item.key,
-                tableName: item.table,
-                updateExpression: item.updateExpression
-            )
-
-            transactItems.append(.update(update))
-        }
-
-        let input = TransactWriteItemsInput(transactItems: transactItems)
-        DynamoDB.logger.log(level: .info, "Update input: \(input)")
-        return transactWriteItems(input)
-                .flatMapThrowing {
-                    DynamoDB.logger.log(level: .info, "Update output: \($0)")
-                }
-    }
-    
-    public func getAllSummaries(forID summaryID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
-        let input = QueryInput(
-            expressionAttributeValues: [":summaryID": .s(summaryID)],
-            indexName: "summaryID-itemID-index",
-            keyConditionExpression: "summaryID = :summaryID",
-            tableName: tableName
+    public func update<Item: Codable & Identifiable>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>> {
+        let input = UpdateItemCodableInput(
+            conditionExpression: "attribute_exists(itemID) AND attribute_exists(summaryID)",
+            key: ["itemID", "summaryID"],
+            returnValues: .updatedOld,
+            tableName: table,
+            updateItem: item
         )
 
-        DynamoDB.logger.log(level: .info, "GetAllSummaries input:\(input)")
-        return query(input).flatMapThrowing {
-            DynamoDB.logger.log(level: .info, "GetAllSummaries output: \($0)")
-            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0 } }), !items.isEmpty else {
-                throw DatabaseError.itemsNotFound(withIDs: nil)
-            }
-            return items.map { DatabaseGetItem($0, table: tableName) }
+        DynamoDB.logger.log(level: .info, "Update input: \(input)")
+        return updateItem(input).flatMapThrowing {
+            DynamoDB.logger.log(level: .info, "Update output: \($0)")
+            guard let keys = $0.attributes?.keys else { return [] }
+            return Set(keys)
         }
     }
-
+    
+    public func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        let input = UpdateItemCodableInput(
+            key: ["itemID", "summaryID"],
+            tableName: table,
+            updateItem: summaries
+        )
+        
+        DynamoDB.logger.log(level: .info, "Update input: \(input)")
+        return updateItem(input).flatMapThrowing {
+            DynamoDB.logger.log(level: .info, "Update output: \($0)")
+        }
+    }
+    
 }

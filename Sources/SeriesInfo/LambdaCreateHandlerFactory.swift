@@ -16,13 +16,12 @@ enum LambdaCreateHandlerFactory {
 
     static func makeHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
         let seriesUseCaseFactory = makeUseCaseFactory(on: context.eventLoop, logger: context.logger)
-        return CreateLambdaHandler(context, useCase: seriesUseCaseFactory.makeUseCase())
+        let createResponseWrapper = SeriesCreateResponseWrapper(useCase: seriesUseCaseFactory.makeUseCase())
+        
+        return CreateLambdaHandler(context, createResponseWrapper: createResponseWrapper)
     }
 
-    private static func makeUseCaseFactory(
-        on eventLoop: EventLoop,
-        logger: Logger
-    ) -> SeriesCreateUseCaseFactory {
+    private static func makeUseCaseFactory(on eventLoop: EventLoop, logger: Logger) -> SeriesCreateUseCaseFactory {
         SeriesCreateUseCaseFactory(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,

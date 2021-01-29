@@ -16,5 +16,9 @@ struct CreateDataProvider<APIWrapper: CreateRepositoryAPIWrapper> {
     func create(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Void> {
         repositoryAPIWrapper.create(item, in: table)
     }
+    
+    func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        repositoryAPIWrapper.createSummaries(summaries, in: table)
+    }
 
 }

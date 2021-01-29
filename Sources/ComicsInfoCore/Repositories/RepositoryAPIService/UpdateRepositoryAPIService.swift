@@ -11,8 +11,7 @@ import NIO
 
 public protocol UpdateRepositoryAPIService {
 
-    func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void>
-
-    func getAllSummaries(forID summaryID: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]>
+    func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>>
+    func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void>
     
 }

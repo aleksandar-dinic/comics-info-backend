@@ -11,7 +11,7 @@ import NIO
 
 public protocol CreateRepositoryAPIService {
 
-    func create(_ item: DatabasePutItem) -> EventLoopFuture<Void>
-    func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void>
+    func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void>
+    func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void>
 
 }

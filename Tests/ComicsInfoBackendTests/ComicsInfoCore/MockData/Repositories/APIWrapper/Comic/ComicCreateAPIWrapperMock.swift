@@ -16,18 +16,13 @@ enum ComicCreateAPIWrapperMock {
     static func make(
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         logger: Logger = Logger(label: "ComicCreateAPIWrapperMock"),
-        encoderService: EncoderService = EncoderProvider(),
-        items: [String: TableMock]
+        items: [String: Codable]
     ) -> ComicCreateAPIWrapper {
         ComicCreateAPIWrapper(
-            eventLoop: eventLoop,
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryCreateAPIService(
                 on: eventLoop,
                 logger: logger
-            ),
-            encoderService: encoderService,
-            characterUseCase: CharacterUseCaseFactoryMock(items: items).makeUseCase(),
-            seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase()
+            )
         )
     }
 

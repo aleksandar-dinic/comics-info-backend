@@ -16,7 +16,9 @@ public enum APIError: Error {
     case itemsNotFound(withIDs: Set<String>?, itemType: Any.Type)
     case invalidItemID(_ itemID: String, itemType: String)
     case invalidSummaryID(_ summaryID: String, itemType: String)
+    case invalidFields(_ fields: Set<String>)
     case handlerUnknown
+    case internalServerError
 
 }
 
@@ -45,9 +47,15 @@ extension APIError: LocalizedError {
 
         case let .invalidSummaryID(summaryID, itemType):
             return "Invalid SummaryID: Expected to decode \(itemType)# but found a \(summaryID) instead."
+            
+        case let .invalidFields(fields):
+            return "Invalid fields: \(fields)"
 
         case .handlerUnknown:
             return "Handler Unknown"
+            
+        case .internalServerError:
+            return "Internal Server Error"
         }
     }
 

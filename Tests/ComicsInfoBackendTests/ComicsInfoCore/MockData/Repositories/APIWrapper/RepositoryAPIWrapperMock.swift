@@ -16,50 +16,40 @@ enum RepositoryAPIWrapperMock {
     static func makeCharacterRepositoryAPIWrapper(
         on eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock],
-        decoderService: DecoderService = DecoderProvider()
+        items: [String: Data]
     ) -> CharacterRepositoryAPIWrapper {
         CharacterRepositoryAPIWrapper(
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryAPIService(
                 on: eventLoop,
                 logger: logger,
                 items: items
-            ),
-            decoderService: decoderService
+            )
         )
     }
     
     static func makeCharacterRepositoryUpdateAPIWrapper(
         on eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock],
-        decoderService: DecoderService = DecoderProvider()
+        items: [String: Data]
     ) -> CharacterUpdateRepositoryAPIWrapper {
         CharacterUpdateRepositoryAPIWrapper(
-            on: eventLoop,
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryUpdateAPIService(
                 on: eventLoop,
                 logger: logger,
                 items: items
-            ),
-            logger: logger,
-            decoderService: decoderService
+            )
         )
     }
     
     static func makeCharacterRepositoryCreateAPIWrapper(
         on eventLoop: EventLoop,
-        logger: Logger,
-        encoderService: EncoderService = EncoderProvider()
+        logger: Logger
     ) -> CharacterCreateRepositoryAPIWrapper {
         CharacterCreateRepositoryAPIWrapper(
-            on: eventLoop,
             repositoryAPIService: RepositoryAPIServiceMock.makeRepositoryCreateAPIService(
                 on: eventLoop,
                 logger: logger
-            ),
-            logger: logger,
-            encoderService: encoderService
+            )
         )
     }
 

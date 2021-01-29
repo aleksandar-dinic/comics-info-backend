@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Domain.Comic
 import Foundation
 import NIO
 
@@ -29,10 +30,10 @@ public struct ComicUpdateResponseWrapper<APIWrapper: UpdateRepositoryAPIWrapper>
 
         let table = String.tableName(for: environment)
         do {
-            let item = try JSONDecoder().decode(Comic.self, from: data)
-            return comicUseCase.update(item, in: table)
+            let item = try JSONDecoder().decode(Domain.Comic.self, from: data)
+            return comicUseCase.update(Comic(from: item), on: eventLoop, in: table)
                 .map { Response(with: ResponseStatus("\(type(of: item.self)) updated"), statusCode: .ok) }
-                .flatMapError { self.catch($0, on: eventLoop, statusCode: .forbidden) }
+                .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {
             let response = Response(with: ResponseStatus(error.localizedDescription), statusCode: .badRequest)

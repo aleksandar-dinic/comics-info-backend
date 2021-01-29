@@ -14,8 +14,10 @@ enum CharacterCreateResponseWrapperMock {
 
     typealias UseCase = CharacterCreateUseCase<CharacterCreateRepositoryAPIWrapper>
 
-    static func make(on eventLoop: EventLoop) -> ComicsInfoCore.CreateResponseWrapper<UseCase> {
-        ComicsInfoCore.CreateResponseWrapper(useCase: CharacterCreateUseCaseFactoryMock(on: eventLoop).makeUseCase())
+    static func make(
+        on eventLoop: EventLoop
+    ) -> CharacterCreateResponseWrapper<CharacterCreateRepositoryAPIWrapper> {
+        CharacterCreateResponseWrapper(useCase: CharacterCreateUseCaseFactoryMock(on: eventLoop).makeUseCase())
     }
 
 }

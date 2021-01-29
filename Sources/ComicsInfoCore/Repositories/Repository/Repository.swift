@@ -19,69 +19,37 @@ public final class Repository<APIWrapper: RepositoryAPIWrapper, CacheProvider: C
         self.dataProvider = dataProvider
     }
 
-    /// Gets item.
-    ///
-    /// - Parameters:
-    ///   - itemID: Item ID.
-    ///   - dataSource: Layer of data source.
-    /// - Returns: Future with Item value.
     public func getItem(
         withID itemID: Item.ID,
-        fromDataSource dataSource: DataSourceLayer,
+        dataSource: DataSourceLayer,
         from table: String
     ) -> EventLoopFuture<Item> {
         dataProvider.getItem(
             withID: itemID,
-            fromDataSource: dataSource,
+            dataSource: dataSource,
             from: table
         )
     }
-
-    /// Gets all items.
-    ///
-    /// - Parameter dataSource: Layer of data source.
-    /// - Returns: Future with Items value.
-    public func getAllItems(
-        fromDataSource dataSource: DataSourceLayer,
+    
+    public func getItems(
+        withIDs IDs: Set<String>,
+        dataSource: DataSourceLayer,
         from table: String
     ) -> EventLoopFuture<[Item]> {
-        dataProvider.getAllItems(fromDataSource: dataSource, from: table)
+        dataProvider.getItems(withIDs: IDs, dataSource: dataSource, from: table)
     }
 
-    /// Gets item metadata.
-    ///
-    /// - Parameters:
-    ///   - id: Item ID.
-    ///   - dataSource: Layer of data source
-    /// - Returns: Future with Item metadata.
-    public func getMetadata(
-        withID id: Item.ID,
-        fromDataSource dataSource: DataSourceLayer,
-        from table: String
-    ) -> EventLoopFuture<Item> {
-        dataProvider.getMetadata(
-            withID: id,
-            fromDataSource: dataSource,
-            from: table
-        )
+    public func getAllItems(dataSource: DataSourceLayer, from table: String) -> EventLoopFuture<[Item]> {
+        dataProvider.getAllItems(dataSource: dataSource, from: table)
     }
-
-    /// Gets items metadata.
-    ///
-    /// - Parameters:
-    ///   - ids: List of items ID.
-    ///   - dataSource: Layer of data source
-    /// - Returns: Future with Items metadata.
-    public func getAllMetadata(
-        withIDs ids: Set<Item.ID>,
-        fromDataSource dataSource: DataSourceLayer,
+    
+    public func getSummaries<Summary: ItemSummary>(
+        _ type: Summary.Type,
+        forID ID: String,
+        dataSource: DataSourceLayer,
         from table: String
-    ) -> EventLoopFuture<[Item]> {
-        dataProvider.getAllMetadata(
-            withIDs: ids,
-            fromDataSource: dataSource,
-            from: table
-        )
+    ) -> EventLoopFuture<[Summary]?> {
+        dataProvider.getSummaries(type, forID: ID, dataSource: dataSource, from: table)
     }
 
 }

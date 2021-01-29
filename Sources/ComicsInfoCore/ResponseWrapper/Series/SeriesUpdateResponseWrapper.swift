@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Domain.Series
 import Foundation
 import NIO
 
@@ -29,10 +30,10 @@ public struct SeriesUpdateResponseWrapper<APIWrapper: UpdateRepositoryAPIWrapper
 
         let table = String.tableName(for: environment)
         do {
-            let item = try JSONDecoder().decode(Series.self, from: data)
-            return seriesUseCase.update(item, in: table)
+            let item = try JSONDecoder().decode(Domain.Series.self, from: data)
+            return seriesUseCase.update(Series(from: item), on: eventLoop, in: table)
                 .map { Response(with: ResponseStatus("\(type(of: item.self)) updated"), statusCode: .ok) }
-                .flatMapError { self.catch($0, on: eventLoop, statusCode: .forbidden) }
+                .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {
             let response = Response(with: ResponseStatus(error.localizedDescription), statusCode: .badRequest)

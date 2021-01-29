@@ -7,28 +7,46 @@
 //
 
 import struct Domain.Series
-import struct Domain.ItemSummary
 import Foundation
 
-extension Domain.Series {
-
-    init(from series: Series) {
-        let characters = series.characters?.compactMap { Domain.ItemSummary(from: $0) }
-        let comics = series.comics?.compactMap { Domain.ItemSummary(from: $0) }
-
-        self.init(
-            identifier: series.id,
-            popularity: series.popularity,
-            title: series.title,
-            thumbnail: series.thumbnail,
-            description: series.description,
-            startYear: series.startYear,
-            endYear: series.endYear,
-            aliases: series.aliases,
-            nextIdentifier: series.nextIdentifier,
-            characters: characters?.sorted(by: { $0.popularity > $1.popularity }),
-            comics: comics?.sorted(by: { $0.popularity > $1.popularity })
-        )
+extension Series {
+    
+    init(from series: Domain.Series) {
+        id = series.identifier
+        popularity = series.popularity
+        title = series.title
+        dateAdded = Date()
+        dateLastUpdated = Date()
+        thumbnail = series.thumbnail
+        description = series.description
+        startYear = series.startYear
+        endYear = series.endYear
+        aliases = series.aliases
+        nextIdentifier = series.nextIdentifier
+        if let charactersID = series.characters?.map({ $0.identifier }), !charactersID.isEmpty {
+            self.charactersID = Set(charactersID)
+        } else {
+            self.charactersID = nil
+        }
+        if let characters = series.characters?.map({ CharacterSummary(from: $0, id: series.identifier, link: Series.self, count: nil) }), !characters.isEmpty {
+            self.characters = characters
+        } else {
+            self.characters = nil
+        }
+        if let comicsID = series.comics?.map({ $0.identifier }), !comicsID.isEmpty {
+            self.comicsID = Set(comicsID)
+        } else {
+            self.comicsID = nil
+        }
+        if let comics = series.comics?.map({ ComicSummary(from: $0, id: series.identifier, link: Series.self, number: nil) }), !comics.isEmpty {
+            self.comics = comics
+        } else {
+            self.comics = nil
+        }
+        
+        itemName = String.getType(from: Series.self)
+        itemID = "\(itemName)#\(id)"
+        summaryID = "\(itemName)#\(id)"
     }
-
+    
 }

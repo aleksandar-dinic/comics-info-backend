@@ -20,46 +20,30 @@ struct DatabaseMockCreate: DatabaseCreate {
         self.logger = logger
     }
 
-    mutating func create(_ item: DatabasePutItem) -> EventLoopFuture<Void> {
+    mutating func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
         logger.log(level: .info, "Create item: \(item))")
 
-        guard let itemID = item["itemID"] as? String else {
-            return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveItemID)
+        guard DatabaseMock.items[item.itemID] == nil, let itemData = try? JSONEncoder().encode(item) else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: item.itemID))
         }
 
-        guard let summaryID = item["summaryID"] as? String else {
-            return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveSummaryID)
-        }
-
-        let id = "\(itemID)|\(summaryID)"
-        guard DatabaseMock.items[id] == nil else {
-            return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
-        }
-        
-        DatabaseMock.items[id] = TableMock(id: id, attributesValue: item.attributeValues)
+        DatabaseMock.items[item.itemID] = itemData
         return eventLoop.makeSucceededFuture(())
     }
-
-    mutating func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void> {
-        logger.log(level: .info, "CreateAll items: \(items))")
-
-        for item in items {
-            guard let itemID = item["itemID"] as? String else {
-                return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveItemID)
-            }
-
-            guard let summaryID = item["summaryID"] as? String else {
-                return eventLoop.makeFailedFuture(DatabaseError.itemDoesNotHaveSummaryID)
-            }
-
-            let id = "\(itemID)|\(summaryID)"
-            guard DatabaseMock.items[id] == nil else {
+    
+    mutating func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        logger.log(level: .info, "CreateSummaries items: \(summaries))")
+        
+        for summary in summaries {
+            let id = "\(summary.itemID)|\(summary.summaryID)"
+            
+            guard DatabaseMock.items[id] == nil, let summaryData = try? JSONEncoder().encode(summary) else {
                 return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))
             }
             
-            DatabaseMock.items[id] = TableMock(id: id, attributesValue: item.attributeValues)
+            DatabaseMock.items[id] = summaryData
         }
-
+        
         return eventLoop.makeSucceededFuture(())
     }
 

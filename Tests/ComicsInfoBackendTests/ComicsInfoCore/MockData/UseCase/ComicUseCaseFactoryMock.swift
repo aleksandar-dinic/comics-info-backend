@@ -32,7 +32,7 @@ struct ComicUseCaseFactoryMock: UseCaseFactory {
 
     private func makecomicRepository() -> Repository<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>> {
         RepositoryFactory(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: makeRepositoryAPIWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()

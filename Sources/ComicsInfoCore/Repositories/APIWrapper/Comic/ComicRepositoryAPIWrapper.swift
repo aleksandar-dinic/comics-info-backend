@@ -12,49 +12,27 @@ import NIO
 public struct ComicRepositoryAPIWrapper: RepositoryAPIWrapper {
 
     public let repositoryAPIService: RepositoryAPIService
-    public let decoderService: DecoderService
-
-    public init(
-        repositoryAPIService: RepositoryAPIService,
-        decoderService: DecoderService = DecoderProvider()
-    ) {
+    private let comicGetAPIWrapper: ComicGetAPIWrapper
+    
+    init(repositoryAPIService: RepositoryAPIService) {
         self.repositoryAPIService = repositoryAPIService
-        self.decoderService = decoderService
+        comicGetAPIWrapper = ComicGetAPIWrapper(repositoryAPIService: repositoryAPIService)
     }
 
-    // MARK: - Get item
-
     public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<Comic> {
-        ComicGetAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).get(withID: itemID, from: table)
+        comicGetAPIWrapper.get(withID: itemID, from: table)
+    }
+    
+    public func getItems(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Comic]> {
+        comicGetAPIWrapper.getItems(withIDs: IDs, from: table)
     }
 
     public func getAllItems(from table: String) -> EventLoopFuture<[Comic]> {
-        ComicGetAllAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).getAll(from: table)
+        comicGetAPIWrapper.getAll(from: table)
     }
-
-    // MARK: - Get metadata
-
-    public func getMetadata(id: String, from table: String) -> EventLoopFuture<Comic> {
-        repositoryAPIService.getMetadata(withID: mapItemID(id), from: table)
-            .flatMapThrowing { Comic(from: try decoderService.decode(from: $0)) }
-            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Comic.self) }
-    }
-
-    private func mapItemID(_ id: String) -> String {
-        "\(String.getType(from: Item.self))#\(id)"
-    }
-
-    public func getAllMetadata(ids: Set<String>, from table: String) -> EventLoopFuture<[Comic]> {
-        ComicGetAllMetadataAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).getAllMetadata(ids: ids, from: table)
+    
+    public func getSummaries<Summary: ItemSummary>(_ type: Summary.Type, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?> {
+        comicGetAPIWrapper.getSummaries(type, forID: ID, from: table)
     }
 
 }

@@ -35,7 +35,7 @@ public struct SeriesUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory whe
 
     private func makeSeriesRepository() -> Repository<SeriesRepositoryAPIWrapper, CacheProvider> {
         RepositoryFactory(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: makeRepositoryAPIWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()

@@ -36,11 +36,11 @@ final class UseCaseTests: XCTestCase {
     func test_whenGetItemFromDatabase_returnsItem() throws {
         // Given
         let givenItem = CharacterMock.makeCharacter()
-        let items = CharacterMock.makeDatabaseItems(table)
+        let items = CharacterMock.makeDatabaseItems()
         sut = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
 
         // When
-        let featureGet = sut.getItem(withID: givenItem.id, fromDataSource: .database, from: table)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -50,39 +50,11 @@ final class UseCaseTests: XCTestCase {
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
         let givenCharacters = CharacterMock.charactersList
-        let givenItems = CharacterMock.makeDatabaseItemsList(table)
+        let givenItems = CharacterMock.makeDatabaseItemsList()
         sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop, logger: logger).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(fromDataSource: .database, from: table)
-        let items = try featureGet.wait()
-
-        // Then
-        XCTAssertEqual(items.map { $0.id }.sorted(by: <), givenCharacters.map { $0.id }.sorted(by: <))
-    }
-
-    func test_whenGetMetadataFromDatabase_returnsMetadata() throws {
-        // Given
-        let givenItem = CharacterMock.makeCharacter()
-        let items = CharacterMock.makeDatabaseItems(table)
-        sut = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
-
-        // When
-        let featureGet = sut.getMetadata(withID: givenItem.id, fromDataSource: .database, from: table)
-        let item = try featureGet.wait()
-
-        // Then
-        XCTAssertEqual(item.id, givenItem.id)
-    }
-
-    func test_whenGetAllMetadataFromDatabase_returnsAllMetadata() throws {
-        // Given
-        let givenCharacters = CharacterMock.charactersList
-        let givenItems = CharacterMock.makeDatabaseItemsList(table)
-        sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop, logger: logger).makeUseCase()
-
-        // When
-        let featureGet = sut.getAllMetadata(withIDs: Set(givenCharacters.map { $0.id }), fromDataSource: .database, from: table)
+        let featureGet = sut.getAllItems(from: table, dataSource: .database)
         let items = try featureGet.wait()
 
         // Then

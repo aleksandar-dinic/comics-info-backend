@@ -8,13 +8,13 @@
 
 import Foundation
 
-public struct Comic: ComicsInfoItem {
+public struct Comic: SummaryMapper {
 
     /// The unique ID of the comic resource.
     public let id: String
 
     /// The value of comic popularity.
-    let popularity: Int
+    public let popularity: Int
 
     /// The canonical title of the comic.
     let title: String
@@ -26,10 +26,10 @@ public struct Comic: ComicsInfoItem {
     let dateLastUpdated: Date
 
     /// The representative image for this comics.
-    let thumbnail: String?
+    public let thumbnail: String?
 
     /// The preferred description of the comic.
-    let description: String?
+    public let description: String?
 
     /// The number of the comic in the series.
     let number: String?
@@ -69,29 +69,21 @@ public struct Comic: ComicsInfoItem {
     var charactersID: Set<String>?
 
     /// A resource list containing the characters which appear in this comic.
-    let characters: [ItemSummary<Character>]?
+    var characters: [CharacterSummary<Comic>]?
+    var comicSummaryForCharacters: [ComicSummary<Character>]?
 
     /// A resource list of seriesID in which this comic appears.
     var seriesID: Set<String>?
 
     /// A resource list containing the series in which this comic appears.
-    let series: [ItemSummary<Series>]?
-
-    mutating func removeID(_ itemID: String) {
-        if itemID.starts(with: String.getType(from: Character.self)) {
-            let id = itemID.dropFirst("\(String.getType(from: Character.self))#".count)
-            charactersID?.remove(String(id))
-        } else if itemID.starts(with: String.getType(from: Series.self)) {
-            let id = itemID.dropFirst("\(String.getType(from: Series.self))#".count)
-            seriesID?.remove(String(id))
-        }
-    }
-
-}
-
-extension Comic: SummaryMapper {
+    var series: [SeriesSummary<Comic>]?
+    var comicSummaryForSeries: [ComicSummary<Series>]?
     
-    var name: String {
+    public let itemID: String
+    public let summaryID: String
+    public let itemName: String
+    
+    public var name: String {
         title
     }
     
@@ -103,6 +95,8 @@ extension Comic {
         case id
         case popularity
         case title
+        case dateAdded
+        case dateLastUpdated
         case thumbnail
         case description
         case number
@@ -115,35 +109,9 @@ extension Comic {
         case collectedIdentifiers
         case images
         case published
-        case charactersID
-        case characters
-        case seriesID
-        case series
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        id = try values.decode(String.self, forKey: .id)
-        popularity = try values.decode(Int.self, forKey: .popularity)
-        title = try values.decode(String.self, forKey: .title)
-        dateAdded = Date()
-        dateLastUpdated = Date()
-        thumbnail = try? values.decode(String.self, forKey: .thumbnail)
-        description = try? values.decode(String.self, forKey: .description)
-        number = try? values.decode(String.self, forKey: .number)
-        aliases = try? values.decode([String].self, forKey: .aliases)
-        variantDescription = try? values.decode(String.self, forKey: .variantDescription)
-        format = try? values.decode(String.self, forKey: .format)
-        pageCount = try? values.decode(Int.self, forKey: .pageCount)
-        variantsIdentifier = try? values.decode([String].self, forKey: .variantsIdentifier)
-        collectionsIdentifier = try? values.decode([String].self, forKey: .collectionsIdentifier)
-        collectedIdentifiers = try? values.decode([String].self, forKey: .collectedIdentifiers)
-        images = try? values.decode([String].self, forKey: .images)
-        published = try? values.decode(Date.self, forKey: .published)
-        charactersID = try? values.decode(Set<String>.self, forKey: .charactersID)
-        characters = try? values.decode([ItemSummary<Character>].self, forKey: .characters)
-        seriesID = try? values.decode(Set<String>.self, forKey: .seriesID)
-        series = try? values.decode([ItemSummary<Series>].self, forKey: .series)
+        case itemID
+        case summaryID
+        case itemName
     }
     
 }

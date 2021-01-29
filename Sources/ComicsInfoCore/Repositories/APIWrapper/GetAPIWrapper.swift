@@ -9,45 +9,43 @@
 import Foundation
 import NIO
 
-protocol GetAPIWrapper: ItemSummaryHandler {
+protocol GetAPIWrapper {
 
-    associatedtype Item: Identifiable
+    associatedtype Item: ComicInfoItem
 
     var repositoryAPIService: RepositoryAPIService { get }
-    var decoderService: DecoderService { get }
 
-    func get(withID itemID: String, from table: String) -> EventLoopFuture<Item>
-    func handleItem(_ items: [DatabaseItem], id: String) throws -> Item
-
-    func handleDatabaseItem<DBItem: DatabaseDecodable>(_ items: [DatabaseItem], id: String) throws -> DBItem
+    func get(withID ID: String, from table: String) -> EventLoopFuture<Item>
+    func getItems(withIDs IDs: Set<Item.ID>, from table: String) -> EventLoopFuture<[Item]>
+    func getAll(from table: String) -> EventLoopFuture<[Item]>
+    func getSummaries<Summary: ItemSummary>(_ type: Summary.Type, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?>
 
 }
 
 extension GetAPIWrapper {
-
-    func get(withID itemID: String, from table: String) -> EventLoopFuture<Item> {
-        repositoryAPIService.getItem(withID: mapToDatabaseID(itemID, itemType: Item.self), from: table)
-            .flatMapThrowing { try handleItem($0, id: itemID) }
+    
+    func get(withID ID: String, from table: String) -> EventLoopFuture<Item> {
+        repositoryAPIService.getItem(withID: mapToDatabaseID(ID), from: table)
             .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
 
-    private func mapToDatabaseID(_ itemID: String, itemType: Any.Type) -> String {
-        "\(String.getType(from: itemType))#\(itemID)"
+    func getItems(withIDs IDs: Set<Item.ID>, from table: String) -> EventLoopFuture<[Item]> {
+        repositoryAPIService.getItems(withIDs: Set(IDs.map { mapToDatabaseID($0) }), from: table)
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
-
-    func handleDatabaseItem<DBItem: DatabaseDecodable>(_ items: [DatabaseItem], id: String) throws -> DBItem {
-        var dbItem: DBItem?
-
-        for item in items {
-            guard dbItem == nil else { break }
-            dbItem = try? decoderService.decode(from: item)
-        }
-
-        guard let item = dbItem else {
-            throw APIError.itemNotFound(withID: id, itemType: Item.self)
-        }
-
-        return item
+    
+    func mapToDatabaseID(_ ID: String, itemType: Any.Type = Item.self) -> String {
+        "\(String.getType(from: itemType))#\(ID)"
+    }
+    
+    func getAll(from table: String) -> EventLoopFuture<[Item]> {
+        repositoryAPIService.getAll(.getType(from: Item.self), from: table)
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
+    }
+    
+    func getSummaries<Summary: ItemSummary>(_ type: Summary.Type, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?> {
+        repositoryAPIService.getSummaries(type, forID: ID, from: table)
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
 
 }

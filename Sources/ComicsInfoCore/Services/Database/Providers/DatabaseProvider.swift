@@ -17,28 +17,20 @@ public final class DatabaseProvider: RepositoryAPIService {
         self.database = database
     }
 
-    // Read
-
-    public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]> {
-        database.getItem(withID: itemID, tableName: table)
+    public func getItem<Item: Codable>(withID ID: String, from table: String) -> EventLoopFuture<Item> {
+        database.getItem(withID: ID, from: table)
     }
 
-    public func getAll(_ items: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]> {
-        database.getAll(items, tableName: table)
+    public func getItems<Item: ComicInfoItem>(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Item]> {
+        database.getItems(withIDs: IDs, from: table)
     }
-
-    public func getMetadata(withID id: String, from table: String) -> EventLoopFuture<DatabaseGetItem> {
-        database.getMetadata(withID: id, tableName: table)
+    
+    public func getAll<Item: ComicInfoItem>(_ items: String, from table: String) -> EventLoopFuture<[Item]> {
+        database.getAll(items, from: table)
     }
-
-    public func getAllMetadata(
-        withIDs ids: Set<String>,
-        from table: String
-    ) -> EventLoopFuture<[DatabaseGetItem]> {
-        database.getAllMetadata(withIDs: ids, tableName: table)
+    
+    public func getSummaries<Summary: ItemSummary>(_ type: Summary.Type, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?> {
+        database.getSummaries(String.getType(from: type), forID: ID, from: table)
     }
-
-//    func delete(forID identifier: String) -> EventLoopFuture<[String: Any]> {
-//    }
 
 }

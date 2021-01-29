@@ -6,18 +6,17 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-@testable import struct ComicsInfoCore.Series
-@testable import struct ComicsInfoCore.ItemSummary
+@testable import struct ComicsInfoCore.Character
+@testable import struct ComicsInfoCore.SeriesSummary
 import Foundation
 
 enum SeriesSummaryMock {
 
-    static func makeSeriesSummary(
+    static func makeSeriesSummary<Item>(
         id: String = "1",
-        itemID: String = "series#1",
-        summaryID: String = "series#1",
-        itemName: String = "series",
-        summaryName: String = "series",
+        itemID: String = "Series#1",
+        summaryID: String = "Series#1",
+        itemName: String = "Series",
         popularity: Int = 0,
         title: String = "SeriesSummary 1 Title",
         dateAdded: Date = Date(),
@@ -27,93 +26,68 @@ enum SeriesSummaryMock {
         count: Int? = nil,
         number: String? = nil,
         roles: [String]? = nil
-    ) -> ItemSummary<Series> {
-        ItemSummary(
-            id: id,
+    ) -> SeriesSummary<Item> {
+        SeriesSummary(
             itemID: itemID,
             summaryID: summaryID,
             itemName: itemName,
-            summaryName: summaryName,
-            popularity: popularity,
-            name: title,
             dateAdded: dateAdded,
             dateLastUpdated: dateLastUpdated,
+            popularity: popularity,
+            name: title,
             thumbnail: thumbnail,
-            description: description,
-            count: count,
-            number: number,
-            roles: roles
+            description: description
         )
     }
 
-    static var seriesSummary: ItemSummary<Series> {
-        ItemSummary(
-            id: "1",
-            itemID: "series#1",
-            summaryID: "series#1",
-            itemName: "series",
-            summaryName: "series",
-            popularity: 0,
-            name: "SeriesSummary 1 Title",
+    static var seriesSummary: SeriesSummary<Character> {
+        SeriesSummary(
+            itemID: "Series#1",
+            summaryID: "Series#1",
+            itemName: "Series",
             dateAdded: Date(),
             dateLastUpdated: Date(),
+            popularity: 0,
+            name: "SeriesSummary 1 Title",
             thumbnail: "SeriesSummary 1 Thumbnail",
-            description: "SeriesSummary 1 Description",
-            count: 1,
-            number: "1",
-            roles: ["Series role"]
+            description: "SeriesSummary 1 Description"
         )
     }
     
-    static var seriesSummaryList: [ItemSummary<Series>] {
+    static func seriesSummaryList<Item>() -> [SeriesSummary<Item>] {
         [
-            ItemSummary(
-                id: "2",
-                itemID: "series#2",
-                summaryID: "series#2",
-                itemName: "series",
-                summaryName: "series",
+            SeriesSummary(
+                itemID: "Series#2",
+                summaryID: "Series#2",
+                itemName: "Series",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 popularity: 2,
                 name: "Series Title 2",
+                thumbnail: "Series Thumbnail 2",
+                description: "Series Description 2"
+            ),
+            SeriesSummary(
+                itemID: "Series#3",
+                summaryID: "Series#3",
+                itemName: "Series",
                 dateAdded: Date(),
                 dateLastUpdated: Date(),
-                thumbnail: "Series Thumbnail 2",
-                description: "Series Description 2",
-                count: 2,
-                number: "2",
-                roles: ["Series role"]
-            ),
-            ItemSummary(
-                id: "3",
-                itemID: "series#3",
-                summaryID: "series#3",
-                itemName: "series",
-                summaryName: "series",
                 popularity: 3,
                 name: "Series Title 3",
+                thumbnail: "Series Thumbnail 3",
+                description: "Series Description 3"
+            ),
+            SeriesSummary(
+                itemID: "Series#4",
+                summaryID: "Series#4",
+                itemName: "Series",
                 dateAdded: Date(),
                 dateLastUpdated: Date(),
-                thumbnail: "Series Thumbnail 3",
-                description: "Series Description 3",
-                count: 3,
-                number: "3",
-                roles: ["Series role"]
-            ),
-            ItemSummary(
-                id: "4",
-                itemID: "series#4",
-                summaryID: "series#4",
-                itemName: "series",
-                summaryName: "series",
                 popularity: 4,
                 name: "Series Title 4",
-                dateAdded: Date(),
-                dateLastUpdated: Date(),
                 thumbnail: "Series Thumbnail 4",
-                description: "Series Description 4",
-                count: 4,
-                number: "4",
-                roles: ["Series role"]
+                description: "Series Description 4"
             )
         ]
     }

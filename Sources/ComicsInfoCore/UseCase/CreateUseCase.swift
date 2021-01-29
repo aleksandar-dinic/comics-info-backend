@@ -17,14 +17,24 @@ public protocol CreateUseCase {
 
     var repository: CreateRepository<APIWrapper> { get }
 
-    func create(_ item: Item, in table: String) -> EventLoopFuture<Void>
-
+    func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
+    func createSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
+    
+    func appendItemSummary(on item: Item, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item>
+    
 }
 
-public extension CreateUseCase {
+extension CreateUseCase {
+    
+    public func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
+        appendItemSummary(on: item, on: eventLoop, from: table)
+            .flatMap { createItemAndSummaries($0, on: eventLoop, in: table) }
+            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
+    }
 
-    func create(_ item: Item, in table: String) -> EventLoopFuture<Void> {
+    private func createItemAndSummaries(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
         repository.create(item, in: table)
+            .flatMap { createSummaries(for: item, on: eventLoop, in: table) }
     }
 
 }

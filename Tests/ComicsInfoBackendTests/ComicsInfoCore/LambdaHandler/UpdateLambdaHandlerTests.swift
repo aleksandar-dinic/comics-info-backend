@@ -11,7 +11,7 @@ import Logging
 import NIO
 import XCTest
 
-final class UpdateLambdaHandlerTests: XCTestCase, LambdaMockFactory, CreateCharacterProtocol {
+final class UpdateLambdaHandlerTests: XCTestCase, LambdaMockFactory {
 
     private var eventLoop: EventLoop!
     private var request: Request!
@@ -20,7 +20,6 @@ final class UpdateLambdaHandlerTests: XCTestCase, LambdaMockFactory, CreateChara
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
-        try createCharacter(CharacterMock.makeCharacter())
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         request = Request(pathParameters: nil, body: CharacterMock.requestBody)
         logger = Logger(label: self.className)
@@ -34,7 +33,11 @@ final class UpdateLambdaHandlerTests: XCTestCase, LambdaMockFactory, CreateChara
 
     func test_whenHandle_responseStatusIsOk() throws {
         // Given
-        let useCase = CharacterUpdateUseCaseFactoryMock(items: [:], on: eventLoop, logger: logger).makeUseCase()
+        let useCase = CharacterUpdateUseCaseFactoryMock(
+            items: CharacterMock.makeDatabaseItems(),
+            on: eventLoop,
+            logger: logger
+        ).makeUseCase()
         let updateResponseWrapper = CharacterUpdateResponseWrapper(characterUseCase: useCase)
         let sut = UpdateLambdaHandler(
             makeLambdaInitializationContext(logger: logger, on: eventLoop),

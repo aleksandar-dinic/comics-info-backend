@@ -25,7 +25,12 @@ struct ComicUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
     }
 
     func makeUseCase() -> ComicUpdateUseCase<ComicUpdateRepositoryAPIWrapper> {
-        ComicUpdateUseCase(repository: makecomicRepository())
+        ComicUpdateUseCase(
+            repository: makecomicRepository(),
+            characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
+            seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
+            comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
+        )
     }
 
     private func makecomicRepository() -> UpdateRepository<ComicUpdateRepositoryAPIWrapper> {
@@ -35,11 +40,7 @@ struct ComicUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
     }
 
     private func makeRepositoryAPIWrapper() -> ComicUpdateRepositoryAPIWrapper {
-        ComicUpdateRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        ComicUpdateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
 
 }

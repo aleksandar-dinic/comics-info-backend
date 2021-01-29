@@ -17,75 +17,54 @@ public protocol UseCase where APIWrapper.Item == CacheService.Item {
     typealias Item = APIWrapper.Item
 
     var repository: Repository<APIWrapper, CacheService> { get }
+    var availableFields: Set<String> { get }
 
     func getItem(
-        withID itemID: Item.ID,
-        fromDataSource dataSource: DataSourceLayer,
-        from table: String
+        on eventLoop: EventLoop,
+        withID ID: String,
+        fields: Set<String>?,
+        from table: String,
+        dataSource: DataSourceLayer
     ) -> EventLoopFuture<Item>
 
-    func getAllItems(
-        fromDataSource dataSource: DataSourceLayer,
+    func getItems(withIDs IDs: Set<Item.ID>, from table: String, dataSource: DataSourceLayer) -> EventLoopFuture<[Item]>
+    func getAllItems(from table: String, dataSource: DataSourceLayer) -> EventLoopFuture<[Item]>
+    
+    func getSummaries<Summary: ItemSummary>(
+        _ type: Summary.Type,
+        forID ID: String,
+        dataSource: DataSourceLayer,
         from table: String
-    ) -> EventLoopFuture<[Item]>
-
-    func getMetadata(
-        withID id: String,
-        fromDataSource dataSource: DataSourceLayer,
-        from table: String
-    ) -> EventLoopFuture<Item>
-
-    func getAllMetadata(
-        withIDs ids: Set<String>,
-        fromDataSource dataSource: DataSourceLayer,
-        from table: String
-    ) -> EventLoopFuture<[Item]>
+    ) -> EventLoopFuture<[Summary]?>
 
 }
 
 public extension UseCase {
-
-    func getItem(
-        withID itemID: Item.ID,
-        fromDataSource dataSource: DataSourceLayer,
-        from table: String
-    ) -> EventLoopFuture<Item> {
-        repository.getItem(
-            withID: itemID,
-            fromDataSource: dataSource,
-            from: table
-        )
+    
+    func getItems(withIDs IDs: Set<Item.ID>, from table: String, dataSource: DataSourceLayer = .memory) -> EventLoopFuture<[Item]> {
+        repository.getItems(withIDs: IDs, dataSource: dataSource, from: table)
     }
 
-    func getAllItems(
-        fromDataSource dataSource: DataSourceLayer,
-        from table: String
-    ) -> EventLoopFuture<[Item]> {
-        repository.getAllItems(fromDataSource: dataSource, from: table)
+    func getAllItems(from table: String, dataSource: DataSourceLayer = .memory) -> EventLoopFuture<[Item]> {
+        repository.getAllItems(dataSource: dataSource, from: table)
     }
-
-    func getMetadata(
-        withID id: Item.ID,
-        fromDataSource dataSource: DataSourceLayer,
-        from table: String
-    ) -> EventLoopFuture<Item> {
-        repository.getMetadata(
-            withID: id,
-            fromDataSource: dataSource,
-            from: table
-        )
+    
+    func handleFields(_ fields: Set<String>?) throws -> Set<String> {
+        guard let fields = fields else { return [] }
+        
+        guard fields.isSubset(of: availableFields) else {
+            throw APIError.invalidFields(fields.filter { !availableFields.contains($0) })
+        }
+        return fields
     }
-
-    func getAllMetadata(
-        withIDs ids: Set<Item.ID>,
-        fromDataSource dataSource: DataSourceLayer,
+    
+    func getSummaries<Summary: ItemSummary>(
+        _ type: Summary.Type,
+        forID ID: String,
+        dataSource: DataSourceLayer,
         from table: String
-    ) -> EventLoopFuture<[Item]> {
-        repository.getAllMetadata(
-            withIDs: ids,
-            fromDataSource: dataSource,
-            from: table
-        )
+    ) -> EventLoopFuture<[Summary]?> {
+        repository.getSummaries(type, forID: ID, dataSource: dataSource, from: table)
     }
 
 }

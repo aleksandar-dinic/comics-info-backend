@@ -8,18 +8,23 @@
 
 @testable import ComicsInfoCore
 import Foundation
+import NIO
 
 protocol CreateCharacterProtocol {
 
-    func createCharacter(_ character: Character, in table: String) throws
+    func createCharacter(_ character: Character, on eventLoop: EventLoop, in table: String) throws
 
 }
 
 extension CreateCharacterProtocol {
 
-    func createCharacter(_ character: Character, in table: String = String.tableName(for: "TEST")) throws {
+    func createCharacter(
+        _ character: Character,
+        on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
+        in table: String = String.tableName(for: "TEST")
+    ) throws {
         let useCase = CharacterCreateUseCaseFactoryMock().makeUseCase()
-        let feature = useCase.create(character, in: table)
+        let feature = useCase.create(character, on: eventLoop, in: table)
         try feature.wait()
     }
 

@@ -35,7 +35,7 @@ public struct ComicUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory wher
 
     private func makecomicRepository() -> Repository<ComicRepositoryAPIWrapper, CacheProvider> {
         RepositoryFactory(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: makeRepositoryAPIWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()

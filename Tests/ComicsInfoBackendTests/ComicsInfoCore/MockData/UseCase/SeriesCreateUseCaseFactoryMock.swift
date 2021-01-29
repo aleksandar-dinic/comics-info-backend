@@ -25,7 +25,11 @@ struct SeriesCreateUseCaseFactoryMock: CreateUseCaseFactory {
     }
 
     func makeUseCase() -> SeriesCreateUseCase<SeriesCreateRepositoryAPIWrapper> {
-        SeriesCreateUseCase(repository: makeSeriesRepository())
+        SeriesCreateUseCase(
+            repository: makeSeriesRepository(),
+            characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
+            comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
+        )
     }
 
     private func makeSeriesRepository() -> CreateRepository<SeriesCreateRepositoryAPIWrapper> {
@@ -35,11 +39,7 @@ struct SeriesCreateUseCaseFactoryMock: CreateUseCaseFactory {
     }
 
     private func makeRepositoryAPIWrapper() -> SeriesCreateRepositoryAPIWrapper {
-        SeriesCreateRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        SeriesCreateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
 
 }

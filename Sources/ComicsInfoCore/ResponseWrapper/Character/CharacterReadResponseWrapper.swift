@@ -27,11 +27,13 @@ public struct CharacterReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, Cac
             let response = Response(statusCode: .badRequest)
             return eventLoop.makeSucceededFuture(response)
         }
+        
+        let fields = getFields(from: request.pathParameters)
 
         let table = String.tableName(for: environment)
-        return characterUseCase.getItem(withID: id, fromDataSource: .memory, from: table)
+        return characterUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table)
             .map { Response(with: Domain.Character(from: $0), statusCode: .ok) }
-            .flatMapError { self.catch($0, on: eventLoop) }
+            .flatMapErrorThrowing { self.catch($0) }
     }
-
+    
 }

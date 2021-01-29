@@ -11,23 +11,9 @@ import Foundation
 
 enum CharacterMock {
 
-    static func makeDatabasePutItem(_ table: String) -> DatabasePutItem {
+    static func makeDatabaseItems() -> [String: Data] {
         let character = makeCharacter()
-        let characterDatabase = CharacterDatabase(item: character)
-        let encoder = EncoderProvider()
-        return encoder.encode(characterDatabase, table: table)
-    }
-    
-    static func makeDatabaseItems(_ table: String) -> [String: TableMock] {
-        let item = makeDatabasePutItem(table)
-
-        guard
-            let itemID = item["itemID"] as? String,
-            let summaryID = item["summaryID"] as? String
-        else { return [:] }
-
-        let id = "\(itemID)|\(summaryID)"
-        return [id: TableMock(id: id, attributesValue: item.attributeValues)]
+        return [character.itemID: try! JSONEncoder().encode(character)]
     }
     
     static func makeCharacter(
@@ -42,9 +28,9 @@ enum CharacterMock {
         aliases: [String]? = nil,
         birth: Date? = nil,
         seriesID: Set<String>? = nil,
-        series: [ItemSummary<Series>]? = nil,
+        series: [SeriesSummary<Character>]? = nil,
         comicsID: Set<String>? = nil,
-        comics: [ItemSummary<Comic>]? = nil
+        comics: [ComicSummary<Character>]? = nil
     ) -> Character {
         Character(
             id: id,
@@ -60,12 +46,15 @@ enum CharacterMock {
             seriesID: seriesID,
             series: series,
             comicsID: comicsID,
-            comics: comics
+            comics: comics,
+            itemID: "Character#\(id)",
+            summaryID: "Character#\(id)",
+            itemName: "Character"
         )
     }
 
     static var requestBody: String {
-        "{ \"id\": \"1\", \"name\": \"Name\", \"popularity\": 0 }"
+        "{ \"identifier\": \"1\", \"name\": \"Name\", \"popularity\": 0 }"
     }
 
     static var character: Character {
@@ -81,34 +70,19 @@ enum CharacterMock {
             aliases: ["Character Aliases"],
             birth: Date(),
             seriesID: ["1"],
-            series: SeriesSummaryMock.seriesSummaryList,
+            series: SeriesSummaryMock.seriesSummaryList(),
             comicsID: ["1"],
-            comics: ComicSummaryMock.comicSummaryList
+            comics: ComicSummaryMock.comicSummaryList(),
+            itemID: "Character#1",
+            summaryID: "Character#1",
+            itemName: "Character"
         )
     }
     
-    static func makeDatabasePutItemsList(_ table: String) -> [DatabasePutItem] {
-        var putItems = [DatabasePutItem]()
-        let encoder = EncoderProvider()
+    static func makeDatabaseItemsList() -> [String: Data] {
+        var items = [String: Data]()
         for character in charactersList {
-            let character = CharacterDatabase(item: character)
-            putItems.append(encoder.encode(character, table: table))
-        }
-        
-        return putItems
-    }
-    
-    static func makeDatabaseItemsList(_ table: String) -> [String: TableMock] {
-        let putItems = makeDatabasePutItemsList(table)
-        var items = [String: TableMock]()
-        for item in putItems {
-            guard
-                let itemID = item["itemID"] as? String,
-                let summaryID = item["summaryID"] as? String
-            else { continue }
-
-            let id = "\(itemID)|\(summaryID)"
-            items[id] = TableMock(id: id, attributesValue: item.attributeValues)
+            items[character.itemID] = try! JSONEncoder().encode(character)
         }
         return items
     }
@@ -129,7 +103,10 @@ enum CharacterMock {
                 seriesID: nil,
                 series: nil,
                 comicsID: nil,
-                comics: nil
+                comics: nil,
+                itemID: "Character#2",
+                summaryID: "Character#2",
+                itemName: "Character"
             ),
             Character(
                 id: "3",
@@ -145,7 +122,10 @@ enum CharacterMock {
                 seriesID: nil,
                 series: nil,
                 comicsID: nil,
-                comics: nil
+                comics: nil,
+                itemID: "Character#3",
+                summaryID: "Character#3",
+                itemName: "Character"
             ),
             Character(
                 id: "4",
@@ -161,17 +141,20 @@ enum CharacterMock {
                 seriesID: nil,
                 series: nil,
                 comicsID: nil,
-                comics: nil
+                comics: nil,
+                itemID: "Character#4",
+                summaryID: "Character#4",
+                itemName: "Character"
             )
         ]
     }
 
     static var items: [String: Any] {
         [
-            "itemID": "character#1",
-            "summaryID": "character#1",
-            "itemName": "character",
-            "summaryName": "character",
+            "itemID": "Character#1",
+            "summaryID": "Character#1",
+            "itemName": "Character",
+            "summaryName": "Character",
             "popularity": 0,
             "name": "Character Name",
             "dateAdded": "14 January 2021 23:27:03",

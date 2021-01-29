@@ -35,7 +35,7 @@ public struct CharacterUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory 
 
     private func makeCharacterRepository() -> Repository<CharacterRepositoryAPIWrapper, CacheProvider> {
         RepositoryFactory(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: makeRepositoryAPIWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()

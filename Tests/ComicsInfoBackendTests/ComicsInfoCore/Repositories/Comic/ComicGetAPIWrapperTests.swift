@@ -9,7 +9,7 @@
 @testable import ComicsInfoCore
 import XCTest
 
-final class ComicGetAPIWrapperTests: XCTestCase, CreateComicProtocol {
+final class ComicGetAPIWrapperTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var sut: ComicGetAPIWrapper!
     private var table: String!
@@ -51,10 +51,49 @@ final class ComicGetAPIWrapperTests: XCTestCase, CreateComicProtocol {
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .itemNotFound(let itemID, let itemType) = error as? APIError {
-            XCTAssertEqual(itemID, "comic#\(givenItemID)")
+            XCTAssertEqual(itemID, givenItemID)
             XCTAssertTrue(itemType == Comic.self)
         } else {
             XCTFail("Expected '.itemNotFound' but got \(error)")
+        }
+    }
+    
+    // Get All
+    
+    func test_whenGetAllItems_returnsAllItems() throws {
+        // Given
+        let character = CharacterMock.makeCharacter(id: "1")
+        try createCharacter(character)
+        let series = SeriesMock.makeSeries(id: "1")
+        try createSeries(series)
+        try createComic(ComicMock.makeComic(id: "1", charactersID: [character.id]))
+        try createComic(ComicMock.makeComic(id: "2", seriesID: [series.id]))
+
+        // When
+        let feature = sut.getAll(from: table)
+        let comics = try feature.wait()
+
+        // Then
+        XCTAssertEqual(comics.map { $0.id }.sorted(by: <), ["1", "2"])
+    }
+
+    func test_whenGetAllItems_throwsItemsNotFound() throws {
+        // Given
+        var thrownError: Error?
+
+        // When
+        let feature = sut.getAll(from: table)
+        XCTAssertThrowsError(try feature.wait()) {
+            thrownError = $0
+        }
+
+        // Then
+        let error = try XCTUnwrap(thrownError)
+        if case .itemsNotFound(let itemIDs, let itemType) = error as? APIError {
+            XCTAssertNil(itemIDs)
+            XCTAssertTrue(itemType == Comic.self)
+        } else {
+            XCTFail("Expected '.itemsNotFound' but got \(error)")
         }
     }
 

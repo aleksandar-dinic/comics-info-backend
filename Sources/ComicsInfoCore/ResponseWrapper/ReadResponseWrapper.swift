@@ -18,3 +18,15 @@ public protocol ReadResponseWrapper: ErrorResponseWrapper {
     ) -> EventLoopFuture<Response>
 
 }
+
+extension ReadResponseWrapper {
+    
+    func getFields(from pathParameters: [String: String]?) -> Set<String>? {
+        guard let fields = pathParameters?["fields"]?.split(separator: ",").compactMap({ String($0) }) else {
+            return nil
+        }
+        
+        return Set(fields)
+    }
+    
+}

@@ -7,20 +7,11 @@
 //
 
 import Foundation
-import NIO
 
 struct ComicGetAPIWrapper: GetAPIWrapper {
-
+    
+    typealias Item = Comic
+    
     let repositoryAPIService: RepositoryAPIService
-    let decoderService: DecoderService
-
-    func handleItem(_ items: [DatabaseItem], id: String) throws -> Comic {
-        var dbComic: ComicDatabase = try handleDatabaseItem(items, id: id)
-
-        dbComic.charactersSummary = handleItemSummary(items)
-        dbComic.seriesSummary = handleItemSummary(items)
-
-        return Comic(from: dbComic)
-    }
 
 }

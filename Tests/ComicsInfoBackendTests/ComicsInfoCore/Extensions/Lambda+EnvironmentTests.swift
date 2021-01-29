@@ -26,8 +26,4 @@ final class Lambda_EnvironmentTests: XCTestCase {
         XCTAssertEqual(Lambda.handler, "")
     }
 
-    func test_tableName_() {
-        XCTAssertEqual(Lambda.tableName(for: "TEST"), "TABLE_NAME_TEST")
-    }
-
 }

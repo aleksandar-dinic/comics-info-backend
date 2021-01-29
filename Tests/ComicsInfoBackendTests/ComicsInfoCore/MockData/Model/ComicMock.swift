@@ -10,6 +10,11 @@
 import Foundation
 
 enum ComicMock {
+    
+    static func makeDatabaseItems() -> [String: Data] {
+        let comic = makeComic()
+        return [comic.itemID: try! JSONEncoder().encode(comic)]
+    }
 
     static func makeComic(
         id: String = "1",
@@ -30,9 +35,9 @@ enum ComicMock {
         images: [String]? = nil,
         published: Date? = nil,
         charactersID: Set<String>? = nil,
-        characters: [ItemSummary<Character>]? = nil,
+        characters: [CharacterSummary<Comic>]? = nil,
         seriesID: Set<String>? = nil,
-        series: [ItemSummary<Series>]? = nil
+        series: [SeriesSummary<Comic>]? = nil
     ) -> Comic {
         Comic(
             id: id,
@@ -55,12 +60,15 @@ enum ComicMock {
             charactersID: charactersID,
             characters: characters,
             seriesID: seriesID,
-            series: series
+            series: series,
+            itemID: "Comic#\(id)",
+            summaryID: "Comic#\(id)",
+            itemName: "Comic"
         )
     }
 
     static var requestBody: String {
-        "{ \"id\": \"1\", \"title\": \"Title\", \"popularity\": 0 }"
+        "{ \"identifier\": \"1\", \"title\": \"Title\", \"popularity\": 0 }"
     }
 
     static var comic: Comic {
@@ -83,9 +91,12 @@ enum ComicMock {
             images: ["Comic Images"],
             published: Date(),
             charactersID: ["1"],
-            characters: CharacterSummaryMock.characterSummaryList,
+            characters: CharacterSummaryMock.characterSummaryList(),
             seriesID: ["1"],
-            series: SeriesSummaryMock.seriesSummaryList
+            series: SeriesSummaryMock.seriesSummaryList(),
+            itemID: "Comic#1",
+            summaryID: "Comic#1",
+            itemName: "Comic"
         )
     }
 
@@ -112,7 +123,10 @@ enum ComicMock {
                 charactersID: nil,
                 characters: nil,
                 seriesID: nil,
-                series: nil
+                series: nil,
+                itemID: "Comic#2",
+                summaryID: "Comic#2",
+                itemName: "Comic"
             ),
             Comic(
                 id: "3",
@@ -135,7 +149,10 @@ enum ComicMock {
                 charactersID: nil,
                 characters: nil,
                 seriesID: nil,
-                series: nil
+                series: nil,
+                itemID: "Comic#3",
+                summaryID: "Comic#3",
+                itemName: "Comic"
             ),
             Comic(
                 id: "4",
@@ -158,17 +175,20 @@ enum ComicMock {
                 charactersID: nil,
                 characters: nil,
                 seriesID: nil,
-                series: nil
+                series: nil,
+                itemID: "Comic#4",
+                summaryID: "Comic#4",
+                itemName: "Comic"
             )
         ]
     }
 
     static var items: [String: Any] {
         [
-            "itemID": "comic#1",
-            "summaryID": "comic#1",
-            "itemName": "comic",
-            "summaryName": "comic",
+            "itemID": "Comic#1",
+            "summaryID": "Comic#1",
+            "itemName": "Comic",
+            "summaryName": "Comic",
             "popularity": 0,
             "title": "Comic Title",
             "dateAdded": "14 January 2021 23:27:03",

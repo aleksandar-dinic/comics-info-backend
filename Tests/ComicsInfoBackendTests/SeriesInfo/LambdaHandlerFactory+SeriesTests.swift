@@ -54,13 +54,12 @@ final class LambdaHandlerFactory_SeriesTests: XCTestCase, LambdaMockFactory {
 
     func test_whenMakeCreateLambdaHandler_isCreateLambdaHandler() throws {
         // Given
-        typealias UseCase = SeriesCreateUseCase<SeriesCreateRepositoryAPIWrapper>
 
         // When
         let sut = LambdaCreateHandlerFactory.makeHandler(context)
 
         // Then
-        XCTAssert(sut is CreateLambdaHandler<UseCase>)
+        XCTAssert(sut is CreateLambdaHandler)
     }
 
     func test_whenMakeUpdateLambdaHandler_isUpdateLambdaHandler() throws {
@@ -72,6 +71,5 @@ final class LambdaHandlerFactory_SeriesTests: XCTestCase, LambdaMockFactory {
         // Then
         XCTAssert(sut is UpdateLambdaHandler)
     }
-
 
 }

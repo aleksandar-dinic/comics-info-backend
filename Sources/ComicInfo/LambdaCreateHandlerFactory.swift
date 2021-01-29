@@ -16,7 +16,9 @@ enum LambdaCreateHandlerFactory {
 
     static func makeHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
         let useCaseFactory = makeUseCaseFactory(on: context.eventLoop, logger: context.logger)
-        return CreateLambdaHandler(context, useCase: useCaseFactory.makeUseCase())
+        let createResponseWrapper = ComicCreateResponseWrapper(useCase: useCaseFactory.makeUseCase())
+        
+        return CreateLambdaHandler(context, createResponseWrapper: createResponseWrapper)
     }
 
     private static func makeUseCaseFactory(

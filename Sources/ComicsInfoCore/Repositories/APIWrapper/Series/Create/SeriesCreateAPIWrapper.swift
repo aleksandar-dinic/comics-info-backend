@@ -9,51 +9,10 @@
 import Foundation
 import NIO
 
-struct SeriesCreateAPIWrapper: CreateAPIWrapper, CharacterSummaryFuturesFactory, ComicSummaryFuturesFactory {
+struct SeriesCreateAPIWrapper: CreateAPIWrapper {
 
-    typealias Summary = ItemSummary<Series>
-    typealias ItemDatabase = SeriesDatabase
+    typealias Item = Series
 
-    let eventLoop: EventLoop
     let repositoryAPIService: CreateRepositoryAPIService
-    let encoderService: EncoderService
-
-    let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
-    let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
-
-    func getSummaryFutures(for item: Series, in table: String) -> [EventLoopFuture<[DatabasePutItem]>] {
-        [
-            getCharactersSummary(forIDs: item.charactersID, series: item, from: table),
-            getComicsSummary(forIDs: item.comicsID, series: item, from: table)
-        ]
-    }
-
-    // MARK: CharactersSummary
-
-    private func getCharactersSummary(
-        forIDs charactersID: Set<String>?,
-        series: Series,
-        from table: String
-    ) -> EventLoopFuture<[DatabasePutItem]> {
-        getCharacters(charactersID, from: table).flatMapThrowing {
-            guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeItemSummary($0, item: series, in: table)
-            return appendItemSummary($0, item: series, dbItems: &dbItems, tableName: table)
-        }
-    }
-
-    // MARK: ComicsSummary
-
-    private func getComicsSummary(
-        forIDs comicsId: Set<String>?,
-        series: Series,
-        from table: String
-    ) -> EventLoopFuture<[DatabasePutItem]> {
-        getComics(comicsId, from: table).flatMapThrowing {
-            guard !$0.isEmpty else { return [] }
-            var dbItems: [DatabasePutItem] = makeItemSummary($0, item: series, in: table)
-            return appendItemSummary($0, item: series, dbItems: &dbItems, tableName: table)
-        }
-    }
-
+    
 }

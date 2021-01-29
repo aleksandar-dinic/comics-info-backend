@@ -17,19 +17,7 @@ final class Error_APIErrorTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
-    func test_whenMapToAPIError_isRequestError() {
-        // Given
-        let databaseError: Error = DatabaseError.itemDoesNotHaveItemID
-        let givenError = APIError.requestError
-
-        // When
-        let sut = databaseError.mapToAPIError(itemType: Comic.self)
-
-        // Then
-        XCTAssertEqual(sut.localizedDescription, givenError.localizedDescription)
-    }
-
-    func test_whenMapToAPIError_isItemAlreadyExists() {
+    func testItemAlreadyExists_whenMapToAPIError_isItemAlreadyExists() {
         // Given
         let databaseError: Error = DatabaseError.itemAlreadyExists(withID: "1")
         let givenError = APIError.itemAlreadyExists(withID: "1", itemType: Comic.self)
@@ -41,7 +29,7 @@ final class Error_APIErrorTests: XCTestCase {
         XCTAssertEqual(sut.localizedDescription, givenError.localizedDescription)
     }
 
-    func test_whenMapToAPIError_isItemNotFound() {
+    func testItemNotFound_whenMapToAPIError_isItemNotFound() {
         // Given
         let databaseError: Error = DatabaseError.itemNotFound(withID: "1")
         let givenError = APIError.itemNotFound(withID: "1", itemType: Comic.self)
@@ -53,7 +41,7 @@ final class Error_APIErrorTests: XCTestCase {
         XCTAssertEqual(sut.localizedDescription, givenError.localizedDescription)
     }
 
-    func test_whenMapToAPIError_isItemsNotFound() {
+    func testItemsNotFound_whenMapToAPIError_isItemsNotFound() {
         // Given
         let databaseError: Error = DatabaseError.itemsNotFound(withIDs: ["1"])
         let givenError = APIError.itemsNotFound(withIDs: ["1"], itemType: Comic.self)
@@ -65,7 +53,19 @@ final class Error_APIErrorTests: XCTestCase {
         XCTAssertEqual(sut.localizedDescription, givenError.localizedDescription)
     }
 
-    func test_whenMapToAPIError_isGivenError() {
+    func testItemsNotFoundWithIDsNil_whenMapToAPIError_isItemsNotFoundWithIDsNil() {
+        // Given
+        let databaseError: Error = DatabaseError.itemsNotFound(withIDs: nil)
+        let givenError = APIError.itemsNotFound(withIDs: nil, itemType: Comic.self)
+
+        // When
+        let sut = databaseError.mapToAPIError(itemType: Comic.self)
+
+        // Then
+        XCTAssertEqual(sut.localizedDescription, givenError.localizedDescription)
+    }
+    
+    func testError_whenMapToAPIError_isGivenError() {
         // Given
         let givenError: Error = NSError(domain: "", code: 0, userInfo: nil)
 

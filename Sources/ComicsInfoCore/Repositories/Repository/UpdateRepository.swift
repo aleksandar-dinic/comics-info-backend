@@ -17,8 +17,12 @@ public final class UpdateRepository<APIWrapper: UpdateRepositoryAPIWrapper> {
         self.dataProvider = dataProvider
     }
 
-    public func update(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Void> {
+    public func update(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Set<String>> {
         dataProvider.update(item, in: table)
+    }
+    
+    public func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        dataProvider.updateSummaries(summaries, in: table)
     }
 
 }

@@ -10,7 +10,7 @@ import Logging
 import Foundation
 import NIO
 
-public struct SeriesUpdateUseCaseFactory: UpdateUseCaseFactory {
+public struct SeriesUpdateUseCaseFactory: UpdateUseCaseFactory, CharacterUseCaseBuilder, SeriesUseCaseBuilder, ComicUseCaseBuilder {
 
     public let eventLoop: EventLoop
     public let isLocalServer: Bool
@@ -27,21 +27,21 @@ public struct SeriesUpdateUseCaseFactory: UpdateUseCaseFactory {
     }
 
     public func makeUseCase() -> SeriesUpdateUseCase<SeriesUpdateRepositoryAPIWrapper> {
-        SeriesUpdateUseCase(repository: makeSeriesRepository())
-    }
-
-    private func makeSeriesRepository() -> UpdateRepository<SeriesUpdateRepositoryAPIWrapper> {
-        UpdateRepositoryFactory(
-            repositoryAPIWrapper: makeRepositoryAPIWrapper()
-        ).makeRepository()
-    }
-
-    private func makeRepositoryAPIWrapper() -> SeriesUpdateRepositoryAPIWrapper {
-        SeriesUpdateRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
+        SeriesUpdateUseCase(
+            repository: makeSeriesRepository(),
+            characterUseCase: buildCharacterUseCase(),
+            seriesUseCase: buildSeriesUseCase(),
+            comicUseCase: buildComicUseCase()
         )
     }
 
+    private func makeSeriesRepository() -> UpdateRepository<SeriesUpdateRepositoryAPIWrapper> {
+        UpdateRepositoryFactory(repositoryAPIWrapper: makeRepositoryAPIWrapper())
+            .makeRepository()
+    }
+
+    private func makeRepositoryAPIWrapper() -> SeriesUpdateRepositoryAPIWrapper {
+        SeriesUpdateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
+    }
+    
 }

@@ -14,17 +14,26 @@ extension Error {
         guard let error = self as? DatabaseError else { return self }
         
         switch error {
-        case .itemDoesNotHaveItemID, .itemDoesNotHaveSummaryID:
-            return APIError.requestError
-
         case let .itemAlreadyExists(withID: id):
-            return APIError.itemAlreadyExists(withID: id, itemType: itemType.self)
+            return APIError.itemAlreadyExists(
+                withID: id.replacingOccurrences(of: "\(String.getType(from: itemType.self))#", with: ""),
+                itemType: itemType.self
+            )
 
         case let .itemNotFound(withID: id):
-            return APIError.itemNotFound(withID: id, itemType: itemType.self)
+            return APIError.itemNotFound(
+                withID: id.replacingOccurrences(of: "\(String.getType(from: itemType.self))#", with: ""),
+                itemType: itemType.self
+            )
 
         case let .itemsNotFound(withIDs: ids):
-            return APIError.itemsNotFound(withIDs: ids, itemType: itemType.self)
+            guard let ids = ids else {
+                return APIError.itemsNotFound(withIDs: nil, itemType: itemType.self)
+            }
+            return APIError.itemsNotFound(
+                withIDs: Set(ids.map { $0.replacingOccurrences(of: "\(String.getType(from: itemType.self))#", with: "") }),
+                itemType: itemType.self
+            )
         }
     }
 

@@ -16,7 +16,7 @@ enum DataProviderMock {
     static func makeCharacterDataProvider(
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
         cacheProvider: InMemoryCacheProvider<Character> = InMemoryCacheProvider<Character>(),
-        items: [String: TableMock]
+        items: [String: Data]
     ) -> DataProvider<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
         let repositoryAPIWrapper = RepositoryAPIWrapperMock.makeCharacterRepositoryAPIWrapper(
             on: eventLoop,
@@ -32,7 +32,7 @@ enum DataProviderMock {
     
     static func makeCharacterUpdateDataProvider(
         on eventLoop: EventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next(),
-        items: [String: TableMock]
+        items: [String: Data]
     ) -> UpdateDataProvider<CharacterUpdateRepositoryAPIWrapper> {
         let repositoryAPIWrapper = RepositoryAPIWrapperMock.makeCharacterRepositoryUpdateAPIWrapper(
             on: eventLoop,

@@ -21,7 +21,7 @@ extension DynamoDB: Database {
         )
 
         let client = AWSClient(httpClientProvider: .shared(httpClient))
-        self.init(client: client, region: .default)
+        self.init(client: client, region: .getFromEnvironment())
         DynamoDB.logger = logger
     }
 
@@ -30,85 +30,94 @@ extension DynamoDB: Database {
 // Read item.
 extension DynamoDB {
 
-    public func getItem(withID itemID: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
-        let input = QueryInput(
-            expressionAttributeValues: [":itemID": .s(itemID)],
-            keyConditionExpression: "itemID = :itemID",
-            tableName: tableName
+    public func getItem<Item: Codable>(withID ID: String, from table: String) -> EventLoopFuture<Item> {
+        let input = GetItemInput(
+            key: ["itemID": .s(ID), "summaryID": .s(ID)],
+            tableName: table
         )
 
         DynamoDB.logger.log(level: .info, "GetItem input: \(input)")
-        return query(input).flatMapThrowing {
+        return getItem(input, type: Item.self).flatMapThrowing {
             DynamoDB.logger.log(level: .info, "GetItem output: \($0)")
-            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0 } }), !items.isEmpty else {
-                throw DatabaseError.itemNotFound(withID: itemID)
+            guard let item = $0.item else {
+                throw DatabaseError.itemNotFound(withID: ID)
             }
-            return items.map { DatabaseGetItem($0, table: tableName) }
+            return item
+        }
+    }
+    
+    public func getItems<Item: ComicInfoItem>(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Item]> {
+        var futures = [EventLoopFuture<Item>]()
+        
+        for id in IDs {
+            let input = GetItemInput(
+                key: ["itemID": .s(id), "summaryID": .s(id)],
+                tableName: table
+            )
+            
+            DynamoDB.logger.log(level: .info, "GetItems input: \(input)")
+            let future: EventLoopFuture<Item> = getItem(input, type: Item.self).flatMapThrowing {
+                DynamoDB.logger.log(level: .info, "GetItems output: \($0)")
+                guard let item = $0.item else {
+                    throw DatabaseError.itemNotFound(withID: id)
+                }
+                return item
+            }
+            futures.append(future)
+        }
+
+        let futureResult = EventLoopFuture.reduce([Item](), futures, on: client.eventLoopGroup.next()) { (items, item) in
+            var items = items
+            items.append(item)
+            return items
+        }
+        return futureResult.flatMapThrowing { items in
+            guard !items.isEmpty else {
+                throw DatabaseError.itemsNotFound(withIDs: IDs)
+            }
+            return items
         }
     }
 
-    public func getAll(_ items: String, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
+    public func getAll<Item: Codable>(_ items: String, from table: String) -> EventLoopFuture<[Item]> {
         let input = QueryInput(
             expressionAttributeValues: [":itemName": .s(items)],
             indexName: "itemName-summaryID-index",
             keyConditionExpression: "itemName = :itemName",
-            tableName: tableName
+            tableName: table
         )
 
         DynamoDB.logger.log(level: .info, "GetAll input: \(input)")
-        return query(input).flatMapThrowing {
+        return query(input, type: Item.self).flatMapThrowing {
             DynamoDB.logger.log(level: .info, "GetAll output: \($0)")
-            guard let items = $0.items?.compactMap({ $0.compactMapValues { $0 } }), !items.isEmpty else {
+            guard let items = $0.items, !items.isEmpty else {
                 throw DatabaseError.itemsNotFound(withIDs: nil)
             }
-            return items.map { DatabaseGetItem($0, table: tableName) }
+            return items
         }
     }
-
-}
-
-// Read item metadata.
-extension DynamoDB {
-
-    public func getMetadata(withID id: String, tableName: String) -> EventLoopFuture<DatabaseGetItem> {
-        let input = GetItemInput(
-            key: ["itemID": .s(id), "summaryID": .s(id)],
-            tableName: tableName
+    
+    public func getSummaries<Summary: ItemSummary>(
+        _ itemName: String,
+        forID ID: String,
+        from table: String
+    ) -> EventLoopFuture<[Summary]?> {
+        let input = QueryInput(
+            expressionAttributeValues: [":itemName": .s(itemName), ":summaryID": .s(ID)],
+            indexName: "itemName-summaryID-index",
+            keyConditionExpression: "itemName = :itemName AND summaryID = :summaryID",
+            tableName: table
         )
 
-        DynamoDB.logger.log(level: .info, "GetMetadata input: \(input)")
-        return getItem(input).flatMapThrowing {
-            DynamoDB.logger.log(level: .info, "GetMetadata output: \($0)")
-            guard let item = $0.item?.compactMapValues({ $0 }) else {
-                throw DatabaseError.itemNotFound(withID: id)
+        DynamoDB.logger.log(level: .info, "GetSummaries input:\(input)")
+        return query(input, type: Summary.self)
+            .flatMapThrowing {
+                DynamoDB.logger.log(level: .info, "GetSummaries output: \($0)")
+                guard let items = $0.items, !items.isEmpty else {
+                    return nil
+                }
+                return items
             }
-            return DatabaseGetItem(item, table: tableName)
-        }
-    }
-
-    public func getAllMetadata(withIDs ids: Set<String>, tableName: String) -> EventLoopFuture<[DatabaseGetItem]> {
-        var keys = [[String: AttributeValue]]()
-
-        for id in ids {
-            keys.append(["itemID": .s(id), "summaryID": .s(id)])
-        }
-
-        let keysAndAttributes = KeysAndAttributes(keys: keys)
-
-        let input = BatchGetItemInput(
-            requestItems: [tableName: keysAndAttributes]
-        )
-
-        DynamoDB.logger.log(level: .info, "GetAllMetadata input: \(input)")
-        return batchGetItem(input).flatMapThrowing {
-            DynamoDB.logger.log(level: .info, "GetAllMetadata output: \($0)")
-            guard let items = $0.responses?[tableName]?.compactMap({ $0.compactMapValues { $0 } }),
-                  !items.isEmpty else {
-                let ids = Set(ids.compactMap({ $0.split(separator: "#").last }).map { String($0) })
-                throw DatabaseError.itemsNotFound(withIDs: ids)
-            }
-            return items.map { DatabaseGetItem($0, table: tableName) }
-        }
     }
 
 }

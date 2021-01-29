@@ -6,18 +6,17 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-@testable import struct ComicsInfoCore.Comic
-@testable import struct ComicsInfoCore.ItemSummary
+@testable import struct ComicsInfoCore.Character
+@testable import struct ComicsInfoCore.ComicSummary
 import Foundation
 
 enum ComicSummaryMock {
 
-    static func makeComicSummary(
+    static func makeComicSummary<Item>(
         id: String = "1",
-        itemID: String = "comic#1",
-        summaryID: String = "comic#1",
-        itemName: String = "comic",
-        summaryName: String = "comic",
+        itemID: String = "Comic#1",
+        summaryID: String = "Comic#1",
+        itemName: String = "Comic",
         popularity: Int = 0,
         title: String = "ComicSummary 1 Title",
         dateAdded: Date = Date(),
@@ -27,93 +26,73 @@ enum ComicSummaryMock {
         count: Int? = nil,
         number: String? = nil,
         roles: [String]? = nil
-    ) -> ItemSummary<Comic> {
-        ItemSummary(
-            id: id,
+    ) -> ComicSummary<Item> {
+        ComicSummary(
             itemID: itemID,
             summaryID: summaryID,
             itemName: itemName,
-            summaryName: summaryName,
-            popularity: popularity,
-            name: title,
             dateAdded: dateAdded,
             dateLastUpdated: dateLastUpdated,
+            popularity: popularity,
+            name: title,
             thumbnail: thumbnail,
             description: description,
-            count: count,
-            number: number,
-            roles: roles
+            number: number
         )
     }
 
-    static var comicSummary: ItemSummary<Comic> {
-        ItemSummary(
-            id: "1",
-            itemID: "comic#1",
-            summaryID: "comic#1",
-            itemName: "comic",
-            summaryName: "comic",
-            popularity: 0,
-            name: "ComicSummary 1 Title",
+    static var comicSummary: ComicSummary<Character> {
+        ComicSummary(
+            itemID: "Comic#1",
+            summaryID: "Comic#1",
+            itemName: "Comic",
             dateAdded: Date(),
             dateLastUpdated: Date(),
+            popularity: 0,
+            name: "ComicSummary 1 Title",
             thumbnail: "ComicSummary 1 Thumbnail",
             description: "ComicSummary 1 Description",
-            count: 1,
-            number: "1",
-            roles: ["Comic role"]
+            number: "1"
         )
     }
     
-    static var comicSummaryList: [ItemSummary<Comic>] {
+    static func comicSummaryList<Item>() -> [ComicSummary<Item>] {
         [
-            ItemSummary(
-                id: "2",
-                itemID: "comic#2",
-                summaryID: "comic#2",
-                itemName: "comic",
-                summaryName: "comic",
+            ComicSummary(
+                itemID: "Comic#2",
+                summaryID: "Comic#2",
+                itemName: "Comic",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 popularity: 2,
                 name: "Comic Title 2",
-                dateAdded: Date(),
-                dateLastUpdated: Date(),
                 thumbnail: "Comic Thumbnail 2",
                 description: "Comic Description 2",
-                count: 1,
-                number: "2",
-                roles: ["Comic role"]
+                number: "2"
             ),
-            ItemSummary(
-                id: "3",
-                itemID: "comic#3",
-                summaryID: "comic#3",
-                itemName: "comic",
-                summaryName: "comic",
+            ComicSummary(
+                itemID: "Comic#3",
+                summaryID: "Comic#3",
+                itemName: "Comic",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 popularity: 3,
                 name: "Comic Title 3",
-                dateAdded: Date(),
-                dateLastUpdated: Date(),
                 thumbnail: "Comic Thumbnail 3",
                 description: "Comic Description 3",
-                count: 1,
-                number: "3",
-                roles: ["Comic role"]
+                number: "3"
             ),
-            ItemSummary(
-                id: "4",
-                itemID: "comic#4",
-                summaryID: "comic#4",
-                itemName: "comic",
-                summaryName: "comic",
-                popularity: 4,
-                name: "Comic Title 4",
+            ComicSummary(
+                itemID: "Comic#4",
+                summaryID: "Comic#4",
+                itemName: "Comic",
                 dateAdded: Date(),
                 dateLastUpdated: Date(),
+                popularity: 4,
+                name: "Comic Title 4",
                 thumbnail: "Comic Thumbnail 4",
                 description: "Comic Description",
-                count: 1,
-                number: "4",
-                roles: ["Comic role"]
+                number: "4"
             )
         ]
     }

@@ -22,7 +22,7 @@ public struct DatabaseFectory {
     public func makeDatabase(
         eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock] = [:]
+        items: [String: Data] = [:]
     ) -> Database {
         guard !isLocalServer else {
             return DatabaseMock(eventLoop: eventLoop, logger: logger, items: items)
@@ -45,7 +45,7 @@ public struct DatabaseFectory {
     public func makeDatabaseUpdate(
         eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock] = [:]
+        items: [String: Data] = [:]
     ) -> DatabaseUpdate {
         guard !isLocalServer else {
             return DatabaseMockUpdate(eventLoop: eventLoop, logger: logger, items: items)

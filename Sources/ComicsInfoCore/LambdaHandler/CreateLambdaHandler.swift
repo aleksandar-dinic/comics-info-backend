@@ -11,15 +11,18 @@ import AWSLambdaRuntime
 import Foundation
 import NIO
 
-public struct CreateLambdaHandler<UseCaseType: CreateUseCase>: EventLoopLambdaHandler, LoggerProvider {
+public struct CreateLambdaHandler: EventLoopLambdaHandler, LoggerProvider {
 
     public typealias In = Request
     public typealias Out = APIGateway.V2.Response
 
-    private let createResponseWrapper: CreateResponseWrapper<UseCaseType>
+    private let createResponseWrapper: CreateResponseWrapper
 
-    public init(_ context: Lambda.InitializationContext, useCase: UseCaseType) {
-        self.createResponseWrapper = CreateResponseWrapper(useCase: useCase)
+    public init(
+        _ context: Lambda.InitializationContext,
+        createResponseWrapper: CreateResponseWrapper
+    ) {
+        self.createResponseWrapper = createResponseWrapper
     }
 
     public func handle(

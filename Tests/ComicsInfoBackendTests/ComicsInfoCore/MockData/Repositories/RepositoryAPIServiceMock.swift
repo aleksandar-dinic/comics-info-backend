@@ -17,7 +17,7 @@ enum RepositoryAPIServiceMock {
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock]
+        items: [String: Data]
     ) -> RepositoryAPIService {
         DatabaseProvider(
             database: makeDatabase(
@@ -33,7 +33,7 @@ enum RepositoryAPIServiceMock {
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock]
+        items: [String: Data]
     ) -> UpdateRepositoryAPIService {
         UpdateDatabaseProvider(
             database: makeUpdateDatabase(
@@ -63,7 +63,7 @@ enum RepositoryAPIServiceMock {
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock]
+        items: [String: Data]
     ) -> Database {
         DatabaseFectory(isLocalServer: isLocalServer)
             .makeDatabase(eventLoop: eventLoop, logger: logger, items: items)
@@ -73,7 +73,7 @@ enum RepositoryAPIServiceMock {
         isLocalServer: Bool = true,
         on eventLoop: EventLoop,
         logger: Logger,
-        items: [String: TableMock]
+        items: [String: Data]
     ) -> DatabaseUpdate {
         DatabaseFectory(isLocalServer: isLocalServer)
             .makeDatabaseUpdate(eventLoop: eventLoop, logger: logger, items: items)

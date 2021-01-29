@@ -13,13 +13,13 @@ import NIO
 
 struct CharacterUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
 
-    let items: [String: TableMock]
+    let items: [String: Data]
     var eventLoop: EventLoop
     var logger: Logger
 
     var isLocalServer: Bool
 
-    init(items: [String: TableMock], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+    init(items: [String: Data], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
         self.items = items
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         self.logger = logger ?? Logger(label: "CharacterUpdateUseCaseFactoryMock")
@@ -27,7 +27,12 @@ struct CharacterUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
     }
 
     func makeUseCase() -> CharacterUpdateUseCase<CharacterUpdateRepositoryAPIWrapper> {
-        CharacterUpdateUseCase(repository: makeCharacterRepository())
+        CharacterUpdateUseCase(
+            repository: makeCharacterRepository(),
+            characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
+            seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
+            comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
+        )
     }
 
     private func makeCharacterRepository() -> UpdateRepository<CharacterUpdateRepositoryAPIWrapper> {
@@ -37,11 +42,7 @@ struct CharacterUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
     }
 
     private func makeRepositoryAPIWrapper() -> CharacterUpdateRepositoryAPIWrapper {
-        CharacterUpdateRepositoryAPIWrapper(
-            on: eventLoop,
-            repositoryAPIService: makeRepositoryAPIService(),
-            logger: logger
-        )
+        CharacterUpdateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
     
     func makeRepositoryAPIService() -> UpdateRepositoryAPIService {

@@ -17,12 +17,12 @@ public final class UpdateDatabaseProvider: UpdateRepositoryAPIService {
         self.database = database
     }
     
-    public func getAllSummaries(forID summaryID: String, from table: String) -> EventLoopFuture<[DatabaseGetItem]> {
-        database.getAllSummaries(forID: summaryID, tableName: table)
+    public func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>> {
+        database.update(item, in: table)
     }
-
-    public func update(_ items: [DatabaseUpdateItem]) -> EventLoopFuture<Void> {
-        database.update(items)
+    
+    public func updateSummaries<Summary: ItemSummary>(_ items: [Summary], in table: String) -> EventLoopFuture<Void> {
+        database.updateSummaries(items, in: table)
     }
-
+    
 }

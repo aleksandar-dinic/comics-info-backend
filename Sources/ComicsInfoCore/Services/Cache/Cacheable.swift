@@ -7,36 +7,23 @@
 //
 
 import Foundation
-import NIO
 
 public protocol Cacheable {
 
-    associatedtype Item: Codable & Identifiable
+    associatedtype Item: ComicInfoItem
 
-    func getItem(
-        withID itemID: Item.ID,
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<Item>
-
-    func getAllItems(
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[Item]>
-
-    func getMetadata(
-        withID id: Item.ID,
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<Item>
-
-    func getAllMetadata(
-        withIDs ids: Set<Item.ID>,
-        from table: String,
-        on eventLoop: EventLoop
-    ) -> EventLoopFuture<[Item]>
+    func getItem(withID itemID: Item.ID, from table: String) -> Result<Item, CacheError<Item>>
+    func getItems(withIDs IDs: Set<Item.ID>, from table: String) -> (items: [Item], missingIDs: Set<Item.ID>)
+    func getAllItems(from table: String) -> Result<[Item], CacheError<Item>>
 
     func save(items: [Item], in table: String)
-    func saveMetadata(items: [Item], in table: String)
+    
+    func getSummaries<Summary: ItemSummary>(
+        _ type: Summary.Type,
+        forID ID: String,
+        from table: String
+    ) -> Result<[Summary], CacheError<Item>>
+    
+    func save<Summary: ItemSummary>(summaries: [Summary], in table: String)
 
 }

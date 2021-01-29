@@ -12,39 +12,29 @@ import SotoDynamoDB
 
 extension DynamoDB: DatabaseCreate {
 
-    public func create(_ item: DatabasePutItem) -> EventLoopFuture<Void> {
-        let input = PutItemInput(
-            conditionExpression: item.conditionExpression,
-            item: item.attributeValues,
-            tableName: item.table
+    public func create<Item: Codable>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
+        let input = PutItemCodableInput(
+            conditionExpression: "attribute_not_exists(itemID) AND attribute_not_exists(summaryID)",
+            item: item,
+            tableName: table
         )
 
         DynamoDB.logger.log(level: .info, "Create input: \(input)")
-        return putItem(input)
-            .flatMapThrowing {
+        return putItem(input).flatMapThrowing {
                 DynamoDB.logger.log(level: .info, "Create output: \($0)")
             }
     }
+    
+    public func createSummaries<Summary: Codable>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        let input = PutItemCodableInput(
+            item: summaries,
+            tableName: table
+        )
 
-    public func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void> {
-        var transactItems = [TransactWriteItem]()
-
-        for item in items {
-            let put = Put(
-                conditionExpression: item.conditionExpression,
-                item: item.attributeValues,
-                tableName: item.table
-            )
-
-            transactItems.append(.put(put))
-        }
-
-        let input = TransactWriteItemsInput(transactItems: transactItems)
-        DynamoDB.logger.log(level: .info, "CreateAll input: \(input)")
-        return transactWriteItems(input)
-                .flatMapThrowing {
-                    DynamoDB.logger.log(level: .info, "CreateAll output: \($0)")
-                }
+        DynamoDB.logger.log(level: .info, "CreateSummaries input: \(input)")
+        return putItem(input).flatMapThrowing {
+                DynamoDB.logger.log(level: .info, "CreateSummaries output: \($0)")
+            }
     }
 
 }

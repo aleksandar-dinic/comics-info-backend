@@ -15,6 +15,7 @@ public protocol UpdateRepositoryAPIWrapper {
 
     var repositoryAPIService: UpdateRepositoryAPIService { get }
 
-    func update(_ item: Item, in table: String) -> EventLoopFuture<Void>
+    func update(_ item: Item, in table: String) -> EventLoopFuture<Set<String>>
+    func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void>
 
 }

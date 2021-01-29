@@ -12,49 +12,27 @@ import NIO
 public struct SeriesRepositoryAPIWrapper: RepositoryAPIWrapper {
 
     public let repositoryAPIService: RepositoryAPIService
-    public let decoderService: DecoderService
-
-    init(
-        repositoryAPIService: RepositoryAPIService,
-        decoderService: DecoderService = DecoderProvider()
-    ) {
+    private let seriesGetAPIWrapper: SeriesGetAPIWrapper
+    
+    init(repositoryAPIService: RepositoryAPIService) {
         self.repositoryAPIService = repositoryAPIService
-        self.decoderService = decoderService
+        seriesGetAPIWrapper = SeriesGetAPIWrapper(repositoryAPIService: repositoryAPIService)
     }
 
-    // MARK: - Get item
-
-    public func getItem(withID itemID: String, from table: String) -> EventLoopFuture<Series> {
-        SeriesGetAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).get(withID: itemID, from: table)
+    public func getItem(withID ID: String, from table: String) -> EventLoopFuture<Series> {
+        seriesGetAPIWrapper.get(withID: ID, from: table)
+    }
+    
+    public func getItems(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Series]> {
+        seriesGetAPIWrapper.getItems(withIDs: IDs, from: table)
     }
 
     public func getAllItems(from table: String) -> EventLoopFuture<[Series]> {
-        SeriesGetAllAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).getAll(from: table)
+        seriesGetAPIWrapper.getAll(from: table)
     }
-
-    // MARK: - Get metadata
     
-    public func getMetadata(id: String, from table: String) -> EventLoopFuture<Series> {
-        repositoryAPIService.getMetadata(withID: mapItemID(id), from: table)
-            .flatMapThrowing { Series(from: try decoderService.decode(from: $0)) }
-            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Series.self) }
-    }
-
-    private func mapItemID(_ id: String) -> String {
-        "\(String.getType(from: Item.self))#\(id)"
-    }
-
-    public func getAllMetadata(ids: Set<String>, from table: String) -> EventLoopFuture<[Series]> {
-        SeriesGetAllMetadataAPIWrapper(
-            repositoryAPIService: repositoryAPIService,
-            decoderService: decoderService
-        ).getAllMetadata(ids: ids, from: table)
+    public func getSummaries<Summary: ItemSummary>(_ type: Summary.Type, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?> {
+        seriesGetAPIWrapper.getSummaries(type, forID: ID, from: table)
     }
 
 }

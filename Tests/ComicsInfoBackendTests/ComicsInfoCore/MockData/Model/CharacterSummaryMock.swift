@@ -6,18 +6,17 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-@testable import struct ComicsInfoCore.Character
-@testable import struct ComicsInfoCore.ItemSummary
+@testable import struct ComicsInfoCore.Series
+@testable import struct ComicsInfoCore.CharacterSummary
 import Foundation
 
 enum CharacterSummaryMock {
 
-    static func makeCharacterSummary(
+    static func makeCharacterSummary<Item>(
         id: String = "1",
-        itemID: String = "character#1",
-        summaryID: String = "character#1",
-        itemName: String = "character",
-        summaryName: String = "character",
+        itemID: String = "Character#1",
+        summaryID: String = "Character#1",
+        itemName: String = "Character",
         popularity: Int = 0,
         name: String = "CharacterSummary 1 Name",
         dateAdded: Date = Date(),
@@ -27,95 +26,75 @@ enum CharacterSummaryMock {
         count: Int? = nil,
         number: String? = nil,
         roles: [String]? = nil
-    ) -> ItemSummary<Character> {
-        ItemSummary(
-            id: id,
+    ) -> CharacterSummary<Item> {
+        CharacterSummary(
             itemID: itemID,
             summaryID: summaryID,
             itemName: itemName,
-            summaryName: summaryName,
-            popularity: popularity,
-            name: name,
             dateAdded: dateAdded,
             dateLastUpdated: dateLastUpdated,
+            popularity: popularity,
+            name: name,
             thumbnail: thumbnail,
             description: description,
-            count: count,
-            number: number,
-            roles: roles
+            count: count
         )
     }
 
-    static var characterSummary: ItemSummary<Character> {
-        ItemSummary(
-            id: "1",
-            itemID: "character#1",
-            summaryID: "character#1",
-            itemName: "character",
-            summaryName: "character",
-            popularity: 0,
-            name: "CharacterSummary 1 Name",
+    static var characterSummary: CharacterSummary<Series> {
+        CharacterSummary(
+            itemID: "Character#1",
+            summaryID: "Character#1",
+            itemName: "Character",
             dateAdded: Date(),
             dateLastUpdated: Date(),
+            popularity: 0,
+            name: "CharacterSummary 1 Name",
             thumbnail: "CharacterSummary 1 Thumbnail",
             description: "CharacterSummary 1 Description",
-            count: 1,
-            number: "1",
-            roles: ["Character role"]
+            count: 1
         )
     }
     
-    static var characterSummaryList: [ItemSummary<Character>] {
+    static func characterSummaryList<Item>() -> [CharacterSummary<Item>] {
         [
-            ItemSummary(
-                id: "2",
-                itemID: "character#2",
-                summaryID: "character#2",
-                itemName: "character",
-                summaryName: "character",
+            CharacterSummary(
+                itemID: "Character#2",
+                summaryID: "Character#2",
+                itemName: "Character",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 popularity: 2,
                 name: "Character Name 2",
-                dateAdded: Date(),
-                dateLastUpdated: Date(),
                 thumbnail: "Character Thumbnail 2",
                 description: "Character Description 2",
-                count: 1,
-                number: "2",
-                roles: ["Character role"]
+                count: 1
             ),
-            ItemSummary(
-                id: "3",
-                itemID: "character#3",
-                summaryID: "character#3",
-                itemName: "character",
-                summaryName: "character",
+            CharacterSummary(
+                itemID: "Character#3",
+                summaryID: "Character#3",
+                itemName: "Character",
+                dateAdded: Date(),
+                dateLastUpdated: Date(),
                 popularity: 3,
                 name: "Character Name 3",
-                dateAdded: Date(),
-                dateLastUpdated: Date(),
                 thumbnail: "Character Thumbnail 3",
                 description: "Character Description 3",
-                count: 1,
-                number: "3",
-                roles: ["Character role"]
+                count: 1
             ),
-            ItemSummary(
-                id: "4",
-                itemID: "character#4",
-                summaryID: "character#4",
-                itemName: "character",
-                summaryName: "character",
-                popularity: 4,
-                name: "Character Name 4",
+            CharacterSummary(
+                itemID: "Character#4",
+                summaryID: "Character#4",
+                itemName: "Character",
                 dateAdded: Date(),
                 dateLastUpdated: Date(),
+                popularity: 4,
+                name: "Character Name 4",
                 thumbnail: "Character Thumbnail 4",
                 description: "Character Description 4",
-                count: 1,
-                number: "4",
-                roles: ["Character role"]
+                count: 1
             )
         ]
     }
-
+    
 }

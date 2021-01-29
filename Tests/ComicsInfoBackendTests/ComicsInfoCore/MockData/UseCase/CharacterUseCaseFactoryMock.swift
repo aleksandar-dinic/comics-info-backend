@@ -13,14 +13,14 @@ import NIO
 
 struct CharacterUseCaseFactoryMock: UseCaseFactory {
 
-    let items: [String: TableMock]
+    let items: [String: Data]
     var eventLoop: EventLoop
     var logger: Logger
 
     var isLocalServer: Bool
     var cacheProvider: InMemoryCacheProvider<Character>
 
-    init(items: [String: TableMock], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+    init(items: [String: Data] = [:], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
         self.items = items
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         self.logger = logger ?? Logger(label: "CharacterUseCaseFactoryMock")
@@ -34,16 +34,14 @@ struct CharacterUseCaseFactoryMock: UseCaseFactory {
 
     private func makeCharacterRepository() -> Repository<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
         RepositoryFactory(
-            on: eventLoop,
+            eventLoop: eventLoop,
             repositoryAPIWrapper: makeRepositoryAPIWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()
     }
 
     private func makeRepositoryAPIWrapper() -> CharacterRepositoryAPIWrapper {
-        CharacterRepositoryAPIWrapper(
-            repositoryAPIService: makeRepositoryAPIService()
-        )
+        CharacterRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
     }
     
     func makeRepositoryAPIService() -> RepositoryAPIService {

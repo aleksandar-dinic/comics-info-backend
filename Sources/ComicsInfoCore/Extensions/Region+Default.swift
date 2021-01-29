@@ -12,12 +12,12 @@ import SotoDynamoDB
 
 extension Region {
 
-    static var `default`: Region {
-        guard let envRegion = Lambda.region else {
+    static func getFromEnvironment(_ region: String? = Lambda.region) -> Region {
+        guard let region = region else {
             return .eucentral1
         }
 
-        return Region(rawValue: envRegion)
+        return Region(rawValue: region)
     }
 
 }

@@ -12,7 +12,9 @@ import Foundation
 extension Lambda.Context {
 
     var environment: String? {
-        guard let environment = invokedFunctionARN.split(separator: ":").last else { return nil }
+        guard let environment = invokedFunctionARN.split(separator: ":").last, !environment.isEmpty else {
+            return nil
+        }
 
         return String(environment)
     }

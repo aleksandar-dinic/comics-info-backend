@@ -20,5 +20,9 @@ public final class CreateRepository<APIWrapper: CreateRepositoryAPIWrapper> {
     public func create(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Void> {
         dataProvider.create(item, in: table)
     }
+    
+    public func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        dataProvider.createSummaries(summaries, in: table)
+    }
 
 }

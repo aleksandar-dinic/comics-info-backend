@@ -33,37 +33,6 @@ final class InMemoryCacheProviderTests: XCTestCase {
         table = nil
     }
 
-    // MARK: - Get All Items
-
-    func testGetAllItems_isEqualToGivenData() throws {
-        // Given
-        sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
-
-        // When
-        let items = try sut.getAllItems(from: table, on: eventLoop).wait()
-
-        // Then
-        XCTAssertEqual(items.count, givenData.count)
-    }
-
-    func testGetAllItems_whenCacheIsEmpty_throwsItemsNotFound() throws {
-        // Given
-        sut = InMemoryCacheProvider()
-        var thrownError: Error?
-
-        // When
-        let itemsFuture = sut.getAllItems(from: table, on: eventLoop)
-        XCTAssertThrowsError(try itemsFuture.wait()) {
-            thrownError = $0
-        }
-
-        // Then
-        let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound = error as? CacheError<Character> {
-        } else {
-            XCTFail("Expected '.itemsNotFound' but got \(error)")
-        }
-    }
 
     // MARK: - Get Item
 
@@ -72,113 +41,64 @@ final class InMemoryCacheProviderTests: XCTestCase {
         sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
 
         // When
-        let item = try sut.getItem(withID: "1", from: table, on: eventLoop).wait()
+        let result = sut.getItem(withID: "1", from: table)
 
         // Then
-        XCTAssertEqual(item.id, "1")
+        switch result {
+        case let .success(item):
+            XCTAssertEqual(item.id, "1")
+        case let .failure(error):
+            XCTFail("\(error)")
+        }
     }
 
     func testGetItemWithID_whenIDNotExist_throwsItemNotFound() throws {
         // Given
         sut = InMemoryCacheProvider()
-        var thrownError: Error?
 
         // When
-        let itemFuture = sut.getItem(withID: "-1", from: table, on: eventLoop)
-        XCTAssertThrowsError(try itemFuture.wait()) {
-            thrownError = $0
-        }
+        let result = sut.getItem(withID: "-1", from: table)
 
         // Then
-        let error = try XCTUnwrap(thrownError)
-        if case .itemNotFound(let itemID, _) = error as? CacheError<Character> {
-            XCTAssertEqual(itemID, "-1")
-        } else {
-            XCTFail("Expected '.itemNotFound' but got \(error)")
+        switch result {
+        case let .success(items):
+            XCTFail("Expected '.failure(.itemNotFound(withID: -1))' but got .success(\(items))")
+        case let .failure(error):
+            XCTAssertEqual(error, .itemNotFound(withID: "-1", itemType: Character.self))
         }
     }
 
-    // MARK: - Get Metadata
+    // MARK: - Get All Items
 
-    func testGetMetadataWithID_isEqualToGivenMetadata() throws {
-        // Give
-        sut = InMemoryCacheProvider(metadataCaches: [table: inMemoryCache])
-
-        // When
-        let item = try sut.getMetadata(withID: "1", from: table, on: eventLoop).wait()
-
-        // Then
-        XCTAssertEqual(item.id, "1")
-    }
-
-    func testGetmetadataWithID_whenIDNotExist_throwsItemNotFound() throws {
-        // Given
-        sut = InMemoryCacheProvider()
-        var thrownError: Error?
-
-        // When
-        let itemFuture = sut.getMetadata(withID: "-1", from: table, on: eventLoop)
-        XCTAssertThrowsError(try itemFuture.wait()) {
-            thrownError = $0
-        }
-
-        // Then
-        let error = try XCTUnwrap(thrownError)
-        if case .itemNotFound(let itemID, _) = error as? CacheError<Character> {
-            XCTAssertEqual(itemID, "-1")
-        } else {
-            XCTFail("Expected '.itemNotFound' but got \(error)")
-        }
-    }
-
-    // MARK: - Get All Metadata
-
-    func testGetAllMetadata_isEqualToGivenMetadata() throws {
-        // Given
-        sut = InMemoryCacheProvider(metadataCaches: [table: inMemoryCache])
-
-        // When
-        let items = try sut.getAllMetadata(withIDs: ["1"], from: table, on: eventLoop).wait()
-
-        // Then
-        XCTAssertEqual(items.count, givenData.count)
-    }
-
-    func testGetAllMetadata_whenCacheIsEmpty_throwsItemsNotFound() throws {
-        // Given
-        sut = InMemoryCacheProvider()
-        var thrownError: Error?
-
-        // When
-        let itemsFuture = sut.getAllMetadata(withIDs: ["-1"], from: table, on: eventLoop)
-        XCTAssertThrowsError(try itemsFuture.wait()) {
-            thrownError = $0
-        }
-
-        // Then
-        let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound = error as? CacheError<Character> {
-        } else {
-            XCTFail("Expected '.itemsNotFound' but got \(error)")
-        }
-    }
-
-    func testGetAllMetadata_whenCacheIsEmptyWithEmptyIDs_throwsItemsNotFound() throws {
+    func testGetAllItems_isEqualToGivenData() throws {
         // Given
         sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
-        var thrownError: Error?
 
         // When
-        let itemsFuture = sut.getAllMetadata(withIDs: [], from: table, on: eventLoop)
-        XCTAssertThrowsError(try itemsFuture.wait()) {
-            thrownError = $0
-        }
+        let result = sut.getAllItems(from: table)
 
         // Then
-        let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound = error as? CacheError<Character> {
-        } else {
-            XCTFail("Expected '.itemsNotFound' but got \(error)")
+        switch result {
+        case let .success(items):
+            XCTAssertEqual(items.count, givenData.count)
+        case let .failure(error):
+            XCTFail("\(error)")
+        }
+    }
+
+    func testGetAllItems_whenCacheIsEmpty_throwsItemsNotFound() throws {
+        // Given
+        sut = InMemoryCacheProvider()
+
+        // When
+        let result = sut.getAllItems(from: table)
+
+        // Then
+        switch result {
+        case let .success(items):
+            XCTFail("Expected '.failure(.itemsNotFound)' but got .success(\(items))")
+        case let .failure(error):
+            XCTAssertEqual(error, .itemsNotFound(itemType: Character.self))
         }
     }
 

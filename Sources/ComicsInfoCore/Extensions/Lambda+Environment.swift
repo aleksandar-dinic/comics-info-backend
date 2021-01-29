@@ -20,15 +20,11 @@ public extension Lambda {
     }
 
     static func tableName(for environment: String?) -> String? {
-        #if DEBUG
-            return "TABLE_NAME_TEST"
-        #else
-            let tableName = "TABLE_NAME"
-            guard let environment = environment else {
-                return Lambda.env(tableName)
-            }
-            return Lambda.env("\(tableName)_\(environment)")
-        #endif
+        let tableName = "TABLE_NAME"
+        guard let environment = environment else {
+            return Lambda.env(tableName)
+        }
+        return Lambda.env("\(tableName)_\(environment)")
     }
 
 }

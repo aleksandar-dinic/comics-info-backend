@@ -17,12 +17,12 @@ public final class CreateDatabaseProvider: CreateRepositoryAPIService {
         self.database = database
     }
     
-    public func create(_ item: DatabasePutItem) -> EventLoopFuture<Void> {
-        database.create(item)
+    public func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
+        database.create(item, in: table)
     }
     
-    public func createAll(_ items: [DatabasePutItem]) -> EventLoopFuture<Void> {
-        database.createAll(items)
+    public func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+        database.createSummaries(summaries, in: table)
     }
     
 }
