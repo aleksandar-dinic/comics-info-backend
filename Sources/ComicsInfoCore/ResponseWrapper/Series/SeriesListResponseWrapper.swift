@@ -20,7 +20,7 @@ public struct SeriesListResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheP
 
     public func handleList(on eventLoop: EventLoop, environment: String?) -> EventLoopFuture<Response> {
         let table = String.tableName(for: environment)
-        return seriesUseCase.getAllItems(from: table)
+        return seriesUseCase.getAllItems(on: eventLoop, from: table)
             .map { Response(with: $0.map { Domain.Series(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

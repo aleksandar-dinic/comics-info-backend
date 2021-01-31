@@ -27,11 +27,22 @@ public protocol UseCase where APIWrapper.Item == CacheService.Item {
         dataSource: DataSourceLayer
     ) -> EventLoopFuture<Item>
 
-    func getItems(withIDs IDs: Set<Item.ID>, from table: String, dataSource: DataSourceLayer) -> EventLoopFuture<[Item]>
-    func getAllItems(from table: String, dataSource: DataSourceLayer) -> EventLoopFuture<[Item]>
+    func getItems(
+        on eventLoop: EventLoop,
+        withIDs IDs: Set<Item.ID>,
+        from table: String,
+        dataSource: DataSourceLayer
+    ) -> EventLoopFuture<[Item]>
+    
+    func getAllItems(
+        on eventLoop: EventLoop,
+        from table: String,
+        dataSource: DataSourceLayer
+    ) -> EventLoopFuture<[Item]>
     
     func getSummaries<Summary: ItemSummary>(
         _ type: Summary.Type,
+        on eventLoop: EventLoop,
         forID ID: String,
         dataSource: DataSourceLayer,
         from table: String
@@ -41,12 +52,23 @@ public protocol UseCase where APIWrapper.Item == CacheService.Item {
 
 public extension UseCase {
     
-    func getItems(withIDs IDs: Set<Item.ID>, from table: String, dataSource: DataSourceLayer = .memory) -> EventLoopFuture<[Item]> {
+    func getItems(
+        on eventLoop: EventLoop,
+        withIDs IDs: Set<Item.ID>,
+        from table: String,
+        dataSource: DataSourceLayer = .memory
+    ) -> EventLoopFuture<[Item]> {
         repository.getItems(withIDs: IDs, dataSource: dataSource, from: table)
+            .hop(to: eventLoop)
     }
 
-    func getAllItems(from table: String, dataSource: DataSourceLayer = .memory) -> EventLoopFuture<[Item]> {
+    func getAllItems(
+        on eventLoop: EventLoop,
+        from table: String,
+        dataSource: DataSourceLayer = .memory
+    ) -> EventLoopFuture<[Item]> {
         repository.getAllItems(dataSource: dataSource, from: table)
+            .hop(to: eventLoop)
     }
     
     func handleFields(_ fields: Set<String>?) throws -> Set<String> {
@@ -60,11 +82,13 @@ public extension UseCase {
     
     func getSummaries<Summary: ItemSummary>(
         _ type: Summary.Type,
+        on eventLoop: EventLoop,
         forID ID: String,
         dataSource: DataSourceLayer,
         from table: String
     ) -> EventLoopFuture<[Summary]?> {
         repository.getSummaries(type, forID: ID, dataSource: dataSource, from: table)
+            .hop(to: eventLoop)
     }
 
 }

@@ -26,7 +26,7 @@ extension ComicSummaryFactory {
             return eventLoop.submit { [] }
         }
         
-        return comicUseCase.getItems(withIDs: comicsID, from: table)
+        return comicUseCase.getItems(on: eventLoop, withIDs: comicsID, from: table)
             .flatMapThrowing { try handleMissingIDs($0, IDs: comicsID) }
     }
     

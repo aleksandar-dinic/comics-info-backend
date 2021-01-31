@@ -20,7 +20,7 @@ public struct CharacterListResponseWrapper<APIWrapper: RepositoryAPIWrapper, Cac
 
     public func handleList(on eventLoop: EventLoop, environment: String?) -> EventLoopFuture<Response> {
         let table = String.tableName(for: environment)
-        return characterUseCase.getAllItems(from: table)
+        return characterUseCase.getAllItems(on: eventLoop, from: table)
             .map { Response(with: $0.map { Domain.Character(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

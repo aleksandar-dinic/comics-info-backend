@@ -26,7 +26,7 @@ extension SeriesSummaryFactory {
             return eventLoop.submit { [] }
         }
 
-        return seriesUseCase.getItems(withIDs: seriesID, from: table)
+        return seriesUseCase.getItems(on: eventLoop, withIDs: seriesID, from: table)
             .flatMapThrowing { try handleMissingIDs($0, IDs: seriesID) }
     }
     

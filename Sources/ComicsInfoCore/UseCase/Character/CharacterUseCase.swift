@@ -52,7 +52,7 @@ public final class CharacterUseCase<APIWrapper: RepositoryAPIWrapper, CacheServi
         from table: String
     ) -> EventLoopFuture<Item> {
         guard fields.contains("series") else { return eventLoop.makeSucceededFuture(item) }
-        return getSummaries(SeriesSummary<Character>.self, forID: ID, dataSource: dataSource, from: table)
+        return getSummaries(SeriesSummary<Character>.self, on: eventLoop, forID: ID, dataSource: dataSource, from: table)
             .map {
                 var item = item
                 item.series = $0
@@ -69,7 +69,7 @@ public final class CharacterUseCase<APIWrapper: RepositoryAPIWrapper, CacheServi
         from table: String
     ) -> EventLoopFuture<Item> {
         guard fields.contains("comics") else { return eventLoop.makeSucceededFuture(item) }
-        return getSummaries(ComicSummary<Character>.self, forID: ID, dataSource: dataSource, from: table)
+        return getSummaries(ComicSummary<Character>.self, on: eventLoop, forID: ID, dataSource: dataSource, from: table)
             .map {
                 var item = item
                 item.comics = $0

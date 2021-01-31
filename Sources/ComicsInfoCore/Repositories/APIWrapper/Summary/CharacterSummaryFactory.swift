@@ -26,7 +26,7 @@ extension CharacterSummaryFactory {
             return eventLoop.submit { [] }
         }
         
-        return characterUseCase.getItems(withIDs: charactersID, from: table)
+        return characterUseCase.getItems(on: eventLoop, withIDs: charactersID, from: table)
             .flatMapThrowing { try handleMissingIDs($0, IDs: charactersID) }
     }
     

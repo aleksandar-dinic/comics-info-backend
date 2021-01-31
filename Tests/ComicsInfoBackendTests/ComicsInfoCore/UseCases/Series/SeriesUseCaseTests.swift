@@ -226,7 +226,7 @@ final class SeriesUseCaseTests: XCTestCase {
         sut = SeriesUseCaseFactoryMock(items: givenItems).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(from: table, dataSource: .database)
+        let featureGet = sut.getAllItems(on: eventLoop, from: table, dataSource: .database)
         let items = try featureGet.wait()
 
         // Then

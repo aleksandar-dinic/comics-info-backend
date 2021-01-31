@@ -26,6 +26,7 @@ extension CreateSummaryFactory {
     ) -> EventLoopFuture<Void> {
         guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
         return repository.createSummaries(summaries, in: table)
+            .hop(to: eventLoop)
     }
     
 }

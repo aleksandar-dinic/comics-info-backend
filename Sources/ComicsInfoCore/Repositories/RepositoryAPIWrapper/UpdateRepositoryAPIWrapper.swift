@@ -11,7 +11,7 @@ import NIO
 
 public protocol UpdateRepositoryAPIWrapper {
 
-    associatedtype Item: Codable & Identifiable
+    associatedtype Item: ComicInfoItem
 
     var repositoryAPIService: UpdateRepositoryAPIService { get }
 

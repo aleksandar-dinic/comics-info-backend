@@ -78,7 +78,7 @@ extension SeriesUpdateUseCase {
         on eventLoop: EventLoop,
         in table: String
     ) -> EventLoopFuture<Void> {
-        seriesUseCase.getSummaries(SeriesSummary<Character>.self, forID: item.id, dataSource: .database, from: table)
+        seriesUseCase.getSummaries(SeriesSummary<Character>.self, on: eventLoop, forID: item.id, dataSource: .database, from: table)
             .flatMap { [weak self] summaries -> EventLoopFuture<Void> in
                 guard let self = self else { return eventLoop.makeFailedFuture(APIError.internalServerError) }
                 guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
@@ -97,7 +97,7 @@ extension SeriesUpdateUseCase {
         on eventLoop: EventLoop,
         in table: String
     ) -> EventLoopFuture<Void> {
-        seriesUseCase.getSummaries(SeriesSummary<Comic>.self, forID: item.id, dataSource: .database, from: table)
+        seriesUseCase.getSummaries(SeriesSummary<Comic>.self, on: eventLoop, forID: item.id, dataSource: .database, from: table)
             .flatMap { [weak self] summaries -> EventLoopFuture<Void> in
                 guard let self = self else { return eventLoop.makeFailedFuture(APIError.internalServerError) }
                 guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
