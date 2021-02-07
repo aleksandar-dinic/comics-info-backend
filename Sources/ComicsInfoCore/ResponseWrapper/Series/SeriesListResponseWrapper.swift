@@ -10,11 +10,11 @@ import struct Domain.Series
 import Foundation
 import NIO
 
-public struct SeriesListResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: ListResponseWrapper where APIWrapper.Item == Series, CacheProvider.Item == Series {
+public struct SeriesListResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ListResponseWrapper where CacheProvider.Item == Series {
 
-    private let seriesUseCase: SeriesUseCase<APIWrapper, CacheProvider>
+    private let seriesUseCase: SeriesUseCase<DBService, CacheProvider>
 
-    public init(seriesUseCase: SeriesUseCase<APIWrapper, CacheProvider>) {
+    public init(seriesUseCase: SeriesUseCase<DBService, CacheProvider>) {
         self.seriesUseCase = seriesUseCase
     }
 

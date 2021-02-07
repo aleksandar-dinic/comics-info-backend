@@ -9,16 +9,18 @@
 import Foundation
 import NIO
 
-public final class CharacterCreateUseCase<APIWrapper: CreateRepositoryAPIWrapper>: CreateUseCase, CreateSummaryFactory, SeriesSummaryFactory, ComicSummaryFactory where APIWrapper.Item == Character {
+public final class CharacterCreateUseCase: CreateUseCase, CreateSummaryFactory, SeriesSummaryFactory, ComicSummaryFactory {
+    
+    public typealias Item = Character
 
-    public let repository: CreateRepository<APIWrapper>
-    var seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
-    var comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
+    public let repository: CreateRepository
+    var seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
+    var comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
 
     public init(
-        repository: CreateRepository<APIWrapper>,
-        seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>,
-        comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
+        repository: CreateRepository,
+        seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>,
+        comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
     ) {
         self.repository = repository
         self.seriesUseCase = seriesUseCase
@@ -29,7 +31,7 @@ public final class CharacterCreateUseCase<APIWrapper: CreateRepositoryAPIWrapper
         getSeries(on: eventLoop, forIDs: item.seriesID, from: table)
             .and(getComics(on: eventLoop, forIDs: item.comicsID, from: table))
             .flatMapThrowing { [weak self] (series, comics) in
-                guard let self = self else { throw APIError.internalServerError }
+                guard let self = self else { throw ComicInfoError.internalServerError }
                 var item = item
                 
                 if !series.isEmpty {

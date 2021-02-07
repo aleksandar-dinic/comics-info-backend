@@ -23,8 +23,13 @@ public protocol UpdateUseCaseFactory  {
 }
 
 extension UpdateUseCaseFactory {
+    
+    func makeUpdateRepository() -> UpdateRepository {
+        UpdateRepositoryFactory(itemUpdateDBService: makeItemUpdateDBService())
+            .make()
+    }
 
-    func makeRepositoryAPIService() -> UpdateRepositoryAPIService {
+    func makeItemUpdateDBService() -> ItemUpdateDBService {
         UpdateDatabaseProvider(database: makeDatabase())
     }
 

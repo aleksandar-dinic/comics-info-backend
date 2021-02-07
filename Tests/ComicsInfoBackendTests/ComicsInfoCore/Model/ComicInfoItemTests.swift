@@ -19,7 +19,7 @@ final class ComicInfoItemTests: XCTestCase {
 
     func test() {
         // Given
-        let newItem = ComicInfoItemMock(
+        let newItem = MockComicInfoItem(
             id: "1",
             itemID: "Item#1",
             summaryID: "Item#1",
@@ -27,7 +27,7 @@ final class ComicInfoItemTests: XCTestCase {
             popularity: 1,
             name: "New Item Name"
         )
-        let oldItem = ComicInfoItemMock(
+        let oldItem = MockComicInfoItem(
             id: "1",
             itemID: "Item#1",
             summaryID: "Item#1",

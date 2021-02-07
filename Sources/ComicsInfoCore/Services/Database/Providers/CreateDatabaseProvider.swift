@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-public final class CreateDatabaseProvider: CreateRepositoryAPIService {
+public final class CreateDatabaseProvider: ItemCreateDBService {
 
     private var database: DatabaseCreate
 

@@ -9,18 +9,20 @@
 import Foundation
 import NIO
 
-public final class CharacterUpdateUseCase<APIWrapper: UpdateRepositoryAPIWrapper>: UpdateUseCase, CharacterSummaryFactory, SeriesSummaryFactory, ComicSummaryFactory where APIWrapper.Item == Character {
+public final class CharacterUpdateUseCase: UpdateUseCase, CharacterSummaryFactory, SeriesSummaryFactory, ComicSummaryFactory {
     
-    public let repository: UpdateRepository<APIWrapper>
-    let characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
-    let seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
-    let comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
+    public typealias Item = Character
+    
+    public let repository: UpdateRepository
+    let characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>
+    let seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
+    let comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
 
     public init(
-        repository: UpdateRepository<APIWrapper>,
-        characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>,
-        seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>,
-        comicUseCase: ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
+        repository: UpdateRepository,
+        characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>,
+        seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>,
+        comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
     ) {
         self.repository = repository
         self.characterUseCase = characterUseCase
@@ -36,7 +38,7 @@ public final class CharacterUpdateUseCase<APIWrapper: UpdateRepositoryAPIWrapper
         getSeries(on: eventLoop, forIDs: item.seriesID, from: table)
             .and(getComics(on: eventLoop, forIDs: item.comicsID, from: table))
             .flatMapThrowing { [weak self] (series, comics) in
-                guard let self = self else { throw APIError.internalServerError }
+                guard let self = self else { throw ComicInfoError.internalServerError }
                 var item = item
 
                 if !series.isEmpty {
@@ -82,9 +84,15 @@ extension CharacterUpdateUseCase {
         on eventLoop: EventLoop,
         in table: String
     ) -> EventLoopFuture<Void> {
-        characterUseCase.getSummaries(CharacterSummary<Series>.self, on: eventLoop, forID: item.id, dataSource: .database, from: table)
-            .flatMap { [weak self] summaries -> EventLoopFuture<Void> in
-                guard let self = self else { return eventLoop.makeFailedFuture(APIError.internalServerError) }
+        let future: EventLoopFuture<[CharacterSummary<Series>]?> = characterUseCase.getSummaries(
+            on: eventLoop,
+            forID: item.itemID,
+            dataSource: .database,
+            from: table,
+            by: .itemID
+        )
+        return future.flatMap { [weak self] summaries -> EventLoopFuture<Void> in
+                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
                 
                 var updatedSummaries = [CharacterSummary<Series>]()
@@ -101,9 +109,15 @@ extension CharacterUpdateUseCase {
         on eventLoop: EventLoop,
         in table: String
     ) -> EventLoopFuture<Void> {
-        characterUseCase.getSummaries(CharacterSummary<Comic>.self, on: eventLoop, forID: item.id, dataSource: .database, from: table)
-            .flatMap { [weak self] summaries -> EventLoopFuture<Void> in
-                guard let self = self else { return eventLoop.makeFailedFuture(APIError.internalServerError) }
+        let future: EventLoopFuture<[CharacterSummary<Comic>]?> = characterUseCase.getSummaries(
+            on: eventLoop,
+            forID: item.itemID,
+            dataSource: .database,
+            from: table,
+            by: .itemID
+        )
+        return future.flatMap { [weak self] summaries -> EventLoopFuture<Void> in
+                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
 
                 var updatedSummaries = [CharacterSummary<Comic>]()

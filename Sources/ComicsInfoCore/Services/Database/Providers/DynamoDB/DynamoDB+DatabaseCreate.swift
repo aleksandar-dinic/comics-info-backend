@@ -26,15 +26,23 @@ extension DynamoDB: DatabaseCreate {
     }
     
     public func createSummaries<Summary: Codable>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        let input = PutItemCodableInput(
-            item: summaries,
-            tableName: table
-        )
-
-        DynamoDB.logger.log(level: .info, "CreateSummaries input: \(input)")
-        return putItem(input).flatMapThrowing {
-                DynamoDB.logger.log(level: .info, "CreateSummaries output: \($0)")
+        DynamoDB.logger.log(level: .info, "Create Summaries")
+        var futures = [EventLoopFuture<Void>]()
+        
+        for summary in summaries {
+            let input = PutItemCodableInput(
+                item: summary,
+                tableName: table
+            )
+            
+            DynamoDB.logger.log(level: .info, "Create Summaries input: \(input)")
+            let future = putItem(input).flatMapThrowing {
+                DynamoDB.logger.log(level: .info, "Create Summaries output: \($0)")
             }
+            futures.append(future)
+        }
+
+        return EventLoopFuture.reduce((), futures, on: client.eventLoopGroup.next()) { (_, _) in }
     }
 
 }

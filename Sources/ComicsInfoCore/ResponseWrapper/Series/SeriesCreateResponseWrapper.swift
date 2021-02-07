@@ -10,11 +10,11 @@ import struct Domain.Series
 import Foundation
 import NIO
 
-public struct SeriesCreateResponseWrapper<APIWrapper: CreateRepositoryAPIWrapper>: CreateResponseWrapper where APIWrapper.Item == Series {
+public struct SeriesCreateResponseWrapper: CreateResponseWrapper {
 
-    private let useCase: SeriesCreateUseCase<APIWrapper>
+    private let useCase: SeriesCreateUseCase
 
-    public init(useCase: SeriesCreateUseCase<APIWrapper>) {
+    public init(useCase: SeriesCreateUseCase) {
         self.useCase = useCase
     }
 

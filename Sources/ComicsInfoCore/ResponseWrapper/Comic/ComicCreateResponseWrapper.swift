@@ -10,11 +10,11 @@ import struct Domain.Comic
 import Foundation
 import NIO
 
-public struct ComicCreateResponseWrapper<APIWrapper: CreateRepositoryAPIWrapper>: CreateResponseWrapper where APIWrapper.Item == Comic {
+public struct ComicCreateResponseWrapper: CreateResponseWrapper {
 
-    private let useCase: ComicCreateUseCase<APIWrapper>
+    private let useCase: ComicCreateUseCase
 
-    public init(useCase: ComicCreateUseCase<APIWrapper>) {
+    public init(useCase: ComicCreateUseCase) {
         self.useCase = useCase
     }
 

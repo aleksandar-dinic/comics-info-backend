@@ -13,16 +13,15 @@ import NIO
 protocol CharacterUseCaseBuilder {
     
     var eventLoop: EventLoop { get }
-    var isLocalServer: Bool { get }
     var logger: Logger { get }
     
-    func buildCharacterUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
+    func buildCharacterUseCase() -> CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>
     
 }
 
 extension CharacterUseCaseBuilder {
     
-    func buildCharacterUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
+    func buildCharacterUseCase() -> CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>> {
         CharacterUseCaseFactory(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,

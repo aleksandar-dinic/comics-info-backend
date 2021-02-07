@@ -10,11 +10,11 @@ import struct Domain.Series
 import Foundation
 import NIO
 
-public struct SeriesReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: ReadResponseWrapper where APIWrapper.Item == Series, CacheProvider.Item == Series {
+public struct SeriesReadResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ReadResponseWrapper where CacheProvider.Item == Series {
 
-    private let seriesUseCase: SeriesUseCase<APIWrapper, CacheProvider>
+    private let seriesUseCase: SeriesUseCase<DBService, CacheProvider>
 
-    public init(seriesUseCase: SeriesUseCase<APIWrapper, CacheProvider>) {
+    public init(seriesUseCase: SeriesUseCase<DBService, CacheProvider>) {
         self.seriesUseCase = seriesUseCase
     }
 
@@ -28,7 +28,7 @@ public struct SeriesReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheP
             return eventLoop.makeSucceededFuture(response)
         }
         
-        let fields = getFields(from: request.pathParameters)
+        let fields = getFields(from: request.queryParameters)
 
         let table = String.tableName(for: environment)
         return seriesUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table)

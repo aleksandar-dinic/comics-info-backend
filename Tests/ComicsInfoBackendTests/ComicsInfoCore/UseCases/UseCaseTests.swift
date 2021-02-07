@@ -15,7 +15,7 @@ final class UseCaseTests: XCTestCase {
 
     private var eventLoop: EventLoop!
     private var logger: Logger!
-    private var sut: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>!
+    private var sut: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>!
     private var table: String!
 
     override func setUpWithError() throws {
@@ -35,8 +35,8 @@ final class UseCaseTests: XCTestCase {
 
     func test_whenGetItemFromDatabase_returnsItem() throws {
         // Given
-        let givenItem = CharacterMock.makeCharacter()
-        let items = CharacterMock.makeDatabaseItems()
+        let givenItem = CharacterFactory.make()
+        let items = CharacterFactory.makeDatabaseItems()
         sut = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
 
         // When
@@ -49,8 +49,8 @@ final class UseCaseTests: XCTestCase {
 
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
-        let givenCharacters = CharacterMock.charactersList
-        let givenItems = CharacterMock.makeDatabaseItemsList()
+        let givenCharacters = CharacterFactory.makeList
+        let givenItems = CharacterFactory.makeDatabaseItemsList()
         sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop, logger: logger).makeUseCase()
 
         // When

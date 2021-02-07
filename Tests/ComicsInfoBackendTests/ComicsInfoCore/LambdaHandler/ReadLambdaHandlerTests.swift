@@ -31,9 +31,9 @@ final class ReadLambdaHandlerTests: XCTestCase, LambdaMockFactory {
 
     func test_whenHandle_responseStatusIsOk() throws {
         // Given
-        request = Request(pathParameters: ["id": "1"], body: nil)
+        request = Request(pathParameters: ["id": "1"])
         let useCase = CharacterUseCaseFactoryMock(
-            items: CharacterMock.makeDatabaseItems(),
+            items: CharacterFactory.makeDatabaseItems(),
             on: eventLoop,
             logger: logger
         ).makeUseCase()

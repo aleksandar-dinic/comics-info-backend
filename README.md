@@ -83,7 +83,7 @@ public final class CharacterInfo {
              }
 
         case .delete, .none:
-            throw APIError.handlerUnknown
+            throw ComicInfoError.handlerUnknown
         }
     }
 

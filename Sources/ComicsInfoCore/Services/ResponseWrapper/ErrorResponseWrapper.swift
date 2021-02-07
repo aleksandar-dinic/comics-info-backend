@@ -17,7 +17,16 @@ public protocol ErrorResponseWrapper {
 extension ErrorResponseWrapper {
 
     public func `catch`(_ error: Error, statusCode: HTTPResponseStatus = .notFound) -> Response {
-        Response(with: ResponseStatus(error.localizedDescription), statusCode: statusCode)
+        guard let comicInfoError = error as? ComicInfoError else {
+            return Response(with: ResponseStatus(error.localizedDescription), statusCode: statusCode)
+        }
+        
+        switch comicInfoError {
+        case .invalidFields:
+            return Response(with: ResponseStatus(error.localizedDescription), statusCode: .forbidden)
+        default:
+            return Response(with: ResponseStatus(error.localizedDescription), statusCode: statusCode)
+        }
     }
 
 }

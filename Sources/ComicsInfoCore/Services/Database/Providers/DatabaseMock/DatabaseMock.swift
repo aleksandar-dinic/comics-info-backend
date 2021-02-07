@@ -10,7 +10,7 @@ import Logging
 import Foundation
 import NIO
 
-struct DatabaseMock: Database {
+struct DatabaseMock: DatabaseGet {
 
     static var items = [String: Data]()
 
@@ -38,7 +38,7 @@ struct DatabaseMock: Database {
             return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: ID))
         }
         
-        return eventLoop.makeSucceededFuture(item)
+        return eventLoop.submit { item }
     }
     
     func getItems<Item: ComicInfoItem>(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Item]> {
@@ -57,7 +57,7 @@ struct DatabaseMock: Database {
             )
         }
 
-        return eventLoop.makeSucceededFuture(items)
+        return eventLoop.submit { items }
     }
 
     func getAll<Item: ComicInfoItem>(_ items: String, from table: String) -> EventLoopFuture<[Item]> {
@@ -74,19 +74,24 @@ struct DatabaseMock: Database {
             return eventLoop.makeFailedFuture(DatabaseError.itemsNotFound(withIDs: nil))
         }
 
-        return eventLoop.makeSucceededFuture(databaseItems)
+        return eventLoop.submit { databaseItems }
     }
     
-    func getSummaries<Summary: ItemSummary>(_ itemName: String, forID ID: String, from table: String) -> EventLoopFuture<[Summary]?> {
-        logger.log(level: .info, "GetSummaries items: itemName = \(itemName), ID = \(ID)")
+    func getSummaries<Summary: ItemSummary>(
+        with criteria: GetSummariesDatabaseCriteria
+    ) -> EventLoopFuture<[Summary]?> {
+        logger.log(level: .info, "GetSummaries items: itemName = \(criteria.itemName), ID = \(criteria.ID)")
         
         var items = [Summary]()
         for (_, el) in DatabaseMock.items.enumerated() {
-            guard el.key.hasSuffix(ID), let item = try? JSONDecoder().decode(Summary.self, from: el.value), item.itemName == itemName else { continue }
+            guard criteria.isValidKey(el.key),
+                  let item = try? JSONDecoder().decode(Summary.self, from: el.value),
+                  item.itemName == criteria.itemName
+            else { continue }
             items.append(item)
         }
         
-        return eventLoop.makeSucceededFuture(!items.isEmpty ? items : nil)
+        return eventLoop.submit { !items.isEmpty ? items : nil }
     }
 
 }

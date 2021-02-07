@@ -15,7 +15,7 @@ final class ResponseTests: XCTestCase {
     private var givenStatusCode: HTTPResponseStatus!
 
     override func setUpWithError() throws {
-        object = CharacterMock.character
+        object = CharacterFactory.make()
         givenStatusCode = HTTPResponseStatus.ok
     }
 

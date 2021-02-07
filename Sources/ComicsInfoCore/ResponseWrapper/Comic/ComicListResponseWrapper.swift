@@ -10,11 +10,11 @@ import struct Domain.Comic
 import Foundation
 import NIO
 
-public struct ComicListResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: ListResponseWrapper where APIWrapper.Item == Comic, CacheProvider.Item == Comic {
+public struct ComicListResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ListResponseWrapper where CacheProvider.Item == Comic {
 
-    private let comicUseCase: ComicUseCase<APIWrapper, CacheProvider>
+    private let comicUseCase: ComicUseCase<DBService, CacheProvider>
 
-    public init(comicUseCase: ComicUseCase<APIWrapper, CacheProvider>) {
+    public init(comicUseCase: ComicUseCase<DBService, CacheProvider>) {
         self.comicUseCase = comicUseCase
     }
 

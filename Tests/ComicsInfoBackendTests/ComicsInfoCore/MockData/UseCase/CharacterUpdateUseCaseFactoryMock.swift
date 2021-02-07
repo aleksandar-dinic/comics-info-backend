@@ -19,33 +19,28 @@ struct CharacterUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
 
     var isLocalServer: Bool
 
-    init(items: [String: Data], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+    init(items: [String: Data] = [:], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
         self.items = items
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         self.logger = logger ?? Logger(label: "CharacterUpdateUseCaseFactoryMock")
         isLocalServer = true
     }
 
-    func makeUseCase() -> CharacterUpdateUseCase<CharacterUpdateRepositoryAPIWrapper> {
+    func makeUseCase() -> CharacterUpdateUseCase {
         CharacterUpdateUseCase(
-            repository: makeCharacterRepository(),
+            repository: makeRepository(),
             characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
             seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
         )
     }
 
-    private func makeCharacterRepository() -> UpdateRepository<CharacterUpdateRepositoryAPIWrapper> {
-        UpdateRepositoryFactory(
-            repositoryAPIWrapper: makeRepositoryAPIWrapper()
-        ).makeRepository()
-    }
-
-    private func makeRepositoryAPIWrapper() -> CharacterUpdateRepositoryAPIWrapper {
-        CharacterUpdateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
+    private func makeRepository() -> UpdateRepository {
+        ComicsInfoCore.UpdateRepositoryFactory(itemUpdateDBService: makeItemUpdateDBService())
+            .make()
     }
     
-    func makeRepositoryAPIService() -> UpdateRepositoryAPIService {
+    func makeItemUpdateDBService() -> ItemUpdateDBService {
         UpdateDatabaseProvider(database: makeDatabase())
     }
 

@@ -15,7 +15,7 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
 
     private var eventLoop: EventLoop!
     private var logger: Logger!
-    private var sut: CharacterUpdateUseCase<CharacterUpdateRepositoryAPIWrapper>!
+    private var sut: CharacterUpdateUseCase!
     private var table: String!
 
     override func setUpWithError() throws {
@@ -36,10 +36,10 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
     
     func test_whenUpdateCharacter_characterIsUpdated() throws {
         // Given
-        try createCharacter(CharacterMock.makeCharacter(name: "Old Name"))
+        try createCharacter(CharacterFactory.make(name: "Old Name"))
 
         // When
-        let feature = sut.update(CharacterMock.makeCharacter(), on: eventLoop, in: table)
+        let feature = sut.update(CharacterFactory.make(), on: eventLoop, in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -47,19 +47,19 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
 
     func test_whenUpdateCharacterWithNotExistingSeriesID_throwsItemsNotFound() throws {
         // Given
-        try createCharacter(CharacterMock.makeCharacter())
+        try createCharacter(CharacterFactory.make())
         let seriesID: Set<String> = ["-1"]
         var thrownError: Error?
 
         // When
-        let feature = sut.update(CharacterMock.makeCharacter(seriesID: seriesID), on: eventLoop, in: table)
+        let feature = sut.update(CharacterFactory.make(seriesID: seriesID), on: eventLoop, in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound(let itemIDs, let itemType) = error as? APIError {
+        if case .itemsNotFound(let itemIDs, let itemType) = error as? ComicInfoError {
             XCTAssertEqual(itemIDs, ["-1"])
             XCTAssertTrue(itemType == Series.self)
         } else {
@@ -69,19 +69,19 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
 
     func test_whenUpdateCharacterWithNotExistingComicsID_throwsItemsNotFound() throws {
         // Given
-        try createCharacter(CharacterMock.makeCharacter())
+        try createCharacter(CharacterFactory.make())
         let comicsID: Set<String> = ["-1"]
         var thrownError: Error?
 
         // When
-        let feature = sut.update(CharacterMock.makeCharacter(comicsID: comicsID), on: eventLoop, in: table)
+        let feature = sut.update(CharacterFactory.make(comicsID: comicsID), on: eventLoop, in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound(let itemIDs, let itemType) = error as? APIError {
+        if case .itemsNotFound(let itemIDs, let itemType) = error as? ComicInfoError {
             XCTAssertEqual(itemIDs, ["-1"])
             XCTAssertTrue(itemType == Comic.self)
         } else {
@@ -91,15 +91,15 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
 
     func test_whenUpdateCharacter_characterAndCharacterSummariesAreUpdated() throws {
         // Given
-        let series = SeriesMock.makeSeries(id: "1")
+        let series = SeriesFactory.make(id: "1")
         try createSeries(series)
-        let comic = ComicMock.makeComic(id: "1")
+        let comic = ComicFactory.make(id: "1")
         try createComic(comic)
 
-        try createCharacter(CharacterMock.makeCharacter(seriesID: [series.id], comicsID: [comic.id]))
+        try createCharacter(CharacterFactory.make(seriesID: [series.id], comicsID: [comic.id]))
 
         // When
-        let feature = sut.update(CharacterMock.makeCharacter(name: "New Name"), on: eventLoop, in: table)
+        let feature = sut.update(CharacterFactory.make(name: "New Name"), on: eventLoop, in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -107,15 +107,15 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
 
     func test_whenUpdateCharacterWithSeriesIDAndComicsID_characterAndCharacterSummariesAreUpdated() throws {
         // Given
-        let series = SeriesMock.makeSeries(id: "1")
+        let series = SeriesFactory.make(id: "1")
         try createSeries(series)
-        let comic = ComicMock.makeComic(id: "1")
+        let comic = ComicFactory.make(id: "1")
         try createComic(comic)
 
-        try createCharacter(CharacterMock.makeCharacter())
+        try createCharacter(CharacterFactory.make())
 
         // When
-        let feature = sut.update(CharacterMock.makeCharacter(name: "New Name", seriesID: [series.id], comicsID: [comic.id]), on: eventLoop, in: table)
+        let feature = sut.update(CharacterFactory.make(name: "New Name", seriesID: [series.id], comicsID: [comic.id]), on: eventLoop, in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -123,36 +123,38 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
 
     func test_whenUpdateCharacter_existingSummariesAreUpdated() throws {
         // Given
-        let series = SeriesMock.makeSeries(id: "1")
+        let series = SeriesFactory.make(id: "SeriesID")
         try createSeries(series)
-        let character = CharacterMock.makeCharacter(
+        let character = CharacterFactory.make(
+            id: "CharacterID",
             popularity: 0,
-            name: "Old Name",
-            thumbnail: "Old Thumbnail",
-            description: "Old Description",
+            name: "Old Character Name",
+            thumbnail: "Old Character Thumbnail",
+            description: "Old Character Description",
             seriesID: [series.id]
         )
         try createCharacter(character)
 
         // When
-        let newCharacter = CharacterMock.makeCharacter(
+        let newCharacter = CharacterFactory.make(
+            id: "CharacterID",
             popularity: 1,
-            name: "New Name",
-            thumbnail: "New Thumbnail",
-            description: "New Description"
+            name: "New Character Name",
+            thumbnail: "New Character Thumbnail",
+            description: "New Character Description"
         )
         let feature = sut.update(newCharacter, on: eventLoop, in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = DatabaseMock.items["Series#1|Character#1"],
-           let characterSummary = try? JSONDecoder().decode(CharacterSummary<Series>.self, from: data){
+        if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary<Series>.self, from: data) {
             XCTAssertEqual(characterSummary.popularity, newCharacter.popularity)
             XCTAssertEqual(characterSummary.name, newCharacter.name)
             XCTAssertEqual(characterSummary.thumbnail, newCharacter.thumbnail)
             XCTAssertEqual(characterSummary.description, newCharacter.description)
         } else {
-            XCTFail("CharacterSummary<Series> with ID: Series#1|Character#1 doesn't exist")
+            XCTFail("CharacterSummary<Series> with ID: Character#CharacterID|Series#SeriesID doesn't exist")
         }
     }
 

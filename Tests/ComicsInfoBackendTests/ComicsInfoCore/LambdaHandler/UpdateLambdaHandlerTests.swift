@@ -21,7 +21,7 @@ final class UpdateLambdaHandlerTests: XCTestCase, LambdaMockFactory {
         _ = LocalServer(enabled: true)
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        request = Request(pathParameters: nil, body: CharacterMock.requestBody)
+        request = Request(body: CharacterFactory.requestBody)
         logger = Logger(label: self.className)
     }
 
@@ -34,7 +34,7 @@ final class UpdateLambdaHandlerTests: XCTestCase, LambdaMockFactory {
     func test_whenHandle_responseStatusIsOk() throws {
         // Given
         let useCase = CharacterUpdateUseCaseFactoryMock(
-            items: CharacterMock.makeDatabaseItems(),
+            items: CharacterFactory.makeDatabaseItems(),
             on: eventLoop,
             logger: logger
         ).makeUseCase()

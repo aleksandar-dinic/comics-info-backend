@@ -20,7 +20,7 @@ final class CreateLambdaHandlerTests: XCTestCase, LambdaMockFactory {
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        request = Request(pathParameters: nil, body: nil)
+        request = Request()
         logger = Logger(label: self.className)
     }
 

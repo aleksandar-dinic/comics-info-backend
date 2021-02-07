@@ -15,7 +15,7 @@ final class SeriesListResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
     private typealias Cache = InMemoryCacheProvider<Series>
 
     private var eventLoop: EventLoop!
-    private var sut: SeriesListResponseWrapper<SeriesRepositoryAPIWrapper, Cache>!
+    private var sut: SeriesListResponseWrapper<GetDatabaseProvider, Cache>!
     private var environment: String!
 
     override func setUpWithError() throws {
@@ -46,7 +46,7 @@ final class SeriesListResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     func test_whenHandleList_statusIsOk() throws {
         // Given
-        try createSeries(SeriesMock.makeSeries())
+        try createSeries(SeriesFactory.make())
 
         // When
         let feature = sut.handleList(on: eventLoop, environment: environment)

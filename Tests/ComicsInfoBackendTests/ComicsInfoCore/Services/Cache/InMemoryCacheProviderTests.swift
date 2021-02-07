@@ -20,7 +20,7 @@ final class InMemoryCacheProviderTests: XCTestCase {
 
     override func setUpWithError() throws {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let character = CharacterMock.character
+        let character = CharacterFactory.make()
         givenData = [character.id: character]
         inMemoryCache = InMemoryCache(storage: givenData)
         table = String.tableName(for: "TEST")

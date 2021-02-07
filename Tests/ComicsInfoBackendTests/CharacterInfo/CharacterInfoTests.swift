@@ -44,7 +44,7 @@ final class CharacterInfoTests: XCTestCase {
 
     func test_whenRunWithNilHandler_throwHandlerUnknown() throws {
         XCTAssertThrowsError(try sut.run()) {
-            XCTAssertEqual($0.localizedDescription, APIError.handlerUnknown.localizedDescription)
+            XCTAssertEqual($0.localizedDescription, ComicInfoError.handlerUnknown.localizedDescription)
         }
     }
 

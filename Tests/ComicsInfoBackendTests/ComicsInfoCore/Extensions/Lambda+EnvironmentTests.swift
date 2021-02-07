@@ -25,5 +25,13 @@ final class Lambda_EnvironmentTests: XCTestCase {
     func test_handler_isEmptyString() {
         XCTAssertEqual(Lambda.handler, "")
     }
+    
+    func test_tableNameForEnvironment_isNil() {
+        XCTAssertNil(Lambda.tableName(for: "TEST"))
+    }
+    
+    func test_tableNameWithoutEnvironment_isNil() {
+        XCTAssertNil(Lambda.tableName(for: nil))
+    }
 
 }

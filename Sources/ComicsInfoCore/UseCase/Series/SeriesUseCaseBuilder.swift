@@ -13,16 +13,15 @@ import NIO
 protocol SeriesUseCaseBuilder {
     
     var eventLoop: EventLoop { get }
-    var isLocalServer: Bool { get }
     var logger: Logger { get }
     
-    func buildSeriesUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
+    func buildSeriesUseCase() -> SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
     
 }
 
 extension SeriesUseCaseBuilder {
     
-    func buildSeriesUseCase() -> SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>> {
+    func buildSeriesUseCase() -> SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>> {
         SeriesUseCaseFactory(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,

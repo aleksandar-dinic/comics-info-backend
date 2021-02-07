@@ -9,16 +9,18 @@
 import Foundation
 import NIO
 
-public final class ComicCreateUseCase<APIWrapper: CreateRepositoryAPIWrapper>: CreateUseCase, CreateSummaryFactory, CharacterSummaryFactory, SeriesSummaryFactory where APIWrapper.Item == Comic {
+public final class ComicCreateUseCase: CreateUseCase, CreateSummaryFactory, CharacterSummaryFactory, SeriesSummaryFactory {
+    
+    public typealias Item = Comic
 
-    public let repository: CreateRepository<APIWrapper>
-    var characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>
-    var seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
+    public let repository: CreateRepository
+    var characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>
+    var seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
 
     public init(
-        repository: CreateRepository<APIWrapper>,
-        characterUseCase: CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>>,
-        seriesUseCase: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>
+        repository: CreateRepository,
+        characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>,
+        seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
     ) {
         self.repository = repository
         self.characterUseCase = characterUseCase
@@ -29,7 +31,7 @@ public final class ComicCreateUseCase<APIWrapper: CreateRepositoryAPIWrapper>: C
         getCharacters(on: eventLoop, forIDs: item.charactersID, from: table)
             .and(getSeries(on: eventLoop, forIDs: item.seriesID, from: table))
             .flatMapThrowing { [weak self] (characters, series) in
-                guard let self = self else { throw APIError.internalServerError }
+                guard let self = self else { throw ComicInfoError.internalServerError }
                 var item = item
 
                 if !characters.isEmpty {

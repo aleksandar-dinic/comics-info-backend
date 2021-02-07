@@ -13,7 +13,7 @@ import NIO
 final class SeriesCreateResponseWrapperTest: XCTestCase {
 
     private var eventLoop: EventLoop!
-    private var sut: SeriesCreateResponseWrapper<SeriesCreateRepositoryAPIWrapper>!
+    private var sut: SeriesCreateResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
@@ -32,7 +32,7 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreateWithoutBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: nil)
+        let request = Request()
 
         // When
         let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
@@ -44,7 +44,7 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreateWithInvalidBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: "")
+        let request = Request(body: "")
 
         // When
         let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
@@ -56,7 +56,7 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreate_statusIsCreated() throws {
         // Given
-        let request = Request(pathParameters: nil, body: SeriesMock.requestBody)
+        let request = Request(body: SeriesFactory.requestBody)
 
         // When
         let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
@@ -68,7 +68,7 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreateSameItemTwice_statusIsForbidden() throws {
         // Given
-        let request = Request(pathParameters: nil, body: SeriesMock.requestBody)
+        let request = Request(body: SeriesFactory.requestBody)
         var feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
         _ = try feature.wait()
 

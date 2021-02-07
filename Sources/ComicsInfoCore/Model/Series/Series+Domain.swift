@@ -28,7 +28,7 @@ extension Series {
         } else {
             self.charactersID = nil
         }
-        if let characters = series.characters?.map({ CharacterSummary(from: $0, id: series.identifier, link: Series.self, count: nil) }), !characters.isEmpty {
+        if let characters = series.characters?.map({ CharacterSummary<Series>(from: $0, id: series.identifier, count: nil) }), !characters.isEmpty {
             self.characters = characters
         } else {
             self.characters = nil
@@ -38,7 +38,7 @@ extension Series {
         } else {
             self.comicsID = nil
         }
-        if let comics = series.comics?.map({ ComicSummary(from: $0, id: series.identifier, link: Series.self, number: nil) }), !comics.isEmpty {
+        if let comics = series.comics?.map({ ComicSummary<Series>(from: $0, id: series.identifier, number: nil) }), !comics.isEmpty {
             self.comics = comics
         } else {
             self.comics = nil

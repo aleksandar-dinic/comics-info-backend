@@ -11,11 +11,9 @@ import NIO
 
 public protocol UpdateUseCase {
 
-    associatedtype APIWrapper: UpdateRepositoryAPIWrapper
+    associatedtype Item: ComicInfoItem
 
-    typealias Item = APIWrapper.Item
-
-    var repository: UpdateRepository<APIWrapper> { get }
+    var repository: UpdateRepository { get }
 
     func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
     
@@ -35,7 +33,6 @@ extension UpdateUseCase {
     public func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
         appendItemSummary(item, on: eventLoop, from: table)
             .flatMap { updateItem($0, on: eventLoop, in: table) }
-            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
     
     func updateItem(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {

@@ -28,7 +28,7 @@ struct DatabaseMockCreate: DatabaseCreate {
         }
 
         DatabaseMock.items[item.itemID] = itemData
-        return eventLoop.makeSucceededFuture(())
+        return eventLoop.submit { }
     }
     
     mutating func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
@@ -44,7 +44,7 @@ struct DatabaseMockCreate: DatabaseCreate {
             DatabaseMock.items[id] = summaryData
         }
         
-        return eventLoop.makeSucceededFuture(())
+        return eventLoop.submit { }
     }
 
 }

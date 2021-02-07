@@ -10,7 +10,7 @@ import Logging
 import Foundation
 import NIO
 
-public struct ComicUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory where CacheProvider.Item == Comic  {
+public struct ComicUseCaseFactory<CacheProvider: Cacheable>: GetUseCaseFactory where CacheProvider.Item == Comic  {
 
     public let eventLoop: EventLoop
     public let isLocalServer: Bool
@@ -29,20 +29,20 @@ public struct ComicUseCaseFactory<CacheProvider: Cacheable>: UseCaseFactory wher
         self.logger = logger
     }
 
-    public func makeUseCase() -> ComicUseCase<ComicRepositoryAPIWrapper, CacheProvider> {
+    public func makeUseCase() -> ComicUseCase<GetDatabaseProvider, CacheProvider> {
         ComicUseCase(repository: makecomicRepository())
     }
 
-    private func makecomicRepository() -> Repository<ComicRepositoryAPIWrapper, CacheProvider> {
-        RepositoryFactory(
+    private func makecomicRepository() -> GetRepository<Comic, CacheProvider> {
+        GetRepositoryFactory(
             eventLoop: eventLoop,
-            repositoryAPIWrapper: makeRepositoryAPIWrapper(),
+            itemGetDBWrapper: makeItemGetDBWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()
     }
 
-    private func makeRepositoryAPIWrapper() -> ComicRepositoryAPIWrapper {
-        ComicRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
+    private func makeItemGetDBWrapper() -> ItemGetDBWrapper<Comic> {
+        ItemGetDBWrapper(itemGetDBService: makeItemGetDBService())
     }
 
 }

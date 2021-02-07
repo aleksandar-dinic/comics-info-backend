@@ -24,23 +24,27 @@ struct ComicUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
         isLocalServer = true
     }
 
-    func makeUseCase() -> ComicUpdateUseCase<ComicUpdateRepositoryAPIWrapper> {
+    func makeUseCase() -> ComicUpdateUseCase {
         ComicUpdateUseCase(
-            repository: makecomicRepository(),
+            repository: makeRepository(),
             characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
             seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
         )
     }
 
-    private func makecomicRepository() -> UpdateRepository<ComicUpdateRepositoryAPIWrapper> {
-        UpdateRepositoryFactory(
-            repositoryAPIWrapper: makeRepositoryAPIWrapper()
-        ).makeRepository()
+    private func makeRepository() -> UpdateRepository {
+        ComicsInfoCore.UpdateRepositoryFactory(itemUpdateDBService: makeItemUpdateDBService())
+            .make()
+    }
+    
+    func makeItemUpdateDBService() -> ItemUpdateDBService {
+        UpdateDatabaseProvider(database: makeDatabase())
     }
 
-    private func makeRepositoryAPIWrapper() -> ComicUpdateRepositoryAPIWrapper {
-        ComicUpdateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
+    private func makeDatabase() -> DatabaseUpdate {
+        DatabaseFectory(isLocalServer: isLocalServer)
+            .makeDatabaseUpdate(eventLoop: eventLoop, logger: logger)
     }
 
 }

@@ -9,16 +9,16 @@
 import Foundation
 import NIO
 
-struct UpdateDataProvider<APIWrapper: UpdateRepositoryAPIWrapper> {
+struct UpdateDataProvider {
 
-    let repositoryAPIWrapper: APIWrapper
+    let itemUpdateDBWrapper: ItemUpdateDBWrapper
 
-    func update(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Set<String>> {
-        repositoryAPIWrapper.update(item, in: table)
+    func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>> {
+        itemUpdateDBWrapper.update(item, in: table)
     }
     
     func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        repositoryAPIWrapper.updateSummaries(summaries, in: table)
+        itemUpdateDBWrapper.updateSummaries(summaries, in: table)
     }
 
 }

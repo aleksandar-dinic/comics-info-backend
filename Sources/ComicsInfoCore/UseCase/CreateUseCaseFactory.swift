@@ -23,8 +23,13 @@ public protocol CreateUseCaseFactory  {
 }
 
 extension CreateUseCaseFactory {
+    
+    func makeCreateRepository() -> CreateRepository {
+        CreateRepositoryFactory(itemCreateDBService: makeItemCreateDBService())
+            .make()
+    }
 
-    func makeRepositoryAPIService() -> CreateRepositoryAPIService {
+    private func makeItemCreateDBService() -> ItemCreateDBService {
         CreateDatabaseProvider(database: makeDatabase())
     }
 

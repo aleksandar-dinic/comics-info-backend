@@ -9,15 +9,15 @@
 import Foundation
 import NIO
 
-public final class CreateRepository<APIWrapper: CreateRepositoryAPIWrapper> {
+public final class CreateRepository {
 
-    private let dataProvider: CreateDataProvider<APIWrapper>
+    private let dataProvider: CreateDataProvider
 
-    init(dataProvider: CreateDataProvider<APIWrapper>) {
+    init(dataProvider: CreateDataProvider) {
         self.dataProvider = dataProvider
     }
 
-    public func create(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Void> {
+    public func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
         dataProvider.create(item, in: table)
     }
     

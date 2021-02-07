@@ -35,7 +35,7 @@ public final class SeriesInfo {
             Lambda.run { LambdaUpdateHandlerFactory.makeHandler($0) }
 
         case .delete, .none:
-            throw APIError.handlerUnknown
+            throw ComicInfoError.handlerUnknown
         }
     }
 

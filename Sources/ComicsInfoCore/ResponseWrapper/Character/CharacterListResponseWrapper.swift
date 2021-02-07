@@ -10,11 +10,11 @@ import struct Domain.Character
 import Foundation
 import NIO
 
-public struct CharacterListResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: ListResponseWrapper where APIWrapper.Item == Character, CacheProvider.Item == Character {
+public struct CharacterListResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ListResponseWrapper where CacheProvider.Item == Character {
 
-    private let characterUseCase: CharacterUseCase<APIWrapper, CacheProvider>
+    private let characterUseCase: CharacterUseCase<DBService, CacheProvider>
 
-    public init(characterUseCase: CharacterUseCase<APIWrapper, CacheProvider>) {
+    public init(characterUseCase: CharacterUseCase<DBService, CacheProvider>) {
         self.characterUseCase = characterUseCase
     }
 

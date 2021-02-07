@@ -9,16 +9,16 @@
 import Foundation
 import NIO
 
-struct CreateDataProvider<APIWrapper: CreateRepositoryAPIWrapper> {
+struct CreateDataProvider {
 
-    let repositoryAPIWrapper: APIWrapper
+    let itemCreateDBWrapper: ItemCreateDBWrapper
 
-    func create(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Void> {
-        repositoryAPIWrapper.create(item, in: table)
+    func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
+        itemCreateDBWrapper.create(item, in: table)
     }
     
     func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        repositoryAPIWrapper.createSummaries(summaries, in: table)
+        itemCreateDBWrapper.createSummaries(summaries, in: table)
     }
 
 }

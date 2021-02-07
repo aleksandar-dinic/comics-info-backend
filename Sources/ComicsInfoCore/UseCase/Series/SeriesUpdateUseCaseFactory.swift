@@ -26,22 +26,13 @@ public struct SeriesUpdateUseCaseFactory: UpdateUseCaseFactory, CharacterUseCase
         self.logger = logger
     }
 
-    public func makeUseCase() -> SeriesUpdateUseCase<SeriesUpdateRepositoryAPIWrapper> {
+    public func makeUseCase() -> SeriesUpdateUseCase {
         SeriesUpdateUseCase(
-            repository: makeSeriesRepository(),
+            repository: makeUpdateRepository(),
             characterUseCase: buildCharacterUseCase(),
             seriesUseCase: buildSeriesUseCase(),
             comicUseCase: buildComicUseCase()
         )
     }
 
-    private func makeSeriesRepository() -> UpdateRepository<SeriesUpdateRepositoryAPIWrapper> {
-        UpdateRepositoryFactory(repositoryAPIWrapper: makeRepositoryAPIWrapper())
-            .makeRepository()
-    }
-
-    private func makeRepositoryAPIWrapper() -> SeriesUpdateRepositoryAPIWrapper {
-        SeriesUpdateRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
-    }
-    
 }

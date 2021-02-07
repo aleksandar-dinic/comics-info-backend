@@ -13,7 +13,7 @@ import NIO
 final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
 
     private var eventLoop: EventLoop!
-    private var sut: ComicUpdateResponseWrapper<ComicUpdateRepositoryAPIWrapper>!
+    private var sut: ComicUpdateResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
@@ -33,7 +33,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
 
     func test_whenHandleUpdateWithoutBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: nil)
+        let request = Request()
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -45,7 +45,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
 
     func test_whenHandleUpdateWithInvalidBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: "")
+        let request = Request(body: "")
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -57,7 +57,7 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
 
     func test_whenHandleUpdateNonExistingItem_statusIsForbidden() throws {
         // Given
-        let request = Request(pathParameters: nil, body: ComicMock.requestBody)
+        let request = Request(body: ComicFactory.requestBody)
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -69,9 +69,9 @@ final class ComicUpdateResponseWrapperTests: XCTestCase, CreateComicProtocol {
 
     func test_whenHandleUpdate_statusIsOk() throws {
         // Given
-        let comic = ComicMock.makeComic(title: "Old Title")
+        let comic = ComicFactory.make(title: "Old Title")
         try createComic(comic)
-        let request = Request(pathParameters: nil, body: ComicMock.requestBody)
+        let request = Request(body: ComicFactory.requestBody)
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)

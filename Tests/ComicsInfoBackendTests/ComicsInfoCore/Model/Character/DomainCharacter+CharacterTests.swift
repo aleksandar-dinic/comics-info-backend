@@ -16,7 +16,7 @@ final class DomainCharacter_CharacterTests: XCTestCase {
     private var sut: Domain.Character!
 
     override func setUpWithError() throws {
-        givenCharacter = CharacterMock.character
+        givenCharacter = CharacterFactory.make()
         sut = Domain.Character(from: givenCharacter)
     }
 

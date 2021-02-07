@@ -9,15 +9,15 @@
 import Foundation
 import NIO
 
-public final class UpdateRepository<APIWrapper: UpdateRepositoryAPIWrapper> {
+public final class UpdateRepository {
 
-    private let dataProvider: UpdateDataProvider<APIWrapper>
+    private let dataProvider: UpdateDataProvider
 
-    init(dataProvider: UpdateDataProvider<APIWrapper>) {
+    init(dataProvider: UpdateDataProvider) {
         self.dataProvider = dataProvider
     }
 
-    public func update(_ item: APIWrapper.Item, in table: String) -> EventLoopFuture<Set<String>> {
+    public func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>> {
         dataProvider.update(item, in: table)
     }
     

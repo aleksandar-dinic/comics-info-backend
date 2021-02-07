@@ -13,16 +13,15 @@ import NIO
 protocol ComicUseCaseBuilder {
     
     var eventLoop: EventLoop { get }
-    var isLocalServer: Bool { get }
     var logger: Logger { get }
     
-    func buildComicUseCase() -> ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>>
+    func buildComicUseCase() -> ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
     
 }
 
 extension ComicUseCaseBuilder {
     
-    func buildComicUseCase() -> ComicUseCase<ComicRepositoryAPIWrapper, InMemoryCacheProvider<Comic>> {
+    func buildComicUseCase() -> ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>> {
         ComicUseCaseFactory(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,

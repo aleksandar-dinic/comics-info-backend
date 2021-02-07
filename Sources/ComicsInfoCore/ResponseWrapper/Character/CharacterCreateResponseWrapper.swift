@@ -10,11 +10,11 @@ import struct Domain.Character
 import Foundation
 import NIO
 
-public struct CharacterCreateResponseWrapper<APIWrapper: CreateRepositoryAPIWrapper>: CreateResponseWrapper where APIWrapper.Item == Character {
+public struct CharacterCreateResponseWrapper: CreateResponseWrapper {
 
-    private let useCase: CharacterCreateUseCase<APIWrapper>
+    private let useCase: CharacterCreateUseCase
 
-    public init(useCase: CharacterCreateUseCase<APIWrapper>) {
+    public init(useCase: CharacterCreateUseCase) {
         self.useCase = useCase
     }
 

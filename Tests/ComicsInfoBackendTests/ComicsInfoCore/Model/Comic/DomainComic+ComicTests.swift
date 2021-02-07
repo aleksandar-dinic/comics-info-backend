@@ -16,7 +16,7 @@ final class DomainComic_ComicTests: XCTestCase {
     private var sut: Domain.Comic!
 
     override func setUpWithError() throws {
-        givenComic = ComicMock.comic
+        givenComic = ComicFactory.make()
         sut = Domain.Comic(from: givenComic)
     }
 

@@ -12,12 +12,14 @@ import NIO
 
 enum SeriesCreateResponseWrapperMock {
 
-    typealias UseCase = SeriesCreateUseCase<SeriesCreateRepositoryAPIWrapper>
+    typealias UseCase = SeriesCreateUseCase
 
     static func make(
         on eventLoop: EventLoop
-    ) -> SeriesCreateResponseWrapper<SeriesCreateRepositoryAPIWrapper> {
-        SeriesCreateResponseWrapper(useCase: SeriesCreateUseCaseFactoryMock(on: eventLoop).makeUseCase())
+    ) -> SeriesCreateResponseWrapper {
+        SeriesCreateResponseWrapper(
+            useCase: SeriesCreateUseCaseFactoryMock(on: eventLoop).makeUseCase()
+        )
     }
 
 }

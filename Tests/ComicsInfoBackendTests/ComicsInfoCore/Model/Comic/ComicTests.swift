@@ -19,7 +19,7 @@ final class ComicTests: XCTestCase {
 
     func testTitle_isEqualToName() {
         // Given
-        let comic = ComicMock.makeComic()
+        let comic = ComicFactory.make()
         
         // When
         

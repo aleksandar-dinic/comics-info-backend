@@ -21,8 +21,8 @@ public protocol ReadResponseWrapper: ErrorResponseWrapper {
 
 extension ReadResponseWrapper {
     
-    func getFields(from pathParameters: [String: String]?) -> Set<String>? {
-        guard let fields = pathParameters?["fields"]?.split(separator: ",").compactMap({ String($0) }) else {
+    func getFields(from queryParams: [String: String]?) -> Set<String>? {
+        guard let fields = queryParams?["fields"]?.split(separator: ",").compactMap({ String($0) }) else {
             return nil
         }
         

@@ -34,7 +34,7 @@ struct DatabaseMockUpdate: DatabaseUpdate {
         }
         
         DatabaseMock.items[item.itemID] = itemData
-        return eventLoop.makeSucceededFuture(item.updatedFields(old: oldItem))
+        return eventLoop.submit { item.updatedFields(old: oldItem) }
     }
     
     func updateSummaries<Summary: ItemSummary>(_ items: [Summary], in table: String) -> EventLoopFuture<Void> {
@@ -45,7 +45,7 @@ struct DatabaseMockUpdate: DatabaseUpdate {
             DatabaseMock.items["\(item.itemID)|\(item.summaryID)"] = itemData
         }
 
-        return eventLoop.makeSucceededFuture(())
+        return eventLoop.submit { }
     }
 
 }

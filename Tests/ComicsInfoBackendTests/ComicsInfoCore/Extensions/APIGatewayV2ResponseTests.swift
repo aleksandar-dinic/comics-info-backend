@@ -22,7 +22,8 @@ final class APIGatewayV2ResponseTests: XCTestCase {
             multiValueHeaders: ["Key": ["Value"]],
             body: "body",
             isBase64Encoded: false,
-            cookies: ["🍪"])
+            cookies: ["🍪"]
+        )
         apiGatewayV2Response = APIGateway.V2.Response(from: response)
     }
 

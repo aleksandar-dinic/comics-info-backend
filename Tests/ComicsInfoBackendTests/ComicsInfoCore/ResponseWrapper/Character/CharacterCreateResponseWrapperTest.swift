@@ -13,7 +13,7 @@ import NIO
 final class CharacterCreateResponseWrapperTest: XCTestCase {
 
     private var eventLoop: EventLoop!
-    private var sut: CharacterCreateResponseWrapper<CharacterCreateRepositoryAPIWrapper>!
+    private var sut: CharacterCreateResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
@@ -32,7 +32,7 @@ final class CharacterCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreateWithoutBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: nil)
+        let request = Request()
 
         // When
         let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
@@ -44,7 +44,7 @@ final class CharacterCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreateWithInvalidBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: "")
+        let request = Request(body: "")
 
         // When
         let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
@@ -56,7 +56,7 @@ final class CharacterCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreate_statusIsCreated() throws {
         // Given
-        let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
+        let request = Request(body: CharacterFactory.requestBody)
 
         // When
         let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
@@ -68,7 +68,7 @@ final class CharacterCreateResponseWrapperTest: XCTestCase {
 
     func test_whenHandleCreateSameItemTwice_statusIsForbidden() throws {
         // Given
-        let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
+        let request = Request(body: CharacterFactory.requestBody)
         var feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
         _ = try feature.wait()
 

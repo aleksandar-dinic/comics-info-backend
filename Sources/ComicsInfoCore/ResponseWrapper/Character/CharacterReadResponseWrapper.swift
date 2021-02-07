@@ -10,11 +10,11 @@ import struct Domain.Character
 import Foundation
 import NIO
 
-public struct CharacterReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: ReadResponseWrapper where APIWrapper.Item == Character, CacheProvider.Item == Character {
+public struct CharacterReadResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ReadResponseWrapper where CacheProvider.Item == Character {
 
-    private let characterUseCase: CharacterUseCase<APIWrapper, CacheProvider>
+    private let characterUseCase: CharacterUseCase<DBService, CacheProvider>
 
-    public init(characterUseCase: CharacterUseCase<APIWrapper, CacheProvider>) {
+    public init(characterUseCase: CharacterUseCase<DBService, CacheProvider>) {
         self.characterUseCase = characterUseCase
     }
 
@@ -28,7 +28,7 @@ public struct CharacterReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, Cac
             return eventLoop.makeSucceededFuture(response)
         }
         
-        let fields = getFields(from: request.pathParameters)
+        let fields = getFields(from: request.queryParameters)
 
         let table = String.tableName(for: environment)
         return characterUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table)

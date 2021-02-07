@@ -13,7 +13,7 @@ import XCTest
 final class SeriesUseCaseTests: XCTestCase {
 
     private var eventLoop: EventLoop!
-    private var sut: SeriesUseCase<SeriesRepositoryAPIWrapper, InMemoryCacheProvider<Series>>!
+    private var sut: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>!
     private var table: String!
 
     override func setUpWithError() throws {
@@ -21,7 +21,7 @@ final class SeriesUseCaseTests: XCTestCase {
         DatabaseMock.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         table = String.tableName(for: "TEST")
-        let items = SeriesMock.makeDatabaseItems()
+        let items = SeriesFactory.makeDatabaseItems()
         sut = SeriesUseCaseFactoryMock(items: items).makeUseCase()
     }
 
@@ -44,7 +44,7 @@ final class SeriesUseCaseTests: XCTestCase {
     func testGetItem_whenFieldIsInvalid_throwInvalidFields() throws {
         // Given
         let fields = Set(["Invalid"])
-        let givenItem = SeriesMock.makeSeries()
+        let givenItem = SeriesFactory.make()
         var thrownError: Error?
 
         // When
@@ -55,7 +55,7 @@ final class SeriesUseCaseTests: XCTestCase {
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case let .invalidFields(invalidFields) = error as? APIError {
+        if case let .invalidFields(invalidFields) = error as? ComicInfoError {
             XCTAssertEqual(invalidFields, ["Invalid"])
         } else {
             XCTFail("Expected '.invalidFields' but got \(error)")
@@ -65,7 +65,7 @@ final class SeriesUseCaseTests: XCTestCase {
     func testGetItem_whenOneOfFieldsIsInvalid_throwInvalidFields() throws {
         // Given
         let fields = Set(["characters", "comics", "Invalid"])
-        let givenItem = SeriesMock.makeSeries()
+        let givenItem = SeriesFactory.make()
         var thrownError: Error?
 
         // When
@@ -76,7 +76,7 @@ final class SeriesUseCaseTests: XCTestCase {
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case let .invalidFields(invalidFields) = error as? APIError {
+        if case let .invalidFields(invalidFields) = error as? ComicInfoError {
             XCTAssertEqual(invalidFields, ["Invalid"])
         } else {
             XCTFail("Expected '.itemsNotFound' but got \(error)")
@@ -85,7 +85,7 @@ final class SeriesUseCaseTests: XCTestCase {
 
     func test_whenGetItemFromDatabase_returnsItem() throws {
         // Given
-        let givenItem = SeriesMock.makeSeries()
+        let givenItem = SeriesFactory.make()
 
         // When
         let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, dataSource: .database)
@@ -97,7 +97,7 @@ final class SeriesUseCaseTests: XCTestCase {
     
     func test_whenGetItemWithoutFields_returnsItemWithoutSummaries() throws {
         // Given
-        let givenItem = SeriesMock.makeSeries()
+        let givenItem = SeriesFactory.make()
 
         // When
         let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, dataSource: .database)
@@ -111,7 +111,7 @@ final class SeriesUseCaseTests: XCTestCase {
     func testGetItemWithFieldCharacter_whenCharacterSummaryDoesntExist_returnsItemWithoutSummaries() throws {
         // Given
         let fields = Set(["characters"])
-        let givenItem = SeriesMock.makeSeries()
+        let givenItem = SeriesFactory.make()
 
         // When
         let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
@@ -125,7 +125,7 @@ final class SeriesUseCaseTests: XCTestCase {
     func testGetItemWithFieldComic_whenComicSummaryDoesntExist_returnsItemWithoutSummaries() throws {
         // Given
         let fields = Set(["comics"])
-        let givenItem = SeriesMock.makeSeries()
+        let givenItem = SeriesFactory.make()
 
         // When
         let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
@@ -140,15 +140,15 @@ final class SeriesUseCaseTests: XCTestCase {
         // Given
         let fields = Set(["characters"])
         
-        var items = SeriesMock.makeDatabaseItems()
-        let characterItems = CharacterMock.makeDatabaseItems()
+        var items = SeriesFactory.makeDatabaseItems()
+        let characterItems = CharacterFactory.makeDatabaseItems()
         for character in characterItems {
             items[character.key] = character.value
         }
         
         sut = SeriesUseCaseFactoryMock(items: items).makeUseCase()
         
-        let givenItem = SeriesMock.makeSeries(charactersID: ["1"])
+        let givenItem = SeriesFactory.make(charactersID: ["1"])
         let updateUseCase = SeriesUpdateUseCaseFactoryMock().makeUseCase()
         try updateUseCase.update(givenItem, on: eventLoop, in: table).wait()
 
@@ -157,8 +157,8 @@ final class SeriesUseCaseTests: XCTestCase {
         let item = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(item.characters?.first?.itemID, "Series#1")
-        XCTAssertEqual(item.characters?.first?.summaryID, "Character#1")
+        XCTAssertEqual(item.characters?.first?.itemID, "Character#1")
+        XCTAssertEqual(item.characters?.first?.summaryID, "Series#1")
         XCTAssertEqual(item.characters?.first?.itemName, "CharacterSummary<Series>")
     }
     
@@ -166,15 +166,15 @@ final class SeriesUseCaseTests: XCTestCase {
         // Given
         let fields = Set(["comics"])
         
-        var items = SeriesMock.makeDatabaseItems()
-        let comicItems = ComicMock.makeDatabaseItems()
+        var items = SeriesFactory.makeDatabaseItems()
+        let comicItems = ComicFactory.makeDatabaseItems()
         for comic in comicItems {
             items[comic.key] = comic.value
         }
         
         sut = SeriesUseCaseFactoryMock(items: items).makeUseCase()
         
-        let givenItem = SeriesMock.makeSeries(comicsID: ["1"])
+        let givenItem = SeriesFactory.make(comicsID: ["1"])
         let updateUseCase = SeriesUpdateUseCaseFactoryMock().makeUseCase()
         try updateUseCase.update(givenItem, on: eventLoop, in: table).wait()
 
@@ -183,8 +183,8 @@ final class SeriesUseCaseTests: XCTestCase {
         let item = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(item.comics?.first?.itemID, "Series#1")
-        XCTAssertEqual(item.comics?.first?.summaryID, "Comic#1")
+        XCTAssertEqual(item.comics?.first?.itemID, "Comic#1")
+        XCTAssertEqual(item.comics?.first?.summaryID, "Series#1")
         XCTAssertEqual(item.comics?.first?.itemName, "ComicSummary<Series>")
     }
     
@@ -192,20 +192,20 @@ final class SeriesUseCaseTests: XCTestCase {
         // Given
         let fields = Set(["characters", "comics"])
         
-        var items = SeriesMock.makeDatabaseItems()
-        let characterItems = CharacterMock.makeDatabaseItems()
+        var items = SeriesFactory.makeDatabaseItems()
+        let characterItems = CharacterFactory.makeDatabaseItems()
         for character in characterItems {
             items[character.key] = character.value
         }
         
-        let comicItems = ComicMock.makeDatabaseItems()
+        let comicItems = ComicFactory.makeDatabaseItems()
         for comic in comicItems {
             items[comic.key] = comic.value
         }
         
         sut = SeriesUseCaseFactoryMock(items: items).makeUseCase()
         
-        let givenItem = SeriesMock.makeSeries(charactersID: ["1"], comicsID: ["1"])
+        let givenItem = SeriesFactory.make(charactersID: ["1"], comicsID: ["1"])
         let updateUseCase = SeriesUpdateUseCaseFactoryMock().makeUseCase()
         try updateUseCase.update(givenItem, on: eventLoop, in: table).wait()
 
@@ -214,15 +214,15 @@ final class SeriesUseCaseTests: XCTestCase {
         let item = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(item.characters?.first?.summaryID, "Character#1")
-        XCTAssertEqual(item.comics?.first?.summaryID, "Comic#1")
+        XCTAssertEqual(item.characters?.first?.itemID, "Character#1")
+        XCTAssertEqual(item.comics?.first?.itemID, "Comic#1")
     }
 
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
         DatabaseMock.removeAll()
-        let givenSeries = SeriesMock.seriesList
-        let givenItems = SeriesMock.makeDatabaseItemsList()
+        let givenSeries = SeriesFactory.seriesList
+        let givenItems = SeriesFactory.makeDatabaseItemsList()
         sut = SeriesUseCaseFactoryMock(items: givenItems).makeUseCase()
 
         // When

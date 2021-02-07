@@ -13,7 +13,7 @@ import NIO
 final class CharacterUpdateResponseWrapperTests: XCTestCase, CreateCharacterProtocol {
 
     private var eventLoop: EventLoop!
-    private var sut: CharacterUpdateResponseWrapper<CharacterUpdateRepositoryAPIWrapper>!
+    private var sut: CharacterUpdateResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
@@ -33,7 +33,7 @@ final class CharacterUpdateResponseWrapperTests: XCTestCase, CreateCharacterProt
 
     func test_whenHandleUpdateWithoutBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: nil)
+        let request = Request()
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -45,7 +45,7 @@ final class CharacterUpdateResponseWrapperTests: XCTestCase, CreateCharacterProt
 
     func test_whenHandleUpdateWithInvalidBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: "")
+        let request = Request(body: "")
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -57,7 +57,7 @@ final class CharacterUpdateResponseWrapperTests: XCTestCase, CreateCharacterProt
 
     func test_whenHandleUpdateNonExistingItem_statusIsForbidden() throws {
         // Given
-        let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
+        let request = Request(body: CharacterFactory.requestBody)
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -69,9 +69,9 @@ final class CharacterUpdateResponseWrapperTests: XCTestCase, CreateCharacterProt
 
     func test_whenHandleUpdate_statusIsOk() throws {
         // Given
-        let character = CharacterMock.makeCharacter(name: "Old Name")
+        let character = CharacterFactory.make(name: "Old Name")
         try createCharacter(character)
-        let request = Request(pathParameters: nil, body: CharacterMock.requestBody)
+        let request = Request(body: CharacterFactory.requestBody)
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)

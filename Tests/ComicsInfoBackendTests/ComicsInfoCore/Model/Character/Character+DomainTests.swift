@@ -94,14 +94,14 @@ final class Character_DomainTests: XCTestCase {
     func testSeries_whenInitFromCharacter_isEqualToCharacterSeries() {
         XCTAssertEqual(
             sut.series?.map { $0.itemID }.sorted(),
-            domainCharacter.series?.map { "Character#\($0.identifier)" }.sorted()
+            domainCharacter.series?.map { "Series#\($0.identifier)" }.sorted()
         )
     }
     
     func testComics_whenInitFromCharacter_isEqualToCharacterComics() {
         XCTAssertEqual(
             sut.comics?.map { $0.itemID }.sorted(),
-            domainCharacter.comics?.map { "Character#\($0.identifier)" }.sorted()
+            domainCharacter.comics?.map { "Comic#\($0.identifier)" }.sorted()
         )
     }
     

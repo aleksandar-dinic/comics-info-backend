@@ -30,14 +30,19 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
     }
 
     public func getItems(withIDs IDs: Set<Item.ID>, from table: String) -> (items: [Item], missingIDs: Set<Item.ID>) {
+        print("InMemoryCacheProvider getItems withIDs: \(IDs)")
         var items = [Item]()
-        guard let cache = itemsCaches[table], !cache.isEmpty else { return (items, IDs) }
+        guard let cache = itemsCaches[table], !cache.isEmpty else {
+            print("InMemoryCacheProvider getItems missingIDs: \(IDs)")
+            return (items, IDs)
+        }
         
         for id in IDs {
             guard let item = cache[id] else { continue }
             items.append(item)
         }
 
+        print("InMemoryCacheProvider getItems missingIDs: \(Set(items.map({ $0.id })).symmetricDifference(IDs))")
         return (items, Set(items.map({ $0.id })).symmetricDifference(IDs))
     }
     
@@ -58,11 +63,7 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
         }
     }
     
-    public func getSummaries<Summary: ItemSummary>(
-        _ type: Summary.Type,
-        forID ID: String,
-        from table: String
-    ) -> Result<[Summary], CacheError<Item>> {
+    public func getSummaries<Summary: ItemSummary>(forID ID: String, from table: String) -> Result<[Summary], CacheError<Item>> {
         guard let cache = itemsSummaries[table], !cache.isEmpty else {
             return .failure(.summariesNotFound(String.getType(from: Summary.self)))
         }

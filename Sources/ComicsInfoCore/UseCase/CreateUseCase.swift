@@ -11,11 +11,9 @@ import NIO
 
 public protocol CreateUseCase {
 
-    associatedtype APIWrapper: CreateRepositoryAPIWrapper
+    associatedtype Item: ComicInfoItem
 
-    typealias Item = APIWrapper.Item
-
-    var repository: CreateRepository<APIWrapper> { get }
+    var repository: CreateRepository { get }
 
     func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
     func createSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
@@ -29,7 +27,6 @@ extension CreateUseCase {
     public func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
         appendItemSummary(on: item, on: eventLoop, from: table)
             .flatMap { createItemAndSummaries($0, on: eventLoop, in: table) }
-            .flatMapErrorThrowing { throw $0.mapToAPIError(itemType: Item.self) }
     }
 
     private func createItemAndSummaries(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {

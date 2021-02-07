@@ -19,7 +19,7 @@ final class SeriesTests: XCTestCase {
 
     func testTitle_isEqualToName() {
         // Given
-        let series = SeriesMock.makeSeries()
+        let series = SeriesFactory.make()
         
         // When
         

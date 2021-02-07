@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-public final class UpdateDatabaseProvider: UpdateRepositoryAPIService {
+public final class UpdateDatabaseProvider: ItemUpdateDBService {
 
     private var database: DatabaseUpdate
 

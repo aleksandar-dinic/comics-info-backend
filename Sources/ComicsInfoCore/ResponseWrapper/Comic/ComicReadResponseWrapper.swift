@@ -10,11 +10,11 @@ import struct Domain.Comic
 import Foundation
 import NIO
 
-public struct ComicReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, CacheProvider: Cacheable>: ReadResponseWrapper where APIWrapper.Item == Comic, CacheProvider.Item == Comic {
+public struct ComicReadResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ReadResponseWrapper where CacheProvider.Item == Comic {
 
-    private let comicUseCase: ComicUseCase<APIWrapper, CacheProvider>
+    private let comicUseCase: ComicUseCase<DBService, CacheProvider>
 
-    public init(comicUseCase: ComicUseCase<APIWrapper, CacheProvider>) {
+    public init(comicUseCase: ComicUseCase<DBService, CacheProvider>) {
         self.comicUseCase = comicUseCase
     }
 
@@ -28,7 +28,7 @@ public struct ComicReadResponseWrapper<APIWrapper: RepositoryAPIWrapper, CachePr
             return eventLoop.makeSucceededFuture(response)
         }
         
-        let fields = getFields(from: request.pathParameters)
+        let fields = getFields(from: request.queryParameters)
 
         let table = String.tableName(for: environment)
         return comicUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table)

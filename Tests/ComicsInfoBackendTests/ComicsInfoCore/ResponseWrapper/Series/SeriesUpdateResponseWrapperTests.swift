@@ -13,7 +13,7 @@ import NIO
 final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     private var eventLoop: EventLoop!
-    private var sut: SeriesUpdateResponseWrapper<SeriesUpdateRepositoryAPIWrapper>!
+    private var sut: SeriesUpdateResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
@@ -33,7 +33,7 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     func test_whenHandleUpdateWithoutBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: nil)
+        let request = Request()
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -45,7 +45,7 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     func test_whenHandleUpdateWithInvalidBody_statusIsBadRequest() throws {
         // Given
-        let request = Request(pathParameters: nil, body: "")
+        let request = Request(body: "")
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -57,7 +57,7 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     func test_whenHandleUpdateNonExistingItem_statusIsForbidden() throws {
         // Given
-        let request = Request(pathParameters: nil, body: SeriesMock.requestBody)
+        let request = Request(body: SeriesFactory.requestBody)
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
@@ -69,9 +69,9 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     func test_whenHandleUpdate_statusIsOk() throws {
         // Given
-        let series = SeriesMock.makeSeries(title: "Old Name")
+        let series = SeriesFactory.make(title: "Old Name")
         try createSeries(series)
-        let request = Request(pathParameters: nil, body: SeriesMock.requestBody)
+        let request = Request(body: SeriesFactory.requestBody)
 
         // When
         let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)

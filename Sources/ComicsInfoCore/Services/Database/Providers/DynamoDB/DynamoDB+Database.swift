@@ -10,7 +10,7 @@ import AsyncHTTPClient
 import Foundation
 import SotoDynamoDB
 
-extension DynamoDB: Database {
+extension DynamoDB: DatabaseGet {
 
     static var logger = AWSClient.loggingDisabled
 
@@ -47,6 +47,7 @@ extension DynamoDB {
     }
     
     public func getItems<Item: ComicInfoItem>(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Item]> {
+        DynamoDB.logger.log(level: .info, "GetItems withIDs: \(IDs)")
         var futures = [EventLoopFuture<Item>]()
         
         for id in IDs {
@@ -98,20 +99,12 @@ extension DynamoDB {
     }
     
     public func getSummaries<Summary: ItemSummary>(
-        _ itemName: String,
-        forID ID: String,
-        from table: String
+        with criteria: GetSummariesDatabaseCriteria
     ) -> EventLoopFuture<[Summary]?> {
-        let input = QueryInput(
-            expressionAttributeValues: [":itemName": .s(itemName), ":summaryID": .s(ID)],
-            indexName: "itemName-summaryID-index",
-            keyConditionExpression: "itemName = :itemName AND summaryID = :summaryID",
-            tableName: table
-        )
+        let input = criteria.queryInput
 
         DynamoDB.logger.log(level: .info, "GetSummaries input:\(input)")
-        return query(input, type: Summary.self)
-            .flatMapThrowing {
+        return query(input, type: Summary.self).flatMapThrowing {
                 DynamoDB.logger.log(level: .info, "GetSummaries output: \($0)")
                 guard let items = $0.items, !items.isEmpty else {
                     return nil

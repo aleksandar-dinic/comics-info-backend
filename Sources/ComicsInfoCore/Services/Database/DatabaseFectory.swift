@@ -23,7 +23,7 @@ public struct DatabaseFectory {
         eventLoop: EventLoop,
         logger: Logger,
         items: [String: Data] = [:]
-    ) -> Database {
+    ) -> DatabaseGet {
         guard !isLocalServer else {
             return DatabaseMock(eventLoop: eventLoop, logger: logger, items: items)
         }

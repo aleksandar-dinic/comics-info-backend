@@ -15,7 +15,7 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
     private typealias Cache = InMemoryCacheProvider<Character>
 
     private var eventLoop: EventLoop!
-    private var sut: CharacterListResponseWrapper<CharacterRepositoryAPIWrapper, Cache>!
+    private var sut: CharacterListResponseWrapper<GetDatabaseProvider, Cache>!
     private var environment: String!
 
     override func setUpWithError() throws {
@@ -46,7 +46,7 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
 
     func test_whenHandleList_statusIsOk() throws {
         // Given
-        try createCharacter(CharacterMock.makeCharacter())
+        try createCharacter(CharacterFactory.make())
 
         // When
         let feature = sut.handleList(on: eventLoop, environment: environment)

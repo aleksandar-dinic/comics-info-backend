@@ -11,7 +11,7 @@ import Foundation
 import Logging
 import NIO
 
-struct CharacterUseCaseFactoryMock: UseCaseFactory {
+struct CharacterUseCaseFactoryMock: GetUseCaseFactory {
 
     let items: [String: Data]
     var eventLoop: EventLoop
@@ -28,27 +28,27 @@ struct CharacterUseCaseFactoryMock: UseCaseFactory {
         cacheProvider = InMemoryCacheProvider<Character>()
     }
 
-    func makeUseCase() -> CharacterUseCase<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
+    func makeUseCase() -> CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>> {
         CharacterUseCase(repository: makeCharacterRepository())
     }
 
-    private func makeCharacterRepository() -> Repository<CharacterRepositoryAPIWrapper, InMemoryCacheProvider<Character>> {
-        RepositoryFactory(
+    private func makeCharacterRepository() -> GetRepository<Character, InMemoryCacheProvider<Character>> {
+        ComicsInfoCore.GetRepositoryFactory(
             eventLoop: eventLoop,
-            repositoryAPIWrapper: makeRepositoryAPIWrapper(),
+            itemGetDBWrapper: makeItemGetDBWrapper(),
             cacheProvider: cacheProvider
         ).makeRepository()
     }
-
-    private func makeRepositoryAPIWrapper() -> CharacterRepositoryAPIWrapper {
-        CharacterRepositoryAPIWrapper(repositoryAPIService: makeRepositoryAPIService())
+    
+    private func makeItemGetDBWrapper() -> ItemGetDBWrapper<Character> {
+        ItemGetDBWrapper(itemGetDBService: makeItemGetDBService())
     }
     
-    func makeRepositoryAPIService() -> RepositoryAPIService {
-        DatabaseProvider(database: makeDatabase())
+    func makeItemGetDBService() -> ItemGetDBService {
+        GetDatabaseProvider(database: makeDatabase())
     }
 
-    private func makeDatabase() -> Database {
+    private func makeDatabase() -> DatabaseGet {
         DatabaseFectory(isLocalServer: isLocalServer)
             .makeDatabase(eventLoop: eventLoop, logger: logger, items: items)
     }

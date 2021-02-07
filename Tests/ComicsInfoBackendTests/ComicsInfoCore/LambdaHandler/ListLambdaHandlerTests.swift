@@ -20,7 +20,7 @@ final class ListLambdaHandlerTests: XCTestCase, LambdaMockFactory {
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        request = Request(pathParameters: nil, body: nil)
+        request = Request()
         logger = Logger(label: self.className)
         DatabaseMock.removeAll()
     }
@@ -33,7 +33,7 @@ final class ListLambdaHandlerTests: XCTestCase, LambdaMockFactory {
 
     func test_whenHandle_responseStatusIsOK() throws {
         // Given
-        let items = CharacterMock.makeDatabaseItems()
+        let items = CharacterFactory.makeDatabaseItems()
         let useCase = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
         let listResponseWrapper = CharacterListResponseWrapper(characterUseCase: useCase)
         let sut = ListLambdaHandler(

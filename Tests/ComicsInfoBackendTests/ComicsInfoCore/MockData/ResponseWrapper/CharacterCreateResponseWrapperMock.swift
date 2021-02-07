@@ -12,11 +12,9 @@ import NIO
 
 enum CharacterCreateResponseWrapperMock {
 
-    typealias UseCase = CharacterCreateUseCase<CharacterCreateRepositoryAPIWrapper>
+    typealias UseCase = CharacterCreateUseCase
 
-    static func make(
-        on eventLoop: EventLoop
-    ) -> CharacterCreateResponseWrapper<CharacterCreateRepositoryAPIWrapper> {
+    static func make(on eventLoop: EventLoop) -> CharacterCreateResponseWrapper {
         CharacterCreateResponseWrapper(useCase: CharacterCreateUseCaseFactoryMock(on: eventLoop).makeUseCase())
     }
 

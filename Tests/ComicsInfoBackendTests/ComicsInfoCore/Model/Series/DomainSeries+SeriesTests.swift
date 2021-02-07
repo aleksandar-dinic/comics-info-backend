@@ -16,7 +16,7 @@ final class DomainSeries_SeriesTests: XCTestCase {
     private var sut: Domain.Series!
 
     override func setUpWithError() throws {
-        givenSeries = SeriesMock.series
+        givenSeries = SeriesFactory.make()
         sut = Domain.Series(from: givenSeries)
     }
 

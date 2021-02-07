@@ -15,7 +15,7 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
 
     private var eventLoop: EventLoop!
     private var logger: Logger!
-    private var sut: CharacterCreateUseCase<CharacterCreateRepositoryAPIWrapper>!
+    private var sut: CharacterCreateUseCase!
     private var table: String!
 
     override func setUpWithError() throws {
@@ -38,7 +38,7 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
         // Given
 
         // When
-        let feature = sut.create(CharacterMock.makeCharacter(), on: eventLoop, in: table)
+        let feature = sut.create(CharacterFactory.make(), on: eventLoop, in: table)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -50,14 +50,14 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
         var thrownError: Error?
 
         // When
-        let feature = sut.create(CharacterMock.makeCharacter(seriesID: seriesID), on: eventLoop, in: table)
+        let feature = sut.create(CharacterFactory.make(seriesID: seriesID), on: eventLoop, in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound(let itemIDs, let itemType) = error as? APIError {
+        if case .itemsNotFound(let itemIDs, let itemType) = error as? ComicInfoError {
             XCTAssertEqual(itemIDs, ["-1"])
             XCTAssertTrue(itemType == Series.self)
         } else {
@@ -71,14 +71,14 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
         var thrownError: Error?
 
         // When
-        let feature = sut.create(CharacterMock.makeCharacter(comicsID: comicsID), on: eventLoop, in: table)
+        let feature = sut.create(CharacterFactory.make(comicsID: comicsID), on: eventLoop, in: table)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound(let itemIDs, let itemType) = error as? APIError {
+        if case .itemsNotFound(let itemIDs, let itemType) = error as? ComicInfoError {
             XCTAssertEqual(itemIDs, ["-1"])
             XCTAssertTrue(itemType == Comic.self)
         } else {
@@ -88,30 +88,34 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
 
     func test_whenCrateCharacterWithSeriesIDAndComicsID_characterAndCharacterSummariesAreCreated() throws {
         // Given
-        let series = SeriesMock.makeSeries(id: "1")
+        let series = SeriesFactory.make(id: "SeriesID")
         try createSeries(series)
-        let comic = ComicMock.makeComic(id: "1")
+        let comic = ComicFactory.make(id: "ComicID")
         try createComic(comic)
 
         // When
         let feature = sut.create(
-            CharacterMock.makeCharacter(seriesID: [series.id], comicsID: [comic.id]),
+            CharacterFactory.make(
+                id: "CharacterID",
+                seriesID: [series.id],
+                comicsID: [comic.id]
+            ),
             on: eventLoop,
             in: table
         )
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        XCTAssertNotNil(DatabaseMock.items["Character#1"])
-        XCTAssertNotNil(DatabaseMock.items["Series#1|Character#1"])
-        XCTAssertNotNil(DatabaseMock.items["Comic#1|Character#1"])
+        XCTAssertNotNil(DatabaseMock.items["Character#CharacterID"])
+        XCTAssertNotNil(DatabaseMock.items["Series#SeriesID|Character#CharacterID"])
+        XCTAssertNotNil(DatabaseMock.items["Comic#ComicID|Character#CharacterID"])
     }
 
     func test_whenCrateCharacterWithOneNotExistingSeriesID_throwsItemsNotFound() throws {
         // Given
-        let series = SeriesMock.makeSeries(id: "1")
+        let series = SeriesFactory.make(id: "1")
         try createSeries(series)
-        let character = CharacterMock.makeCharacter(seriesID: [series.id, "-1"])
+        let character = CharacterFactory.make(seriesID: [series.id, "-1"])
         var thrownError: Error?
 
         // When
@@ -122,7 +126,7 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound(let itemID, let itemType) = error as? APIError {
+        if case .itemsNotFound(let itemID, let itemType) = error as? ComicInfoError {
             XCTAssertEqual(itemID, ["-1"])
             XCTAssertTrue(itemType == Series.self)
         } else {
@@ -132,9 +136,9 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
 
     func test_whenCrateCharacterWithOneNotExistingComicID_throwsItemsNotFound() throws {
         // Given
-        let comic = ComicMock.makeComic(id: "1")
+        let comic = ComicFactory.make(id: "1")
         try createComic(comic)
-        let character = CharacterMock.makeCharacter(comicsID: [comic.id, "-1"])
+        let character = CharacterFactory.make(comicsID: [comic.id, "-1"])
         var thrownError: Error?
 
         // When
@@ -145,7 +149,7 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
 
         // Then
         let error = try XCTUnwrap(thrownError)
-        if case .itemsNotFound(let itemID, let itemType) = error as? APIError {
+        if case .itemsNotFound(let itemID, let itemType) = error as? ComicInfoError {
             XCTAssertEqual(itemID, ["-1"])
             XCTAssertTrue(itemType == Comic.self)
         } else {
