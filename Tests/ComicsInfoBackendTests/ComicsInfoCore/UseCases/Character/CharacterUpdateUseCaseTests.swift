@@ -157,5 +157,96 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
             XCTFail("CharacterSummary<Series> with ID: Character#CharacterID|Series#SeriesID doesn't exist")
         }
     }
+    
+    func test_whenUpdateCharacterWithoutRealName_realNameDidntChange() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let character = CharacterFactory.make(
+            id: "CharacterID",
+            realName: "Character Real Name",
+            seriesID: [series.id]
+        )
+        try createCharacter(character)
+
+        // When
+        let newCharacter = CharacterFactory.make(
+            id: "CharacterID",
+            realName: nil
+        )
+        let feature = sut.update(newCharacter, on: eventLoop, in: table)
+
+        // Then
+        XCTAssertNoThrow(try feature.wait())
+        if let data = DatabaseMock.items["Character#CharacterID"],
+           let characterSummary = try? JSONDecoder().decode(Character.self, from: data) {
+            XCTAssertEqual(characterSummary.realName, character.realName)
+        } else {
+            XCTFail("Character with ID: CharacterID doesn't exist")
+        }
+    }
+    
+    func test_whenUpdateCharacterRealName_realNameIsUpdated() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let character = CharacterFactory.make(id: "CharacterID", seriesID: [series.id])
+        try createCharacter(character)
+
+        // When
+        let newCharacter = CharacterFactory.make(id: "CharacterID", realName: "Real Name")
+        let feature = sut.update(newCharacter, on: eventLoop, in: table)
+
+        // Then
+        XCTAssertNoThrow(try feature.wait())
+        if let data = DatabaseMock.items["Character#CharacterID"],
+           let characterSummary = try? JSONDecoder().decode(Character.self, from: data) {
+            XCTAssertEqual(characterSummary.realName, newCharacter.realName)
+        } else {
+            XCTFail("Character with ID: CharacterID doesn't exist")
+        }
+    }
+    
+    func test_whenUpdateSummaryFields_summariesIsUpdated() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let character = CharacterFactory.make(id: "CharacterID", name: "Old Name", seriesID: [series.id])
+        try createCharacter(character)
+
+        // When
+        let newCharacter = CharacterFactory.make(id: "CharacterID", name: "New Name")
+        let feature = sut.update(newCharacter, on: eventLoop, in: table)
+
+        // Then
+        XCTAssertNoThrow(try feature.wait())
+        if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary<Series>.self, from: data) {
+            XCTAssertNotEqual(characterSummary.dateAdded, characterSummary.dateLastUpdated)
+        } else {
+            XCTFail("CharacterSummary<Series> with ID: Character#CharacterID|Series#SeriesID doesn't exist")
+        }
+    }
+    
+    func test_whenUpdateWithoutSummaryFields_summariesIsnotUpdated() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let character = CharacterFactory.make(id: "CharacterID", seriesID: [series.id])
+        try createCharacter(character)
+
+        // When
+        let newCharacter = CharacterFactory.make(id: "CharacterID", realName: "Real Name")
+        let feature = sut.update(newCharacter, on: eventLoop, in: table)
+
+        // Then
+        XCTAssertNoThrow(try feature.wait())
+        if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary<Series>.self, from: data) {
+            XCTAssertEqual(characterSummary.dateAdded, characterSummary.dateLastUpdated)
+        } else {
+            XCTFail("CharacterSummary<Series> with ID: Character#CharacterID|Series#SeriesID doesn't exist")
+        }
+    }
 
 }

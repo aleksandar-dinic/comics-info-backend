@@ -16,10 +16,21 @@ struct SummaryMapperMock: SummaryMapper {
     let summaryID: String
     let itemName: String
     
-    let popularity: Int
-    let name: String
-    let thumbnail: String?
-    let description: String?
+    private(set) var popularity: Int
+    private(set) var name: String
+    private(set) var thumbnail: String?
+    private(set) var description: String?
+    
+    mutating func update(with newItem: SummaryMapperMock) {
+        popularity = newItem.popularity
+        name = newItem.name
+        if let thumbnail = newItem.thumbnail {
+            self.thumbnail = thumbnail
+        }
+        if let description = newItem.description {
+            self.description = description
+        }
+    }
     
     static func make(
         id: String = "1",

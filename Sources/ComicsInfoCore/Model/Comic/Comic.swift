@@ -14,56 +14,56 @@ public struct Comic: SummaryMapper {
     public let id: String
 
     /// The value of comic popularity.
-    public let popularity: Int
+    public private(set) var popularity: Int
 
     /// The canonical title of the comic.
-    let title: String
+    private(set) var title: String
     
     /// Date the comic was added to Comic Info.
     let dateAdded: Date
     
     /// Date the comic was last updated on Comic Info.
-    let dateLastUpdated: Date
+    private(set) var dateLastUpdated: Date
 
     /// The representative image for this comics.
-    public let thumbnail: String?
+    public private(set) var thumbnail: String?
 
     /// The preferred description of the comic.
-    public let description: String?
+    public private(set) var description: String?
 
     /// The number of the comic in the series.
-    let number: String?
+    private(set) var number: String?
     
     /// List of aliases the comic is known by.
-    let aliases: [String]?
+    private(set) var aliases: [String]?
 
     /// If the comic is a variant (e.g. an alternate cover, second printing, or director’s cut),
     /// a text description of the variant.
-    let variantDescription: String?
+    private(set) var variantDescription: String?
 
     /// The publication format of the comic e.g. comic, hardcover, trade paperback.
-    let format: String?
+    private(set) var format: String?
 
     /// The Int of story pages in the comic.
-    let pageCount: Int?
+    private(set) var pageCount: Int?
 
     /// A list of variant comics ID for this comic (includes the "original" comic if the current
     /// comic is a variant).
-    let variantsIdentifier: [String]?
+    private(set) var variantsIdentifier: [String]?
 
     /// A list of collections ID which include this comic (will generally be nil if the comic's
     /// format is a collection).
-    let collectionsIdentifier: [String]?
+    private(set) var collectionsIdentifier: [String]?
 
     /// A list of comics ID collected in this comic (will generally be nil for periodical formats
     /// such as "comic" or "magazine").
-    let collectedIdentifiers: [String]?
+    private(set) var collectedIdentifiers: [String]?
 
     /// A list of promotional images associated with this comic.
-    let images: [String]?
+    private(set) var images: [String]?
 
     /// The date of publication for this comic.
-    let published: Date?
+    private(set) var published: Date?
 
     /// A resource list containing charactersID which appear in this comic.
     var charactersID: Set<String>?
@@ -85,6 +85,54 @@ public struct Comic: SummaryMapper {
     
     public var name: String {
         title
+    }
+    
+}
+
+extension Comic {
+    
+    public mutating func update(with newItem: Comic) {
+        popularity = newItem.popularity
+        title = newItem.title
+        dateLastUpdated = Date()
+        
+        if let thumbnail = newItem.thumbnail {
+            self.thumbnail = thumbnail
+        }
+        if let description = newItem.description {
+            self.description = description
+        }
+        if let number = newItem.number {
+            self.number = number
+        }
+        
+        aliases = update(aliases, with: newItem.aliases)
+        
+        if let variantDescription = newItem.variantDescription {
+            self.variantDescription = variantDescription
+        }
+        if let format = newItem.format {
+            self.format = format
+        }
+        if let pageCount = newItem.pageCount {
+            self.pageCount = pageCount
+        }
+
+        variantsIdentifier = update(variantsIdentifier, with: newItem.variantsIdentifier)
+        collectionsIdentifier = update(collectionsIdentifier, with: newItem.collectionsIdentifier)
+        collectedIdentifiers = update(collectedIdentifiers, with: newItem.collectedIdentifiers)
+        images = update(images, with: newItem.images)
+
+        if let published = newItem.published {
+            self.published = published
+        }
+
+        charactersID = newItem.charactersID
+        characters = newItem.characters
+        comicSummaryForCharacters = newItem.comicSummaryForCharacters
+        seriesID = newItem.seriesID
+        series = newItem.series
+        comicSummaryForSeries = newItem.comicSummaryForSeries
     }
     
 }

@@ -37,7 +37,7 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         // Given
 
         // When
-        let feature = sut.handleList(on: eventLoop, environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -49,7 +49,7 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         try createCharacter(CharacterFactory.make())
 
         // When
-        let feature = sut.handleList(on: eventLoop, environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
         let response = try feature.wait()
 
         // Then

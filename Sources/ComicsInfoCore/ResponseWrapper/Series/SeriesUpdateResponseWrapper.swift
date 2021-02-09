@@ -25,7 +25,7 @@ public struct SeriesUpdateResponseWrapper: UpdateResponseWrapper {
     ) -> EventLoopFuture<Response> {
         guard let data = request.body?.data(using: .utf8) else {
             let response = Response(statusCode: .badRequest)
-            return eventLoop.makeSucceededFuture(response)
+            return eventLoop.submit { response }
         }
 
         let table = String.tableName(for: environment)
@@ -37,7 +37,7 @@ public struct SeriesUpdateResponseWrapper: UpdateResponseWrapper {
 
         } catch {
             let response = Response(with: ResponseStatus(error.localizedDescription), statusCode: .badRequest)
-            return eventLoop.makeSucceededFuture(response)
+            return eventLoop.submit { response }
         }
     }
 

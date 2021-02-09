@@ -12,40 +12,44 @@ import Foundation
 extension Character {
     
     init(from character: Domain.Character) {
-        id = character.identifier
-        popularity = character.popularity
-        name = character.name
-        dateAdded = Date()
-        dateLastUpdated = Date()
-        thumbnail = character.thumbnail
-        description = character.description
-        realName = character.realName
-        aliases = character.aliases
-        birth = character.birth
-        if let seriesID = character.series?.map({ $0.identifier }), !seriesID.isEmpty {
-            self.seriesID = Set(seriesID)
-        } else {
-            self.seriesID = nil
+        var seriesID: Set<String>?
+        if let IDs = character.series?.map({ $0.identifier }), !IDs.isEmpty {
+            seriesID = Set(IDs)
         }
+        var seriesSummary: [SeriesSummary<Character>]?
         if let series = character.series?.map({ SeriesSummary<Character>(from: $0, id: character.identifier) }), !series.isEmpty {
-            self.series = series
-        } else {
-            self.series = nil
+            seriesSummary = series
         }
-        if let comicsID = character.comics?.map({ $0.identifier }), !comicsID.isEmpty {
-            self.comicsID = Set(comicsID)
-        } else {
-            self.comicsID = nil
+        var comicsID: Set<String>?
+        if let IDs = character.comics?.map({ $0.identifier }), !IDs.isEmpty {
+            comicsID = Set(IDs)
         }
+        var comicSummary: [ComicSummary<Character>]?
         if let comics = character.comics?.map({ ComicSummary<Character>(from: $0, id: character.identifier, number: nil) }), !comics.isEmpty {
-            self.comics = comics
-        } else {
-            self.comics = nil
+            comicSummary = comics
         }
-
-        itemName = String.getType(from: Character.self)
-        itemID = "\(itemName)#\(id)"
-        summaryID = "\(itemName)#\(id)"
+                
+        self.init(
+            id: character.identifier,
+            popularity: character.popularity,
+            name: character.name,
+            dateAdded: Date(),
+            dateLastUpdated: Date(),
+            thumbnail: character.thumbnail,
+            description: character.description,
+            realName: character.realName,
+            aliases: character.aliases,
+            birth: character.birth,
+            seriesID: seriesID,
+            series: seriesSummary,
+            characterSummaryForSeries: nil,
+            comicsID: comicsID,
+            comics: comicSummary,
+            characterSummaryForComics: nil,
+            itemID: "\(String.getType(from: Character.self))#\(character.identifier)",
+            summaryID: "\(String.getType(from: Character.self))#\(character.identifier)",
+            itemName: .getType(from: Character.self)
+        )
     }
     
 }

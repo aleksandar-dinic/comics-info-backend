@@ -25,7 +25,7 @@ public struct SeriesReadResponseWrapper<DBService: ItemGetDBService, CacheProvid
     ) -> EventLoopFuture<Response> {
         guard let id = request.pathParameters?["id"] else {
             let response = Response(statusCode: .badRequest)
-            return eventLoop.makeSucceededFuture(response)
+            return eventLoop.submit { response }
         }
         
         let fields = getFields(from: request.queryParameters)

@@ -37,7 +37,7 @@ final class ComicListResponseWrapperTests: XCTestCase {
         sut = ComicListResponseWrapper(comicUseCase: useCase)
 
         // When
-        let feature = sut.handleList(on: eventLoop, environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
         let response = try feature.wait()
 
         // Then
@@ -51,7 +51,7 @@ final class ComicListResponseWrapperTests: XCTestCase {
         sut = ComicListResponseWrapper(comicUseCase: useCase)
 
         // When
-        let feature = sut.handleList(on: eventLoop, environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
         let response = try feature.wait()
 
         // Then

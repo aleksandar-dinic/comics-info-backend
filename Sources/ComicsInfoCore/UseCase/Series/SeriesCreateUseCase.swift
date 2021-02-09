@@ -53,7 +53,7 @@ public final class SeriesCreateUseCase: CreateUseCase, CreateSummaryFactory, Cha
             .and(createSummaries(item.characters, on: eventLoop, in: table))
             .and(createSummaries(item.seriesSummaryForComics, on: eventLoop, in: table))
             .and(createSummaries(item.comics, on: eventLoop, in: table))
-            .flatMap { _ in eventLoop.makeSucceededFuture(()) }
+            .map { _ in }
     }
 
 }

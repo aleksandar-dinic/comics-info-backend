@@ -14,34 +14,34 @@ public struct Series: SummaryMapper {
     public let id: String
 
     /// The value of Series popularity
-    public let popularity: Int
+    public private(set) var popularity: Int
 
     /// The canonical title of the series.
-    let title: String
+    private(set) var title: String
     
     /// Date the series was added to Comic Info.
     let dateAdded: Date
     
     /// Date the series was last updated on Comic Info.
-    let dateLastUpdated: Date
+    private(set) var dateLastUpdated: Date
 
     /// The representative image for this series.
-    public let thumbnail: String?
+    public private(set) var thumbnail: String?
 
     /// A description of the series.
-    public let description: String?
+    public private(set) var description: String?
 
     /// The first year of publication for the series.
-    let startYear: Int?
+    private(set) var startYear: Int?
 
     /// The last year of publication for the series (conventionally, nil for ongoing series) .
-    let endYear: Int?
+    private(set) var endYear: Int?
     
     /// List of aliases the series is known by.
-    let aliases: [String]?
+    private(set) var aliases: [String]?
 
     /// ID of the series which follows this series.
-    let nextIdentifier: String?
+    private(set) var nextIdentifier: String?
 
     /// A resource list containing charactersID which appear in comics in this series.
     var charactersID: Set<String>?
@@ -63,6 +63,41 @@ public struct Series: SummaryMapper {
     
     public var name: String {
         title
+    }
+    
+}
+
+extension Series {
+    
+    public mutating func update(with newItem: Series) {
+        popularity = newItem.popularity
+        title = newItem.title
+        dateLastUpdated = Date()
+        
+        if let thumbnail = newItem.thumbnail {
+            self.thumbnail = thumbnail
+        }
+        if let description = newItem.description {
+            self.description = description
+        }
+        if let startYear = newItem.startYear {
+            self.startYear = startYear
+        }
+        if let endYear = newItem.endYear {
+            self.endYear = endYear
+        }
+
+        aliases = update(aliases, with: newItem.aliases)
+
+        if let nextIdentifier = newItem.nextIdentifier {
+            self.nextIdentifier = nextIdentifier
+        }
+        charactersID = newItem.comicsID
+        characters = newItem.characters
+        seriesSummaryForCharacters = newItem.seriesSummaryForCharacters
+        comicsID = newItem.comicsID
+        comics = newItem.comics
+        seriesSummaryForComics = newItem.seriesSummaryForComics
     }
     
 }

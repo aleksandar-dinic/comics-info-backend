@@ -27,11 +27,11 @@ extension CreateUseCase {
     public func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
         appendItemSummary(on: item, on: eventLoop, from: table)
             .flatMap { createItemAndSummaries($0, on: eventLoop, in: table) }
+            .hop(to: eventLoop)
     }
 
     private func createItemAndSummaries(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
         repository.create(item, in: table)
-            .hop(to: eventLoop)
             .flatMap { createSummaries(for: item, on: eventLoop, in: table) }
     }
 

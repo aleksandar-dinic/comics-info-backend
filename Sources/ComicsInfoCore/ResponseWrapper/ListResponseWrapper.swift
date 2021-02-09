@@ -11,6 +11,22 @@ import NIO
 
 public protocol ListResponseWrapper: ErrorResponseWrapper {
 
-    func handleList(on eventLoop: EventLoop, environment: String?) -> EventLoopFuture<Response>
+    func handleList(
+        on eventLoop: EventLoop,
+        request: Request,
+        environment: String?
+    ) -> EventLoopFuture<Response>
 
+}
+
+extension ListResponseWrapper {
+    
+    func getFields(from queryParams: [String: String]?) -> Set<String>? {
+        guard let fields = queryParams?["fields"]?.split(separator: ",").compactMap({ String($0) }) else {
+            return nil
+        }
+        
+        return Set(fields)
+    }
+    
 }

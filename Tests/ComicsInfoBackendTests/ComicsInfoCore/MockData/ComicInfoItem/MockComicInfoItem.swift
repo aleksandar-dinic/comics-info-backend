@@ -16,8 +16,19 @@ struct MockComicInfoItem: ComicInfoItem {
     let summaryID: String
     let itemName: String
     
-    let popularity: Int
-    let name: String
+    private(set) var popularity: Int
+    private(set) var name: String
+    
+    private(set) var dummyField: String?
+    
+    mutating func update(with newItem: MockComicInfoItem) {
+        popularity = newItem.popularity
+        name = newItem.name
+        
+        if let dummyField = newItem.dummyField {
+            self.dummyField = dummyField
+        }
+    }
     
 }
 
@@ -39,7 +50,8 @@ enum MockComicInfoItemFactory {
         summaryID: String = "MockComicInfoItem#1",
         itemName: String = "MockComicInfoItem",
         popularity: Int = 0,
-        name: String = "MockComicInfoItem name"
+        name: String = "MockComicInfoItem name 1",
+        dummyField: String? = nil
     ) -> MockComicInfoItem {
         MockComicInfoItem(
             id: id,
@@ -47,7 +59,8 @@ enum MockComicInfoItemFactory {
             summaryID: summaryID,
             itemName: itemName,
             popularity: popularity,
-            name: name
+            name: name,
+            dummyField: dummyField
         )
     }
     

@@ -14,31 +14,31 @@ public struct Character: SummaryMapper {
     public let id: String
 
     /// The value of character popularity
-    public let popularity: Int
+    public private(set) var popularity: Int
 
     /// The name of the character.
-    public let name: String
+    public private(set) var name: String
     
     /// Date the character was added to Comic Info.
     let dateAdded: Date
     
     /// Date the character was last updated on Comic Info.
-    let dateLastUpdated: Date
+    private(set) var dateLastUpdated: Date
 
     /// The representative image for this character.
-    public let thumbnail: String?
+    public private(set) var thumbnail: String?
 
     ///  A short bio or description of the character
-    public let description: String?
+    public private(set) var description: String?
     
     /// Real name of the character.
-    let realName: String?
+    private(set) var realName: String?
     
     /// List of aliases the character is known by.
-    let aliases: [String]?
+    private(set) var aliases: [String]?
     
     /// A date, that the character was born on. Not an origin date.
-    let birth: Date?
+    private(set) var birth: Date?
 
     /// A resource list of seriesID in which this character appears.
     var seriesID: Set<String>?
@@ -58,6 +58,36 @@ public struct Character: SummaryMapper {
     public let summaryID: String
     public let itemName: String
     
+}
+
+extension Character {
+    
+    public mutating func update(with newItem: Character) {
+        popularity = newItem.popularity
+        name = newItem.name
+        dateLastUpdated = Date()
+        if let thumbnail = newItem.thumbnail {
+            self.thumbnail = thumbnail
+        }
+        if let description = newItem.description {
+            self.description = description
+        }
+        if let realName = newItem.realName {
+            self.realName = realName
+        }
+        aliases = update(aliases, with: newItem.aliases)
+        
+        if let birth = newItem.birth {
+            self.birth = birth
+        }
+        seriesID = newItem.seriesID
+        series = newItem.series
+        characterSummaryForSeries = newItem.characterSummaryForSeries
+        comicsID = newItem.comicsID
+        comics = newItem.comics
+        characterSummaryForComics = newItem.characterSummaryForComics
+    }
+
 }
 
 extension Character {

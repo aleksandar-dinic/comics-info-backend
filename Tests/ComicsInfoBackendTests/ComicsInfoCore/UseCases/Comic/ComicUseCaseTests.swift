@@ -226,7 +226,7 @@ final class ComicUseCaseTests: XCTestCase {
         sut = ComicUseCaseFactoryMock(items: givenItems).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(on: eventLoop, from: table, dataSource: .database)
+        let featureGet = sut.getAllItems(on: eventLoop, fields: nil, from: table, dataSource: .database)
         let items = try featureGet.wait()
 
         // Then

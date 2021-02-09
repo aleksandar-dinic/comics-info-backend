@@ -18,9 +18,15 @@ public struct SeriesListResponseWrapper<DBService: ItemGetDBService, CacheProvid
         self.seriesUseCase = seriesUseCase
     }
 
-    public func handleList(on eventLoop: EventLoop, environment: String?) -> EventLoopFuture<Response> {
+    public func handleList(
+        on eventLoop: EventLoop,
+        request: Request,
+        environment: String?
+    ) -> EventLoopFuture<Response> {
         let table = String.tableName(for: environment)
-        return seriesUseCase.getAllItems(on: eventLoop, from: table)
+        let fields = getFields(from: request.queryParameters)
+        
+        return seriesUseCase.getAllItems(on: eventLoop, fields: fields, from: table)
             .map { Response(with: $0.map { Domain.Series(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

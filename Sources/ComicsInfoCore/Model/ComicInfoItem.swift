@@ -14,35 +14,56 @@ public protocol ComicInfoItem: Identifiable, Codable where ID == String {
     var summaryID: String { get }
     var itemName: String { get }
     
+    mutating func update(with newItem: Self)
+    
 }
 
 extension ComicInfoItem {
     
+    func update(_ items: [String]?, with newItems: [String]?) -> [String]? {
+        var tmp = Set(items ?? [])
+        for item in newItems ?? [] {
+            tmp.insert(item)
+        }
+        return !tmp.isEmpty ? Array(tmp).sorted() : nil
+    }
+    
     func updatedFields(old: Any) -> Set<String> {
-        let newMirror = Mirror(reflecting: self)
+        let oldMirror = Mirror(reflecting: old)
 
-        var newDict = [String: Any]()
-        for child in newMirror.children {
+        var oldDict = [String: Any]()
+        for child in oldMirror.children {
             guard let label = child.label else { continue }
-            newDict[label] = child.value
+            oldDict[label] = child.value
         }
         
-        let oldMirror = Mirror(reflecting: old)
+        let newMirror = Mirror(reflecting: self)
         var updated = Set<String>()
         
-        for child in oldMirror.children {
-            guard let label = child.label, let oldVal = newDict[label] else { continue }
+        for new in newMirror.children {
+            guard let label = new.label, let oldVal = oldDict[label] else { continue }
             guard
-                (isType(type: Int.self, lhs: oldVal, rhs: child.value) &&
-                !isEqual(type: Int.self, lhs: oldVal, rhs: child.value)) ||
+                (isType(type: Int.self, lhs: oldVal, rhs: new.value) &&
+                !isEqual(type: Int.self, lhs: oldVal, rhs: new.value)) ||
                     
-                (isType(type: String.self, lhs: oldVal, rhs: child.value) &&
-                !isEqual(type: String.self, lhs: oldVal, rhs: child.value))
+                (isType(type: String.self, lhs: oldVal, rhs: new.value) &&
+                !isEqual(type: String.self, lhs: oldVal, rhs: new.value)) ||
+            
+                (isNil(oldVal) && !isNil(new.value))
             else { continue }
             updated.insert(label)
         }
         
         return updated
+    }
+    
+    private func isNil(_ value: Any) -> Bool {
+        switch value {
+        case Optional<Any>.none:
+            return true
+        default:
+            return false
+        }
     }
     
     private func isType<T: Equatable>(type: T.Type, lhs: Any, rhs: Any) -> Bool {

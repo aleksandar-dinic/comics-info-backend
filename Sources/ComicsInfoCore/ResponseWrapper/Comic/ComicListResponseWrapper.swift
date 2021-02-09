@@ -18,9 +18,15 @@ public struct ComicListResponseWrapper<DBService: ItemGetDBService, CacheProvide
         self.comicUseCase = comicUseCase
     }
 
-    public func handleList(on eventLoop: EventLoop, environment: String?) -> EventLoopFuture<Response> {
+    public func handleList(
+        on eventLoop: EventLoop,
+        request: Request,
+        environment: String?
+    ) -> EventLoopFuture<Response> {
         let table = String.tableName(for: environment)
-        return comicUseCase.getAllItems(on: eventLoop, from: table)
+        let fields = getFields(from: request.queryParameters)
+        
+        return comicUseCase.getAllItems(on: eventLoop, fields: fields, from: table)
             .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

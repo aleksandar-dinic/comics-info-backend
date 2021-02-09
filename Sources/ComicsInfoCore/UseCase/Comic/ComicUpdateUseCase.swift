@@ -50,13 +50,17 @@ public final class ComicUpdateUseCase: UpdateUseCase, CharacterSummaryFactory, S
                 return item
             }
     }
+    
+    public func getItem(withID ID: String, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item> {
+        comicUseCase.getItem(on: eventLoop, withID: ID, fields: nil, from: table)
+    }
 
     public func updateSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
         updateSummaries(item.comicSummaryForCharacters, on: eventLoop, in: table)
             .and(updateSummaries(item.characters, on: eventLoop, in: table))
             .and(updateSummaries(item.comicSummaryForSeries, on: eventLoop, in: table))
             .and(updateSummaries(item.series, on: eventLoop, in: table))
-            .flatMap { _ in eventLoop.makeSucceededFuture(()) }
+            .map { _ in }
     }
     
 }
@@ -68,22 +72,22 @@ extension ComicUpdateUseCase {
         on eventLoop: EventLoop,
         fields: Set<String>,
         in table: String
-    ) -> EventLoopFuture<Void> {
-        guard item.shouldUpdateExistingSummaries(fields) else { return eventLoop.makeSucceededFuture(()) }
+    ) -> EventLoopFuture<Bool> {
+        guard item.shouldUpdateExistingSummaries(fields) else { return eventLoop.submit { false } }
         return updateCharacterSummaries(for: item, on: eventLoop, in: table)
             .and(updateSeriesSummaries(for: item, on: eventLoop, in: table))
-            .flatMap { _ in eventLoop.makeSucceededFuture(()) }
+            .map { _ in true }
     }
     
     private func updateCharacterSummaries(
         for item: Item,
         on eventLoop: EventLoop,
         in table: String
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<Bool> {
         let future: EventLoopFuture<[ComicSummary<Character>]?> = comicUseCase.getSummaries(on: eventLoop, forID: item.itemID, dataSource: .database, from: table, by: .itemID)
-        return future.flatMap { [weak self] summaries -> EventLoopFuture<Void> in
+        return future.flatMap { [weak self] summaries -> EventLoopFuture<Bool> in
                 guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
+                guard let summaries = summaries else { return eventLoop.submit { false } }
 
                 var updatedSummaries = [ComicSummary<Character>]()
                 for var summary in summaries {
@@ -91,6 +95,7 @@ extension ComicUpdateUseCase {
                     updatedSummaries.append(summary)
                 }
                 return self.updateSummaries(updatedSummaries, on: eventLoop, in: table)
+                    .map { true }
             }
     }
     
@@ -98,11 +103,11 @@ extension ComicUpdateUseCase {
         for item: Item,
         on eventLoop: EventLoop,
         in table: String
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<Bool> {
         let future: EventLoopFuture<[ComicSummary<Series>]?> = comicUseCase.getSummaries(on: eventLoop, forID: item.itemID, dataSource: .database, from: table, by: .itemID)
-        return future.flatMap { [weak self] summaries -> EventLoopFuture<Void> in
+        return future.flatMap { [weak self] summaries -> EventLoopFuture<Bool> in
                 guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
+                guard let summaries = summaries else { return eventLoop.submit { false } }
 
                 var updatedSummaries = [ComicSummary<Series>]()
                 for var summary in summaries {
@@ -110,6 +115,7 @@ extension ComicUpdateUseCase {
                     updatedSummaries.append(summary)
                 }
                 return self.updateSummaries(updatedSummaries, on: eventLoop, in: table)
+                    .map { true }
             }
     }
     

@@ -15,16 +15,20 @@ public protocol UpdateUseCase {
 
     var repository: UpdateRepository { get }
 
-    func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
-    
     func appendItemSummary(
         _ item: Item,
         on eventLoop: EventLoop,
         from table: String
     ) -> EventLoopFuture<Item>
     
+    func getItem(
+        withID ID: String,
+        on eventLoop: EventLoop,
+        from table: String
+    ) -> EventLoopFuture<Item>
+    
     func updateSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
-    func updateExistingSummaries(for item: Item, on eventLoop: EventLoop, fields: Set<String>, in table: String) -> EventLoopFuture<Void>
+    func updateExistingSummaries(for item: Item, on eventLoop: EventLoop, fields: Set<String>, in table: String) -> EventLoopFuture<Bool>
 
 }
 
@@ -33,15 +37,22 @@ extension UpdateUseCase {
     public func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
         appendItemSummary(item, on: eventLoop, from: table)
             .flatMap { updateItem($0, on: eventLoop, in: table) }
+            .hop(to: eventLoop)
     }
     
-    func updateItem(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        repository.update(item, in: table)
-            .hop(to: eventLoop)
+    private func updateItem(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
+        getItem(withID: item.id, on: eventLoop, from: table)
+            .flatMap { oldItem in
+                let fields = item.updatedFields(old: oldItem)
+                guard !fields.isEmpty else { return eventLoop.submit { fields } }
+                var newItem = oldItem
+                newItem.update(with: item)
+                return repository.update(newItem, in: table)
+            }
             .flatMap { fields in
                 updateSummaries(for: item, on: eventLoop, in: table)
                     .and(updateExistingSummaries(for: item, on: eventLoop, fields: fields, in: table))
-                    .flatMap { _ in eventLoop.makeSucceededFuture(()) }
+                    .map { _ in }
             }
     }
     
@@ -50,9 +61,8 @@ extension UpdateUseCase {
         on eventLoop: EventLoop,
         in table: String
     ) -> EventLoopFuture<Void> {
-        guard let summaries = summaries else { return eventLoop.makeSucceededFuture(()) }
+        guard let summaries = summaries else { return eventLoop.submit { } }
         return repository.updateSummaries(summaries, in: table)
-            .hop(to: eventLoop)
     }
     
 }

@@ -12,41 +12,45 @@ import Foundation
 extension Series {
     
     init(from series: Domain.Series) {
-        id = series.identifier
-        popularity = series.popularity
-        title = series.title
-        dateAdded = Date()
-        dateLastUpdated = Date()
-        thumbnail = series.thumbnail
-        description = series.description
-        startYear = series.startYear
-        endYear = series.endYear
-        aliases = series.aliases
-        nextIdentifier = series.nextIdentifier
-        if let charactersID = series.characters?.map({ $0.identifier }), !charactersID.isEmpty {
-            self.charactersID = Set(charactersID)
-        } else {
-            self.charactersID = nil
+        var charactersID: Set<String>?
+        if let IDs = series.characters?.map({ $0.identifier }), !IDs.isEmpty {
+            charactersID = Set(IDs)
         }
+        var characterSummary: [CharacterSummary<Series>]?
         if let characters = series.characters?.map({ CharacterSummary<Series>(from: $0, id: series.identifier, count: nil) }), !characters.isEmpty {
-            self.characters = characters
-        } else {
-            self.characters = nil
+            characterSummary = characters
         }
-        if let comicsID = series.comics?.map({ $0.identifier }), !comicsID.isEmpty {
-            self.comicsID = Set(comicsID)
-        } else {
-            self.comicsID = nil
+        var comicsID: Set<String>?
+        if let IDs = series.comics?.map({ $0.identifier }), !IDs.isEmpty {
+            comicsID = Set(IDs)
         }
+        var comicSummary: [ComicSummary<Series>]?
         if let comics = series.comics?.map({ ComicSummary<Series>(from: $0, id: series.identifier, number: nil) }), !comics.isEmpty {
-            self.comics = comics
-        } else {
-            self.comics = nil
+            comicSummary = comics
         }
         
-        itemName = String.getType(from: Series.self)
-        itemID = "\(itemName)#\(id)"
-        summaryID = "\(itemName)#\(id)"
+        self.init(
+            id: series.identifier,
+            popularity: series.popularity,
+            title: series.title,
+            dateAdded: Date(),
+            dateLastUpdated: Date(),
+            thumbnail: series.thumbnail,
+            description: series.description,
+            startYear: series.startYear,
+            endYear: series.endYear,
+            aliases: series.aliases,
+            nextIdentifier: series.nextIdentifier,
+            charactersID: charactersID,
+            characters: characterSummary,
+            seriesSummaryForCharacters: nil,
+            comicsID: comicsID,
+            comics: comicSummary,
+            seriesSummaryForComics: nil,
+            itemID: "\(String.getType(from: Series.self))#\(series.identifier)",
+            summaryID: "\(String.getType(from: Series.self))#\(series.identifier)",
+            itemName: .getType(from: Series.self)
+        )
     }
     
 }

@@ -19,40 +19,33 @@ public final class ComicUseCase<DBService: ItemGetDBService, CacheService: Cache
     public init(repository: GetRepository<Comic, CacheService>) {
         self.repository = repository
     }
-    
-    public func getItem(
+
+    public func appendSummaries(
+        for item: Item,
         on eventLoop: EventLoop,
-        withID ID: String,
-        fields: Set<String>?,
-        from table: String,
-        dataSource: DataSourceLayer = .memory
+        fields: Set<String>,
+        table: String
     ) -> EventLoopFuture<Item> {
-        do {
-            let fields = try handleFields(fields)
-            return repository.getItem(with: GetItemCriteria(itemID: ID, dataSource: dataSource, table: table))
-                .flatMap { [weak self] (item: Item) in
-                    guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                    return self.appendCharactersSummaries(fields: fields, item: item, withID: item.itemID, on: eventLoop, from: table)
-                }
-                .flatMap { [weak self] (item: Item) in
-                    guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                    return self.appendSeriesSummaries(fields: fields, item: item, withID: item.itemID, on: eventLoop, from: table)
-                }
-        } catch {
-            return eventLoop.makeFailedFuture(error)
-        }
+        appendCharactersSummaries(fields: fields, item: item, on: eventLoop, from: table)
+            .flatMap { [weak self] (item: Item) in
+                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                return self.appendSeriesSummaries(fields: fields, item: item, on: eventLoop, from: table)
+            }
     }
+    
+}
+
+extension ComicUseCase {
     
     private func appendCharactersSummaries(
         fields: Set<String>,
         item: Item,
-        withID ID: String,
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
         from table: String
     ) -> EventLoopFuture<Item> {
-        guard fields.contains("characters") else { return eventLoop.makeSucceededFuture(item) }
-        let future: EventLoopFuture<[CharacterSummary<Comic>]?> = getSummaries(on: eventLoop, forID: ID, dataSource: dataSource, from: table, by: .summaryID)
+        guard fields.contains("characters") else { return eventLoop.submit { item } }
+        let future: EventLoopFuture<[CharacterSummary<Comic>]?> = getSummaries(on: eventLoop, forID: item.itemID, dataSource: dataSource, from: table, by: .summaryID)
         return future.map {
                 var item = item
                 item.characters = $0
@@ -63,13 +56,12 @@ public final class ComicUseCase<DBService: ItemGetDBService, CacheService: Cache
     private func appendSeriesSummaries(
         fields: Set<String>,
         item: Item,
-        withID ID: String,
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
         from table: String
     ) -> EventLoopFuture<Item> {
-        guard fields.contains("series") else { return eventLoop.makeSucceededFuture(item) }
-        let future: EventLoopFuture<[SeriesSummary<Comic>]?> = getSummaries(on: eventLoop, forID: ID, dataSource: dataSource, from: table, by: .summaryID)
+        guard fields.contains("series") else { return eventLoop.submit { item } }
+        let future: EventLoopFuture<[SeriesSummary<Comic>]?> = getSummaries(on: eventLoop, forID: item.itemID, dataSource: dataSource, from: table, by: .summaryID)
         return future.map {
                 var item = item
                 item.series = $0
