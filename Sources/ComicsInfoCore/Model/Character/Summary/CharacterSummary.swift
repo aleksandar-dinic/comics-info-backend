@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct CharacterSummary<Item>: ItemSummary {
+struct CharacterSummary: ItemSummary {
     
     let itemID: String
     let summaryID: String

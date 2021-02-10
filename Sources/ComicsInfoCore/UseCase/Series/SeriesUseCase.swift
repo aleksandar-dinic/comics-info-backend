@@ -27,9 +27,12 @@ public final class SeriesUseCase<DBService: ItemGetDBService, CacheService: Cach
         table: String
     ) -> EventLoopFuture<Item> {
         appendCharactersSummaries(fields: fields, item: item, on: eventLoop, from: table)
-            .flatMap { [weak self] (item: Item) in
-                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                return self.appendComicsSummaries(fields: fields, item: item, on: eventLoop, from: table)
+            .and(appendComicsSummaries(fields: fields, item: item, on: eventLoop, from: table))
+            .map { charactersSummaries, comicsSummaries in
+                var item = item
+                item.characters = charactersSummaries
+                item.comics = comicsSummaries
+                return item
             }
     }
     
@@ -43,14 +46,9 @@ extension SeriesUseCase {
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
         from table: String
-    ) -> EventLoopFuture<Series> {
-        guard fields.contains("characters") else { return eventLoop.submit { item } }
-        let future: EventLoopFuture<[CharacterSummary<Series>]?> = getSummaries(on: eventLoop, forID: item.itemID, dataSource: dataSource, from: table, by: .summaryID)
-        return future.map {
-                var item = item
-                item.characters = $0
-                return item
-            }
+    ) -> EventLoopFuture<[CharacterSummary]?> {
+        guard fields.contains("characters") else { return eventLoop.submit { nil } }
+        return getSummaries(on: eventLoop, forID: item.itemID, dataSource: dataSource, from: table, by: .summaryID)
     }
     
     private func appendComicsSummaries(
@@ -59,14 +57,9 @@ extension SeriesUseCase {
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
         from table: String
-    ) -> EventLoopFuture<Series> {
-        guard fields.contains("comics") else { return eventLoop.submit { item } }
-        let future: EventLoopFuture<[ComicSummary<Series>]?> = getSummaries(on: eventLoop, forID: item.itemID, dataSource: dataSource, from: table, by: .summaryID)
-        return future.map {
-                var item = item
-                item.comics = $0
-                return item
-            }
+    ) -> EventLoopFuture<[ComicSummary]?> {
+        guard fields.contains("comics") else { return eventLoop.submit { nil } }
+        return getSummaries(on: eventLoop, forID: item.itemID, dataSource: dataSource, from: table, by: .summaryID)
     }
 
 }

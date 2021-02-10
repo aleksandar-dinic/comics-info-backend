@@ -11,16 +11,17 @@ import Foundation
 
 extension Domain.ItemSummary {
 
-    init<Item>(from item: ComicSummary<Item>) {
+    init(from item: ComicSummary) {
         self.init(
-            identifier: item.itemID.replacingOccurrences(of: "\(String.getType(from: Comic.self))#", with: ""),
+            identifier: item.itemID.getIDFromComicInfoID(for: Comic.self),
             popularity: item.popularity,
             name: item.name,
             thumbnail: item.thumbnail,
             description: item.description,
             count: nil,
             number: item.number,
-            roles: nil)
+            roles: nil
+        )
     }
 
 }

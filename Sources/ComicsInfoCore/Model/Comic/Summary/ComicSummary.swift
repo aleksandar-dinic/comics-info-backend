@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ComicSummary<Item>: ItemSummary {
+struct ComicSummary: ItemSummary {
     
     let itemID: String
     let summaryID: String
@@ -28,6 +28,7 @@ struct ComicSummary<Item>: ItemSummary {
         name = comic.name
         thumbnail = comic.thumbnail
         description = comic.description
+        number = comic.number
     }
     
 }

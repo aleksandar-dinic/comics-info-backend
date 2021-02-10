@@ -47,15 +47,15 @@ public struct Series: SummaryMapper {
     var charactersID: Set<String>?
 
     /// A resource list containing characters which appear in comics in this series.
-    var characters: [CharacterSummary<Series>]?
-    var seriesSummaryForCharacters: [SeriesSummary<Character>]?
+    var characters: [CharacterSummary]?
+    var seriesSummaryForCharacters: [SeriesSummary]?
 
     /// A resource list containing comicsID in this series.
     var comicsID: Set<String>?
 
     /// A resource list containing comics in this series.
-    var comics: [ComicSummary<Series>]?
-    var seriesSummaryForComics: [SeriesSummary<Comic>]?
+    var comics: [ComicSummary]?
+    var seriesSummaryForComics: [SeriesSummary]?
     
     public let itemID: String
     public let summaryID: String

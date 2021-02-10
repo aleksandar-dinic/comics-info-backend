@@ -20,7 +20,7 @@ final class CharacterSummaryTests: XCTestCase {
     func test_whenUpdate_dateLastUpdatedIsUpdated() throws {
         // Given
         let character = CharacterFactory.make()
-        var sut: CharacterSummary<Series> = CharacterSummaryFactory.make()
+        var sut = CharacterSummaryFactory.make()
         let oldDateLastUpdated = sut.dateLastUpdated
         
         // When
@@ -33,7 +33,7 @@ final class CharacterSummaryTests: XCTestCase {
     func test_whenUpdate_popularityIsUpdated() throws {
         // Given
         let character = CharacterFactory.make(popularity: 1)
-        var sut: CharacterSummary<Series> = CharacterSummaryFactory.make(popularity: 0)
+        var sut = CharacterSummaryFactory.make(popularity: 0)
         
         // When
         sut.update(with: character)
@@ -45,7 +45,7 @@ final class CharacterSummaryTests: XCTestCase {
     func test_whenUpdate_nameIsUpdated() throws {
         // Given
         let character = CharacterFactory.make(name: "New Name")
-        var sut: CharacterSummary<Series> = CharacterSummaryFactory.make(name: "Old Name")
+        var sut = CharacterSummaryFactory.make(name: "Old Name")
         
         // When
         sut.update(with: character)
@@ -57,7 +57,7 @@ final class CharacterSummaryTests: XCTestCase {
     func test_whenUpdate_thumbnailIsUpdated() throws {
         // Given
         let character = CharacterFactory.make(thumbnail: "New Thumbnail")
-        var sut: CharacterSummary<Series> = CharacterSummaryFactory.make(thumbnail: "Old Thumbnail")
+        var sut = CharacterSummaryFactory.make(thumbnail: "Old Thumbnail")
         
         // When
         sut.update(with: character)
@@ -69,7 +69,7 @@ final class CharacterSummaryTests: XCTestCase {
     func test_whenUpdate_descriptionIsUpdated() throws {
         // Given
         let character = CharacterFactory.make(description: "New Description")
-        var sut: CharacterSummary<Series> = CharacterSummaryFactory.make(description: "Old Description")
+        var sut = CharacterSummaryFactory.make(description: "Old Description")
         
         // When
         sut.update(with: character)

@@ -12,9 +12,7 @@ import XCTest
 
 final class DomainItemSummary_ComicSummaryTests: XCTestCase {
 
-    private typealias Item = Series
-    
-    private var summary: ComicSummary<Item>!
+    private var summary: ComicSummary!
     private var sut: Domain.ItemSummary!
     
     override func setUpWithError() throws {

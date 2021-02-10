@@ -11,38 +11,32 @@ import XCTest
 
 final class ComicSummary_ComicTests: XCTestCase {
 
-    private typealias Item = Series
-    
     private var comic: Comic!
-    private var id: String!
-    private var number: String!
-    private var sut: ComicSummary<Item>!
+    private var series: Series!
+    private var sut: ComicSummary!
     
     override func setUpWithError() throws {
-        comic = ComicFactory.make()
-        id = "1"
-        number = "1"
-        sut = ComicSummary<Item>(comic, id: id, number: number)
+        comic = ComicFactory.make(ID: "ComicID")
+        series = SeriesFactory.make(ID: "SeriesID")
+        sut = ComicSummary(comic, link: series)
     }
 
     override func tearDownWithError() throws {
         comic = nil
-        id = nil
-        number = nil
+        series = nil
         sut = nil
     }
     
     func testItemID_whenInitFromComic() throws {
-        let id = try XCTUnwrap(self.id)
-        XCTAssertEqual(sut.itemID, "\(String.getType(from: Comic.self))#\(id)")
+        XCTAssertEqual(sut.itemID, "\(String.getType(from: Comic.self))#\(comic.id)")
     }
     
     func testSummaryID_whenInitFromComic() {
-        XCTAssertEqual(sut.summaryID, "\(String.getType(from: Item.self))#\(comic.id)")
+        XCTAssertEqual(sut.summaryID, "\(String.getType(from: Series.self))#\(series.id)")
     }
     
     func testItemName_whenInitFromComic() {
-        XCTAssertEqual(sut.itemName, .getType(from: ComicSummary<Item>.self))
+        XCTAssertEqual(sut.itemName, .getType(from: ComicSummary.self))
     }
     
     func testDateAdded_whenInitFromComic() {
@@ -76,7 +70,7 @@ final class ComicSummary_ComicTests: XCTestCase {
     }
     
     func testNumber_whenInitFromComic() {
-        XCTAssertEqual(sut.number, number)
+        XCTAssertEqual(sut.number, comic.number)
     }
 
 }

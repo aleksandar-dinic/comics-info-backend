@@ -10,13 +10,15 @@ import Foundation
 
 extension CharacterSummary {
     
-    init(_ character: Character, id: String, count: Int?) {
+    init<Summary: Identifiable>(_ character: Character, link: Summary, count: Int?) {
+        let now = Date()
+        
         self.init(
-            itemID: "\(String.getType(from: Character.self))#\(character.id)",
-            summaryID: "\(String.getType(from: Item.self))#\(id)",
-            itemName: .getType(from: CharacterSummary<Item>.self),
-            dateAdded: Date(),
-            dateLastUpdated: Date(),
+            itemID: .comicInfoID(for: character),
+            summaryID: .comicInfoID(for: link),
+            itemName: .getType(from: CharacterSummary.self),
+            dateAdded: now,
+            dateLastUpdated: now,
             popularity: character.popularity,
             name: character.name,
             thumbnail: character.thumbnail,

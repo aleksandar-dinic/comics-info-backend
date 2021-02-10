@@ -61,9 +61,9 @@ enum SeriesFactory {
         aliases: [String]? = nil,
         nextIdentifier: String? = nil,
         charactersID: Set<String>? = nil,
-        characters: [CharacterSummary<Series>]? = nil,
+        characters: [CharacterSummary]? = nil,
         comicsID: Set<String>? = nil,
-        comics: [ComicSummary<Series>]? = nil
+        comics: [ComicSummary]? = nil
     ) -> Series {
         Series(
             id: id,

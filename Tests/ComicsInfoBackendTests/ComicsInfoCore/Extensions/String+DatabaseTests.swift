@@ -21,41 +21,28 @@ final class String_DatabaseTests: XCTestCase {
         XCTAssertEqual(String.tableName(for: nil), "")
     }
 
-    func test_getTypeFromCharacter_isEqualCharacter() throws {
+    func test_getTypeFromCharacter_isEqualCharacter() {
         XCTAssertEqual(String.getType(from: Character.self), "Character")
     }
 
-    func test_getTypeFromSeries_isEqualSeries() throws {
+    func test_getTypeFromSeries_isEqualSeries() {
         XCTAssertEqual(String.getType(from: Series.self), "Series")
     }
 
-    func test_getTypeFromComic_isEqualComic() throws {
+    func test_getTypeFromComic_isEqualComic() {
         XCTAssertEqual(String.getType(from: Comic.self), "Comic")
     }
     
-    func test_getTypeFromCharacterSummarySeries_isEqualCharacterSummarySeries() throws {
-        XCTAssertEqual(String.getType(from: CharacterSummary<Series>.self), "CharacterSummary<Series>")
+    func test_getTypeFromCharacterSummary_isEqualCharacterSummary() {
+        XCTAssertEqual(String.getType(from: CharacterSummary.self), "CharacterSummary")
     }
     
-    func test_getTypeFromCharacterSummaryComic_isEqualCharacterSummaryComic() throws {
-        XCTAssertEqual(String.getType(from: CharacterSummary<Comic>.self), "CharacterSummary<Comic>")
-    }
-
-    func test_getTypeFromSeriesSummaryCharacter_isEqualSeriesSummaryCharacter() throws {
-        XCTAssertEqual(String.getType(from: SeriesSummary<Character>.self), "SeriesSummary<Character>")
+    func test_getTypeFromSeriesSummary_isEqualSeriesSummary() {
+        XCTAssertEqual(String.getType(from: SeriesSummary.self), "SeriesSummary")
     }
     
-    func test_getTypeFromSeriesSummaryComic_isEqualSeriesSummaryComic() throws {
-        XCTAssertEqual(String.getType(from: SeriesSummary<Comic>.self), "SeriesSummary<Comic>")
+    func test_getTypeFromComicSummary_isEqualComicSummary() {
+        XCTAssertEqual(String.getType(from: ComicSummary.self), "ComicSummary")
     }
-    
-    func test_getTypeFromComicSummaryCharacter_isEqualComicSummaryCharacter() throws {
-        XCTAssertEqual(String.getType(from: ComicSummary<Character>.self), "ComicSummary<Character>")
-    }
-    
-    func test_getTypeFromComicSummarySeries_isEqualComicSummarySeries() throws {
-        XCTAssertEqual(String.getType(from: ComicSummary<Series>.self), "ComicSummary<Series>")
-    }
-    
     
 }

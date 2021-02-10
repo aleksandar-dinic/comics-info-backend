@@ -59,9 +59,9 @@ enum CharacterFactory {
         aliases: [String]? = nil,
         birth: Date? = nil,
         seriesID: Set<String>? = nil,
-        series: [SeriesSummary<Character>]? = nil,
+        series: [SeriesSummary]? = nil,
         comicsID: Set<String>? = nil,
-        comics: [ComicSummary<Character>]? = nil
+        comics: [ComicSummary]? = nil
     ) -> Character {
         Character(
             id: id,

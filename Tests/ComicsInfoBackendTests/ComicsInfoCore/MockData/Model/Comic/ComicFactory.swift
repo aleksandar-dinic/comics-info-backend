@@ -73,9 +73,9 @@ enum ComicFactory {
         images: [String]? = nil,
         published: Date? = nil,
         charactersID: Set<String>? = nil,
-        characters: [CharacterSummary<Comic>]? = nil,
+        characters: [CharacterSummary]? = nil,
         seriesID: Set<String>? = nil,
-        series: [SeriesSummary<Comic>]? = nil
+        series: [SeriesSummary]? = nil
     ) -> Comic {
         Comic(
             id: id,

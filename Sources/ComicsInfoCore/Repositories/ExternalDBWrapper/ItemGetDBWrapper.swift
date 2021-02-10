@@ -14,17 +14,13 @@ struct ItemGetDBWrapper<Item: ComicInfoItem> {
     let itemGetDBService: ItemGetDBService
 
     func getItem(withID ID: String, from table: String) -> EventLoopFuture<Item> {
-        itemGetDBService.getItem(withID: mapToDatabaseID(ID), from: table)
+        itemGetDBService.getItem(withID: .comicInfoID(for: Item.self, ID: ID), from: table)
             .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Item.self) }
     }
     
     func getItems(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Item]> {
-        itemGetDBService.getItems(withIDs: Set(IDs.map { mapToDatabaseID($0) }), from: table)
+        itemGetDBService.getItems(withIDs: Set(IDs.map { .comicInfoID(for: Item.self, ID: $0) }), from: table)
             .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Item.self) }
-    }
-    
-    private func mapToDatabaseID(_ ID: String, itemType: Any.Type = Item.self) -> String {
-        "\(String.getType(from: itemType))#\(ID)"
     }
     
     func getAllItems(from table: String) -> EventLoopFuture<[Item]> {

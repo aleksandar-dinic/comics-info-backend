@@ -18,5 +18,17 @@ public extension String {
     static func getType(from item: Any.Type) -> String {
         "\(item.self)"
     }
+    
+    static func comicInfoID<Item: Identifiable>(for item: Item) -> String {
+        "\(String.getType(from: Item.self))#\(item.id)"
+    }
+    
+    static func comicInfoID<Item: Identifiable>(for item: Item.Type, ID: String) -> String {
+        "\(String.getType(from: Item.self))#\(ID)"
+    }
+    
+    func getIDFromComicInfoID(for item: Any.Type) -> String {
+        self.replacingOccurrences(of: "\(String.getType(from: item.self))#", with: "")
+    }
 
 }

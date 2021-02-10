@@ -16,13 +16,13 @@ extension Error {
         switch error {
         case let .itemAlreadyExists(withID: id):
             return ComicInfoError.itemAlreadyExists(
-                withID: id.replacingOccurrences(of: "\(String.getType(from: itemType.self))#", with: ""),
+                withID: id.getIDFromComicInfoID(for: itemType.self),
                 itemType: itemType.self
             )
 
         case let .itemNotFound(withID: id):
             return ComicInfoError.itemNotFound(
-                withID: id.replacingOccurrences(of: "\(String.getType(from: itemType.self))#", with: ""),
+                withID: id.getIDFromComicInfoID(for: itemType.self),
                 itemType: itemType.self
             )
 
@@ -31,7 +31,7 @@ extension Error {
                 return ComicInfoError.itemsNotFound(withIDs: nil, itemType: itemType.self)
             }
             return ComicInfoError.itemsNotFound(
-                withIDs: Set(ids.map { $0.replacingOccurrences(of: "\(String.getType(from: itemType.self))#", with: "") }),
+                withIDs: Set(ids.map { $0.getIDFromComicInfoID(for: itemType.self) }),
                 itemType: itemType.self
             )
         }

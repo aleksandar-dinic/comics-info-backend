@@ -12,38 +12,35 @@ import XCTest
 
 final class CharacterSummary_DomainTests: XCTestCase {
 
-    private typealias Item = Series
-    
     private var item: Domain.ItemSummary!
-    private var id: String!
+    private var series: Series!
     private var count: Int!
-    private var sut: CharacterSummary<Item>!
+    private var sut: CharacterSummary!
     
     override func setUpWithError() throws {
         item = DomainItemSummaryFactory.make()
-        id = "1"
+        series = SeriesFactory.make(ID: "SeriesID")
         count = 0
-        sut = CharacterSummary<Item>(from: item, id: id, count: count)
+        sut = CharacterSummary(from: item, link: series, count: count)
     }
 
     override func tearDownWithError() throws {
         item = nil
-        id = nil
+        series = nil
         count = nil
         sut = nil
     }
 
     func testItemID_whenInitFromItem() throws {
-        let id = try XCTUnwrap(self.id)
-        XCTAssertEqual(sut.itemID, "\(String.getType(from: Character.self))#\(id)")
+        XCTAssertEqual(sut.itemID, "\(String.getType(from: Character.self))#\(item.identifier)")
     }
     
     func testSummaryID_whenInitFromItem() {
-        XCTAssertEqual(sut.summaryID, "\(String.getType(from: Item.self))#\(item.identifier)")
+        XCTAssertEqual(sut.summaryID, "\(String.getType(from: Series.self))#\(series.id)")
     }
     
     func testItemName_whenInitFromItem() {
-        XCTAssertEqual(sut.itemName, .getType(from: CharacterSummary<Item>.self))
+        XCTAssertEqual(sut.itemName, .getType(from: CharacterSummary.self))
     }
     
     func testDateAdded_whenInitFromItem() {

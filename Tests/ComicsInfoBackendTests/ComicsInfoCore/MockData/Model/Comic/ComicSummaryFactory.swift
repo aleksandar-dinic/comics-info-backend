@@ -11,7 +11,7 @@ import Foundation
 
 enum ComicSummaryFactory {
     
-    static func make<Item>(ID: String = "1", popularity: Int = 0) -> ComicSummary<Item> {
+    static func make(ID: String = "1", popularity: Int = 0) -> ComicSummary {
         make(
             itemID: "Comic#\(ID)",
             summaryID: "Comic#\(ID)",
@@ -26,7 +26,7 @@ enum ComicSummaryFactory {
         )
     }
 
-    static func make<Item>(
+    static func make(
         itemID: String = "Comic#1",
         summaryID: String = "Comic#1",
         itemName: String = "Comic",
@@ -37,7 +37,7 @@ enum ComicSummaryFactory {
         thumbnail: String? = nil,
         description: String? = nil,
         number: String? = nil
-    ) -> ComicSummary<Item> {
+    ) -> ComicSummary {
         ComicSummary(
             itemID: itemID,
             summaryID: summaryID,
@@ -52,7 +52,7 @@ enum ComicSummaryFactory {
         )
     }
     
-    static func comicList<Item>() -> [ComicSummary<Item>] {
+    static func comicList() -> [ComicSummary] {
         [
             make(ID: "2", popularity: 2),
             make(ID: "3", popularity: 3),

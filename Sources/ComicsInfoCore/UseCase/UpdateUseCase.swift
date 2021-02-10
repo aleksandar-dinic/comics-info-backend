@@ -15,11 +15,7 @@ public protocol UpdateUseCase {
 
     var repository: UpdateRepository { get }
 
-    func appendItemSummary(
-        _ item: Item,
-        on eventLoop: EventLoop,
-        from table: String
-    ) -> EventLoopFuture<Item>
+    func addSummaries(to item: Item, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item>
     
     func getItem(
         withID ID: String,
@@ -35,7 +31,7 @@ public protocol UpdateUseCase {
 extension UpdateUseCase {
     
     public func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        appendItemSummary(item, on: eventLoop, from: table)
+        addSummaries(to: item, on: eventLoop, from: table)
             .flatMap { updateItem($0, on: eventLoop, in: table) }
             .hop(to: eventLoop)
     }

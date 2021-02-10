@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-public final class CharacterUpdateUseCase: UpdateUseCase, CharacterSummaryFactory, SeriesSummaryFactory, ComicSummaryFactory {
+public final class CharacterUpdateUseCase: UpdateUseCase, CharacterAddSummariesFactory {
     
     public typealias Item = Character
     
@@ -28,31 +28,6 @@ public final class CharacterUpdateUseCase: UpdateUseCase, CharacterSummaryFactor
         self.characterUseCase = characterUseCase
         self.seriesUseCase = seriesUseCase
         self.comicUseCase = comicUseCase
-    }
-    
-    public func appendItemSummary(
-        _ item: Item,
-        on eventLoop: EventLoop,
-        from table: String
-    ) -> EventLoopFuture<Item> {
-        getSeries(on: eventLoop, forIDs: item.seriesID, from: table)
-            .and(getComics(on: eventLoop, forIDs: item.comicsID, from: table))
-            .flatMapThrowing { [weak self] (series, comics) in
-                guard let self = self else { throw ComicInfoError.internalServerError }
-                var item = item
-
-                if !series.isEmpty {
-                    item.series = self.makeSeriesSummaries(series, link: item)
-                    item.characterSummaryForSeries = self.makeCharacterSummaries(item, link: series, count: nil)
-                }
-                    
-                if !comics.isEmpty {
-                    item.comics = self.makeComicSummaries(comics, link: item, number: nil)
-                    item.characterSummaryForComics = self.makeCharacterSummaries(item, link: comics, count: nil)
-                }
-                
-                return item
-            }
     }
     
     public func getItem(withID ID: String, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item> {
@@ -88,7 +63,7 @@ extension CharacterUpdateUseCase {
         on eventLoop: EventLoop,
         in table: String
     ) -> EventLoopFuture<Bool> {
-        let future: EventLoopFuture<[CharacterSummary<Series>]?> = characterUseCase.getSummaries(
+        let future: EventLoopFuture<[CharacterSummary]?> = characterUseCase.getSummaries(
             on: eventLoop,
             forID: item.itemID,
             dataSource: .database,
@@ -99,7 +74,7 @@ extension CharacterUpdateUseCase {
                 guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 guard let summaries = summaries else { return eventLoop.submit { false } }
                 
-                var updatedSummaries = [CharacterSummary<Series>]()
+                var updatedSummaries = [CharacterSummary]()
                 for var summary in summaries {
                     summary.update(with: item)
                     updatedSummaries.append(summary)
@@ -114,7 +89,7 @@ extension CharacterUpdateUseCase {
         on eventLoop: EventLoop,
         in table: String
     ) -> EventLoopFuture<Bool> {
-        let future: EventLoopFuture<[CharacterSummary<Comic>]?> = characterUseCase.getSummaries(
+        let future: EventLoopFuture<[CharacterSummary]?> = characterUseCase.getSummaries(
             on: eventLoop,
             forID: item.itemID,
             dataSource: .database,
@@ -125,7 +100,7 @@ extension CharacterUpdateUseCase {
                 guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 guard let summaries = summaries else { return eventLoop.submit { false } }
 
-                var updatedSummaries = [CharacterSummary<Comic>]()
+                var updatedSummaries = [CharacterSummary]()
                 for var summary in summaries {
                     summary.update(with: item)
                     updatedSummaries.append(summary)

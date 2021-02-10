@@ -18,14 +18,14 @@ public protocol CreateUseCase {
     func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
     func createSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
     
-    func appendItemSummary(on item: Item, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item>
+    func addSummaries(to item: Item, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item>
     
 }
 
 extension CreateUseCase {
     
     public func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        appendItemSummary(on: item, on: eventLoop, from: table)
+        addSummaries(to: item, on: eventLoop, from: table)
             .flatMap { createItemAndSummaries($0, on: eventLoop, in: table) }
             .hop(to: eventLoop)
     }

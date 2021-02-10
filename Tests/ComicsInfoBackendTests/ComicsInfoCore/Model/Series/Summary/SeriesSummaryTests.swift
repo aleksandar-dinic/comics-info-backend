@@ -20,7 +20,7 @@ final class SeriesSummaryTests: XCTestCase {
     func test_whenUpdate_dateLastUpdatedIsUpdated() throws {
         // Given
         let series = SeriesFactory.make()
-        var sut: SeriesSummary<Character> = SeriesSummaryFactory.make()
+        var sut = SeriesSummaryFactory.make()
         let oldDateLastUpdated = sut.dateLastUpdated
         
         // When
@@ -33,7 +33,7 @@ final class SeriesSummaryTests: XCTestCase {
     func test_whenUpdate_popularityIsUpdated() throws {
         // Given
         let series = SeriesFactory.make(popularity: 1)
-        var sut: SeriesSummary<Character> = SeriesSummaryFactory.make(popularity: 0)
+        var sut = SeriesSummaryFactory.make(popularity: 0)
         
         // When
         sut.update(with: series)
@@ -45,7 +45,7 @@ final class SeriesSummaryTests: XCTestCase {
     func test_whenUpdate_nameIsUpdated() throws {
         // Given
         let series = SeriesFactory.make(title: "New Name")
-        var sut: SeriesSummary<Character> = SeriesSummaryFactory.make(name: "Old Name")
+        var sut = SeriesSummaryFactory.make(name: "Old Name")
         
         // When
         sut.update(with: series)
@@ -57,7 +57,7 @@ final class SeriesSummaryTests: XCTestCase {
     func test_whenUpdate_thumbnailIsUpdated() throws {
         // Given
         let series = SeriesFactory.make(thumbnail: "New Thumbnail")
-        var sut: SeriesSummary<Character> = SeriesSummaryFactory.make(thumbnail: "Old Thumbnail")
+        var sut = SeriesSummaryFactory.make(thumbnail: "Old Thumbnail")
         
         // When
         sut.update(with: series)
@@ -69,7 +69,7 @@ final class SeriesSummaryTests: XCTestCase {
     func test_whenUpdate_descriptionIsUpdated() throws {
         // Given
         let series = SeriesFactory.make(description: "New Description")
-        var sut: SeriesSummary<Character> = SeriesSummaryFactory.make(description: "Old Description")
+        var sut = SeriesSummaryFactory.make(description: "Old Description")
         
         // When
         sut.update(with: series)

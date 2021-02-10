@@ -11,13 +11,15 @@ import Foundation
 
 extension SeriesSummary {
     
-    init(from item: Domain.ItemSummary, id: String) {
+    init<Summary: Identifiable>(from item: Domain.ItemSummary, link: Summary) {
+        let now = Date()
+        
         self.init(
-            itemID: "\(String.getType(from: Series.self))#\(item.identifier)",
-            summaryID: "\(String.getType(from: Item.self))#\(id)",
-            itemName: .getType(from: SeriesSummary<Item>.self),
-            dateAdded: Date(),
-            dateLastUpdated: Date(),
+            itemID: .comicInfoID(for: Series.self, ID: item.identifier),
+            summaryID: .comicInfoID(for: link),
+            itemName: .getType(from: SeriesSummary.self),
+            dateAdded: now,
+            dateLastUpdated: now,
             popularity: item.popularity,
             name: item.name,
             thumbnail: item.thumbnail,

@@ -148,7 +148,7 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
         // Then
         XCTAssertNoThrow(try feature.wait())
         if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
-           let characterSummary = try? JSONDecoder().decode(CharacterSummary<Series>.self, from: data) {
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
             XCTAssertEqual(characterSummary.popularity, newCharacter.popularity)
             XCTAssertEqual(characterSummary.name, newCharacter.name)
             XCTAssertEqual(characterSummary.thumbnail, newCharacter.thumbnail)
@@ -221,7 +221,7 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
         // Then
         XCTAssertNoThrow(try feature.wait())
         if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
-           let characterSummary = try? JSONDecoder().decode(CharacterSummary<Series>.self, from: data) {
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
             XCTAssertNotEqual(characterSummary.dateAdded, characterSummary.dateLastUpdated)
         } else {
             XCTFail("CharacterSummary<Series> with ID: Character#CharacterID|Series#SeriesID doesn't exist")
@@ -242,7 +242,7 @@ final class CharacterUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Cr
         // Then
         XCTAssertNoThrow(try feature.wait())
         if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
-           let characterSummary = try? JSONDecoder().decode(CharacterSummary<Series>.self, from: data) {
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
             XCTAssertEqual(characterSummary.dateAdded, characterSummary.dateLastUpdated)
         } else {
             XCTFail("CharacterSummary<Series> with ID: Character#CharacterID|Series#SeriesID doesn't exist")

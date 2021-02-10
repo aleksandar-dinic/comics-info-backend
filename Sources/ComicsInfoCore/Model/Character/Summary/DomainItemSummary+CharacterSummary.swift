@@ -11,9 +11,9 @@ import Foundation
 
 extension Domain.ItemSummary {
 
-    init<Item>(from summary: CharacterSummary<Item>) {
+    init(from summary: CharacterSummary) {
         self.init(
-            identifier: summary.itemID.replacingOccurrences(of: "\(String.getType(from: Character.self))#", with: ""),
+            identifier: summary.itemID.getIDFromComicInfoID(for: Character.self),
             popularity: summary.popularity,
             name: summary.name,
             thumbnail: summary.thumbnail,

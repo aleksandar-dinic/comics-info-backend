@@ -11,10 +11,8 @@ import struct Domain.ItemSummary
 import XCTest
 
 final class DomainItemSummary_SeriesSummaryTests: XCTestCase {
-
-    private typealias Item = Character
     
-    private var summary: SeriesSummary<Item>!
+    private var summary: SeriesSummary!
     private var sut: Domain.ItemSummary!
     
     override func setUpWithError() throws {

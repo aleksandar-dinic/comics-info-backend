@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-public final class SeriesCreateUseCase: CreateUseCase, CreateSummaryFactory, CharacterSummaryFactory, ComicSummaryFactory {
+public final class SeriesCreateUseCase: CreateUseCase, CreateSummaryFactory, SeriesAddSummariesFactory {
     
     public typealias Item = Series
 
@@ -25,27 +25,6 @@ public final class SeriesCreateUseCase: CreateUseCase, CreateSummaryFactory, Cha
         self.repository = repository
         self.characterUseCase = characterUseCase
         self.comicUseCase = comicUseCase
-    }
-    
-    public func appendItemSummary(on item: Item, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item> {
-        getCharacters(on: eventLoop, forIDs: item.charactersID, from: table)
-            .and(getComics(on: eventLoop, forIDs: item.comicsID, from: table))
-            .flatMapThrowing { [weak self] (characters, comics) in
-                guard let self = self else { throw ComicInfoError.internalServerError }
-                var item = item
-
-                if !characters.isEmpty {
-                    item.characters = self.makeCharacterSummaries(characters, link: item, count: nil)
-                    item.seriesSummaryForCharacters = self.makeSeriesSummaries(item, link: characters)
-                }
-                
-                if !comics.isEmpty {
-                    item.comics = self.makeComicSummaries(comics, link: item, number: nil)
-                    item.seriesSummaryForComics = self.makeSeriesSummaries(item, link: comics)
-                }
-                
-                return item
-            }
     }
     
     public func createSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {

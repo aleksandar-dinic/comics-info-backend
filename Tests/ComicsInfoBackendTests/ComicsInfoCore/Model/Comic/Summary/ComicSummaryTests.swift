@@ -20,7 +20,7 @@ final class ComicSummaryTests: XCTestCase {
     func test_whenUpdate_dateLastUpdatedIsUpdated() throws {
         // Given
         let comic = ComicFactory.make()
-        var sut: ComicSummary<Character> = ComicSummaryFactory.make()
+        var sut = ComicSummaryFactory.make()
         let oldDateLastUpdated = sut.dateLastUpdated
         
         // When
@@ -33,7 +33,7 @@ final class ComicSummaryTests: XCTestCase {
     func test_whenUpdate_popularityIsUpdated() throws {
         // Given
         let comic = ComicFactory.make(popularity: 1)
-        var sut: ComicSummary<Character> = ComicSummaryFactory.make(popularity: 0)
+        var sut = ComicSummaryFactory.make(popularity: 0)
         
         // When
         sut.update(with: comic)
@@ -45,7 +45,7 @@ final class ComicSummaryTests: XCTestCase {
     func test_whenUpdate_nameIsUpdated() throws {
         // Given
         let comic = ComicFactory.make(title: "New Name")
-        var sut: ComicSummary<Character> = ComicSummaryFactory.make(name: "Old Name")
+        var sut = ComicSummaryFactory.make(name: "Old Name")
         
         // When
         sut.update(with: comic)
@@ -57,7 +57,7 @@ final class ComicSummaryTests: XCTestCase {
     func test_whenUpdate_thumbnailIsUpdated() throws {
         // Given
         let comic = ComicFactory.make(thumbnail: "New Thumbnail")
-        var sut: ComicSummary<Character> = ComicSummaryFactory.make(thumbnail: "Old Thumbnail")
+        var sut = ComicSummaryFactory.make(thumbnail: "Old Thumbnail")
         
         // When
         sut.update(with: comic)
@@ -69,7 +69,7 @@ final class ComicSummaryTests: XCTestCase {
     func test_whenUpdate_descriptionIsUpdated() throws {
         // Given
         let comic = ComicFactory.make(description: "New Description")
-        var sut: ComicSummary<Character> = ComicSummaryFactory.make(description: "Old Description")
+        var sut = ComicSummaryFactory.make(description: "Old Description")
         
         // When
         sut.update(with: comic)
