@@ -52,13 +52,12 @@ extension Series {
             nextIdentifier: series.nextIdentifier,
             charactersID: charactersID,
             characters: characterSummary,
-            seriesSummaryForCharacters: nil,
             comicsID: comicsID,
             comics: comicSummary,
-            seriesSummaryForComics: nil,
             itemID: .comicInfoID(for: series),
             summaryID: .comicInfoID(for: series),
-            itemName: .getType(from: Series.self)
+            itemName: .getType(from: Series.self),
+            seriesSummaries: nil
         )
     }
     

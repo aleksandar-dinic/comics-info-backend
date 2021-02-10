@@ -25,12 +25,22 @@ extension SeriesAddSummariesFactory {
 
                 if !characters.isEmpty {
                     item.characters = self.makeCharacterSummaries(characters, link: item, count: nil)
-                    item.seriesSummaryForCharacters = self.makeSeriesSummaries(item, link: characters)
+                    let summaries = self.makeSeriesSummaries(item, link: characters)
+                    
+                    if item.seriesSummaries == nil {
+                        item.seriesSummaries = [SeriesSummary]()
+                    }
+                    item.seriesSummaries?.append(contentsOf: summaries)
                 }
                 
                 if !comics.isEmpty {
                     item.comics = self.makeComicSummaries(comics, link: item)
-                    item.seriesSummaryForComics = self.makeSeriesSummaries(item, link: comics)
+                    let summaries = self.makeSeriesSummaries(item, link: comics)
+                    
+                    if item.seriesSummaries == nil {
+                        item.seriesSummaries = [SeriesSummary]()
+                    }
+                    item.seriesSummaries?.append(contentsOf: summaries)
                 }
                 
                 return item

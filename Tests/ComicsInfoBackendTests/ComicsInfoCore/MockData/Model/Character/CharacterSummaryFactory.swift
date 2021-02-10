@@ -15,7 +15,6 @@ enum CharacterSummaryFactory {
         make(
             itemID: "Character#\(ID)",
             summaryID: "Character#\(ID)",
-            itemName: "Character",
             dateAdded: Date(),
             dateLastUpdated: Date(),
             popularity: popularity,

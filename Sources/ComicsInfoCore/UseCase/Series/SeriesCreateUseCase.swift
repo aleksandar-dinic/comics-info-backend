@@ -28,9 +28,8 @@ public final class SeriesCreateUseCase: CreateUseCase, CreateSummaryFactory, Ser
     }
     
     public func createSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        createSummaries(item.seriesSummaryForCharacters, on: eventLoop, in: table)
+        createSummaries(item.seriesSummaries, on: eventLoop, in: table)
             .and(createSummaries(item.characters, on: eventLoop, in: table))
-            .and(createSummaries(item.seriesSummaryForComics, on: eventLoop, in: table))
             .and(createSummaries(item.comics, on: eventLoop, in: table))
             .map { _ in }
     }

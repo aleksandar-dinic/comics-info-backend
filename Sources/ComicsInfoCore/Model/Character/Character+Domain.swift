@@ -51,13 +51,12 @@ extension Character {
             birth: character.birth,
             seriesID: seriesID,
             series: seriesSummary,
-            characterSummaryForSeries: nil,
             comicsID: comicsID,
             comics: comicSummary,
-            characterSummaryForComics: nil,
             itemID: .comicInfoID(for: character),
             summaryID: .comicInfoID(for: character),
-            itemName: .getType(from: Character.self)
+            itemName: .getType(from: Character.self),
+            characterSummaries: nil
         )
     }
     

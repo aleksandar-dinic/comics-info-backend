@@ -58,13 +58,12 @@ extension Comic {
             published: comic.published,
             charactersID: charactersID,
             characters: characterSummary,
-            comicSummaryForCharacters: nil,
             seriesID: seriesID,
             series: seriesSummary,
-            comicSummaryForSeries: nil,
             itemID: .comicInfoID(for: comic),
             summaryID: .comicInfoID(for: comic),
-            itemName: .getType(from: Comic.self)
+            itemName: .getType(from: Comic.self),
+            comicSummaries: nil
         )
     }
     

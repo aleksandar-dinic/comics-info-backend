@@ -35,9 +35,8 @@ public final class SeriesUpdateUseCase: UpdateUseCase, SeriesAddSummariesFactory
     }
     
     public func updateSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        updateSummaries(item.seriesSummaryForCharacters, on: eventLoop, in: table)
+        updateSummaries(item.seriesSummaries, on: eventLoop, in: table)
             .and(updateSummaries(item.characters, on: eventLoop, in: table))
-            .and(updateSummaries(item.seriesSummaryForComics, on: eventLoop, in: table))
             .and(updateSummaries(item.comics, on: eventLoop, in: table))
             .map { _ in }
     }

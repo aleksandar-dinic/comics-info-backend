@@ -15,7 +15,6 @@ enum ComicSummaryFactory {
         make(
             itemID: "Comic#\(ID)",
             summaryID: "Comic#\(ID)",
-            itemName: "Comic \(ID)",
             dateAdded: Date(),
             dateLastUpdated: Date(),
             popularity: 0,

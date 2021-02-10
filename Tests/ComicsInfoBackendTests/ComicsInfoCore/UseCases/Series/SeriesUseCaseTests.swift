@@ -159,7 +159,6 @@ final class SeriesUseCaseTests: XCTestCase {
         // Then
         XCTAssertEqual(item.characters?.first?.itemID, "Character#1")
         XCTAssertEqual(item.characters?.first?.summaryID, "Series#1")
-        XCTAssertEqual(item.characters?.first?.itemName, "CharacterSummary")
     }
     
     func test_whenGetItemComicsField_returnItemWithComics() throws {
@@ -185,7 +184,6 @@ final class SeriesUseCaseTests: XCTestCase {
         // Then
         XCTAssertEqual(item.comics?.first?.itemID, "Comic#1")
         XCTAssertEqual(item.comics?.first?.summaryID, "Series#1")
-        XCTAssertEqual(item.comics?.first?.itemName, "ComicSummary")
     }
     
     func testGetItem_whenFieldsAreCharactersAndComics_returnItemWithCharactersAndComics() throws {

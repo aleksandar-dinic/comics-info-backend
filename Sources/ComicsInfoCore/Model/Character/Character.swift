@@ -45,18 +45,18 @@ public struct Character: SummaryMapper {
 
     /// A resource list of series in which this character appears.
     var series: [SeriesSummary]?
-    var characterSummaryForSeries: [CharacterSummary]?
 
     /// A resource list containing comicsID which feature this character.
     var comicsID: Set<String>?
 
     /// A resource list containing comics which feature this character.
     var comics: [ComicSummary]?
-    var characterSummaryForComics: [CharacterSummary]?
     
     public let itemID: String
     public let summaryID: String
     public let itemName: String
+    
+    var characterSummaries: [CharacterSummary]?
     
 }
 
@@ -82,10 +82,9 @@ extension Character {
         }
         seriesID = newItem.seriesID
         series = newItem.series
-        characterSummaryForSeries = newItem.characterSummaryForSeries
         comicsID = newItem.comicsID
         comics = newItem.comics
-        characterSummaryForComics = newItem.characterSummaryForComics
+        characterSummaries = newItem.characterSummaries
     }
 
 }
