@@ -29,16 +29,14 @@ extension DynamoDB: DatabaseUpdate {
         }
     }
     
-    public func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+    public func updateSummaries<Summary: ItemSummary>(
+        with criteria: [UpdateSummariesCriteria<Summary>]
+    ) -> EventLoopFuture<Void> {
         DynamoDB.logger.log(level: .info, "Update Summaries")
         var futures = [EventLoopFuture<Void>]()
         
-        for summary in summaries {
-            let input = UpdateItemCodableInput(
-                key: ["itemID", "summaryID"],
-                tableName: table,
-                updateItem: summary
-            )
+        for criterion in criteria {
+            let input = criterion.updateInput
             
             DynamoDB.logger.log(level: .info, "Update Summaries: \(input)")
             let future = updateItem(input).flatMapThrowing {

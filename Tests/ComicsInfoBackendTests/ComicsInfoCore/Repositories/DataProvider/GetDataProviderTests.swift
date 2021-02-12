@@ -334,12 +334,12 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromMemory_retursSummaries() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(ID: "1", dataSource: .memory, table: table, key: .summaryID)
+        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: "1", dataSource: .memory, table: table, strategy: .summaryID)
         let cash = TestCache<MockComicInfoItem>(itemsSummaries: [table: [givenItem.itemID: givenItem]])
         sut = GetDataProviderFactory.make(cacheProvider: cash)
         
         // When
-        let feature: EventLoopFuture<[MockItemSummary]?> = sut.getSummaries(with: criteria)
+        let feature = sut.getSummaries(with: criteria)
         let items = try feature.wait()
         
         // Then
@@ -349,12 +349,12 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromDatabase_retursSummaries() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(ID: givenItem.itemID, dataSource: .database, table: table, key: .summaryID)
+        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .database, table: table, strategy: .summaryID)
         let itemData = MockItemSummaryFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
         // When
-        let feature: EventLoopFuture<[MockItemSummary]?> = sut.getSummaries(with: criteria)
+        let feature = sut.getSummaries(with: criteria)
         let items = try feature.wait()
         
         // Then
@@ -363,10 +363,10 @@ extension GetDataProviderTests {
     
     func test_whenGetSummaries_returnsNil() throws {
         // Given
-        let criteria = GetSummariesCriteria(ID: "-1", dataSource: .memory, table: table, key: .summaryID)
+        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: "-1", dataSource: .memory, table: table, strategy: .summaryID)
         
         // When
-        let feature: EventLoopFuture<[MockItemSummary]?> = sut.getSummaries(with: criteria)
+        let feature = sut.getSummaries(with: criteria)
         let items = try feature.wait()
         
         // Then
@@ -376,12 +376,12 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromEmptyMemory_retursSummariesFromDatabase() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(ID: givenItem.itemID, dataSource: .memory, table: table, key: .summaryID)
+        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .memory, table: table, strategy: .summaryID)
         let itemData = MockItemSummaryFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
         // When
-        let feature: EventLoopFuture<[MockItemSummary]?> = sut.getSummaries(with: criteria)
+        let feature = sut.getSummaries(with: criteria)
         let items = try feature.wait()
         
         // Then
@@ -391,13 +391,13 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromEmptyMemory_saveSummariesInCache() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(ID: "", dataSource: .memory, table: table, key: .summaryID)
+        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: "", dataSource: .memory, table: table, strategy: .summaryID)
         let cache = TestCache<MockComicInfoItem>()
         let itemData = MockItemSummaryFactory.makeData()
         sut = GetDataProviderFactory.make(cacheProvider: cache, items: itemData)
         
         // When
-        let feature: EventLoopFuture<[MockItemSummary]?> = sut.getSummaries(with: criteria)
+        let feature = sut.getSummaries(with: criteria)
         XCTAssertNoThrow(try feature.wait())
         
         // Then

@@ -111,41 +111,79 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     
     // Get Summaries
      
-    func getSummaries<Summary: ItemSummary>(with criteria: GetSummariesCriteria) -> EventLoopFuture<[Summary]?> {
+    func getSummaries<Summary: ItemSummary>(
+        with criteria: GetSummariesCriteria<Summary>
+    ) -> EventLoopFuture<[Summary]?> {
         switch criteria.dataSource {
         case .memory:
-            return getSummariesFromMemory(forID: criteria.ID, from: criteria.table, by: criteria.key)
+            return getSummariesFromMemory(with: criteria)
 
         case .database:
-            return getSummariesFromDatabase(forID: criteria.ID, from: criteria.table, by: criteria.key)
+            return getSummariesFromDatabase(with: criteria)
         }
     }
     
     private func getSummariesFromMemory<Summary: ItemSummary>(
-        forID ID: String,
-        from table: String,
-        by key: PartitionKey
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?>  {
-        let result: Result<[Summary], CacheError<Item>> = cacheProvider.getSummaries(forID: ID, from: table)
+        let result: Result<[Summary], CacheError<Item>> = cacheProvider.getSummaries(forID: criteria.ID, from: criteria.table)
         
         switch result {
         case let .success(items):
             return eventLoop.submit { items }
 
         case .failure:
-            return getSummariesFromDatabase(forID: ID, from: table, by: key)
+            return getSummariesFromDatabase(with: criteria)
         }
     }
     
     private func getSummariesFromDatabase<Summary: ItemSummary>(
-        forID ID: String,
-        from table: String,
-        by key: PartitionKey
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
-        itemGetDBWrapper.getSummaries(forID: ID, from: table, by: key).always { result in
+        itemGetDBWrapper.getSummaries(with: criteria).always { result in
             guard let summaries = try? result.get() else { return }
-            cacheProvider.save(summaries: summaries, in: table)
+            cacheProvider.save(summaries: summaries, in: criteria.table)
         }
+    }
+    
+    
+    // TODO: 
+    // Get Summary
+     
+    func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+//        switch criteria.dataSource {
+//        case .memory:
+//            return getSummariesFromMemory(with: criteria)
+//
+//        case .database:
+            return getSummaryFromDatabase(with: criteria)
+//        }
+    }
+    
+//    private func getSummariesFromMemory<Summary: ItemSummary>(
+//        with criteria: GetSummariesCriteria<Summary>
+//    ) -> EventLoopFuture<[Summary]?>  {
+//        let result: Result<[Summary], CacheError<Item>> = cacheProvider.getSummaries(forID: criteria.ID, from: criteria.table)
+//
+//        switch result {
+//        case let .success(items):
+//            return eventLoop.submit { items }
+//
+//        case .failure:
+//            return getSummariesFromDatabase(with: criteria)
+//        }
+//    }
+//
+    private func getSummaryFromDatabase<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        itemGetDBWrapper.getSummary(with: criteria)
+//            .always { result in
+//            guard let summaries = try? result.get() else { return }
+//            cacheProvider.save(summaries: summaries, in: criteria.table)
+//        }
     }
     
 }

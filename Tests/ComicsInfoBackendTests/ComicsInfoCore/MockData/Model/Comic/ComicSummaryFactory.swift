@@ -1,5 +1,5 @@
 //
-//  ComicSummaryFactory.swift
+//  GetComics.swift
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 13/10/2020.

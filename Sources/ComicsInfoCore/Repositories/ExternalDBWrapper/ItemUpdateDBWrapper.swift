@@ -18,8 +18,18 @@ struct ItemUpdateDBWrapper {
             .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Item.self) }
     }
     
-    func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        itemUpdateDBService.updateSummaries(summaries, in: table)
+    func updateSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary],
+        in table: String,
+        strategy: UpdateSummariesStrategy
+    ) -> EventLoopFuture<Void> {
+        var criteria = [UpdateSummariesCriteria<Summary>]()
+        
+        for summary in summaries {
+            criteria.append(UpdateSummariesCriteria(table: table, item: summary, strategy: strategy))
+        }
+        
+        return itemUpdateDBService.updateSummaries(with: criteria)
             .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Summary.self) }
     }
 

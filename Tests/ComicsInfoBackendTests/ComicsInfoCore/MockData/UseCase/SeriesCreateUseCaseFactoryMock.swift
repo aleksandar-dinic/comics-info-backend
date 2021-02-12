@@ -26,8 +26,9 @@ struct SeriesCreateUseCaseFactoryMock: CreateUseCaseFactory {
 
     func makeUseCase() -> SeriesCreateUseCase {
         SeriesCreateUseCase(
-            repository: makeRepository(),
+            createRepository: makeRepository(),
             characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
+            seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
         )
     }

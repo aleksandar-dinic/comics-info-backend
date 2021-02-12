@@ -142,10 +142,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let givenItem = MockItemSummaryFactory.make()
         let databaseItems = MockItemSummaryFactory.makeData()
+        let criterion = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .memory, table: table, strategy: .summaryID)
         let sut = ItemGetDBWrapperFactory.make(items: databaseItems)
 
         // When
-        let feature: EventLoopFuture<[MockItemSummary]?> = sut.getSummaries(forID: givenItem.itemID, from: table, by: .summaryID)
+        let feature = sut.getSummaries(with: criterion)
         let items = try feature.wait()
 
         // Then
@@ -156,10 +157,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
     func test_whenGetSummaries_returnsNil() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
+        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .memory, table: table, strategy: .summaryID)
         let sut = ItemGetDBWrapperFactory.make()
-
+        
         // When
-        let feature: EventLoopFuture<[MockItemSummary]?> = sut.getSummaries(forID: givenItem.itemID, from: table, by: .summaryID)
+        let feature = sut.getSummaries(with: criteria)
         let items = try feature.wait()
 
         // Then

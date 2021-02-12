@@ -17,71 +17,136 @@ final class ComicInfoErrorTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
-    func testLocalizedDescription_requestError() throws {
-        XCTAssertEqual(ComicInfoError.requestError.localizedDescription, "Request Error")
+    func testLocalizedDescription_requestError() {
+        // Given
+        let comicInfoError = ComicInfoError.requestError
+        let localizedDescription = "Request Error"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
 
-    func testLocalizedDescription_itemAlreadyExists() throws {
-        XCTAssertEqual(
-            ComicInfoError.itemAlreadyExists(withID: "1", itemType: Character.self).localizedDescription,
-            "Character already exists with id: 1"
-        )
+    func testLocalizedDescription_itemAlreadyExists() {
+        // Given
+        let comicInfoError = ComicInfoError.itemAlreadyExists(withID: "1", itemType: Character.self)
+        let localizedDescription = "Character already exists with id: 1"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
 
-    func testLocalizedDescription_itemNotFound() throws {
-        XCTAssertEqual(
-            ComicInfoError.itemNotFound(withID: "1", itemType: Character.self).localizedDescription,
-            "We couldn't find Character with id: 1"
-        )
+    func testLocalizedDescription_itemNotFound() {
+        // Given
+        let comicInfoError = ComicInfoError.itemNotFound(withID: "1", itemType: Character.self)
+        let localizedDescription = "We couldn't find Character with id: 1"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
 
-    func testLocalizedDescription_itemsNotFound() throws {
-        XCTAssertEqual(
-            ComicInfoError.itemsNotFound(withIDs: ["1"], itemType: Character.self).localizedDescription,
-            "We couldn't find Character with ids: [\"1\"]"
-        )
+    func testLocalizedDescription_itemsNotFound() {
+        // Given
+        let comicInfoError = ComicInfoError.itemsNotFound(withIDs: ["1", "2"], itemType: Character.self)
+        let localizedDescription = "We couldn't find Character with ids: [\"1\", \"2\"]"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
 
-    func testLocalizedDescription_itemsNotFoundEmptySet() throws {
-        XCTAssertEqual(
-            ComicInfoError.itemsNotFound(withIDs: [], itemType: Character.self).localizedDescription,
-            "We couldn't find Character"
-        )
+    func testLocalizedDescription_itemsNotFoundEmptySet() {
+        // Given
+        let comicInfoError = ComicInfoError.itemsNotFound(withIDs: [], itemType: Character.self)
+        let localizedDescription = "We couldn't find Character"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
 
-    func testLocalizedDescription_invalidItemID() throws {
-        XCTAssertEqual(
-            ComicInfoError.invalidItemID("1", itemType: "character").localizedDescription,
-            "Invalid ItemID: Expected to decode character# but found a 1 instead."
-        )
-    }
-
-    func testLocalizedDescription_invalidSummaryID() throws {
-        XCTAssertEqual(
-            ComicInfoError.invalidSummaryID("1", itemType: "character").localizedDescription,
-            "Invalid SummaryID: Expected to decode character# but found a 1 instead."
-        )
+    func testLocalizedDescription_invalidItemID() {
+        // Given
+        let comicInfoError = ComicInfoError.invalidItemID("1", itemType: "character")
+        let localizedDescription = "Invalid ItemID: Expected to decode character# but found a 1 instead."
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
     
-    func testLocalizedDescription_invalidFields() throws {
-        XCTAssertEqual(
-            ComicInfoError.invalidFields(["UnknownField"]).localizedDescription,
-            "Invalid fields: [\"UnknownField\"]"
-        )
+    func testLocalizedDescription_summariesAlreadyExist() {
+        // Given
+        let comicInfoError = ComicInfoError.summariesAlreadyExist(["1", "2"])
+        let localizedDescription = "Summaries already exist withIDs: [\"1\", \"2\"]"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
 
-    func testLocalizedDescription_handlerUnknown() throws {
-        XCTAssertEqual(
-            ComicInfoError.handlerUnknown.localizedDescription,
-            "Handler Unknown"
-        )
+    func testLocalizedDescription_invalidSummaryID() {
+        // Given
+        let comicInfoError = ComicInfoError.invalidSummaryID("1", itemType: "character")
+        let localizedDescription = "Invalid SummaryID: Expected to decode character# but found a 1 instead."
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
     
-    func testLocalizedDescription_internalServerError() throws {
-        XCTAssertEqual(
-            ComicInfoError.internalServerError.localizedDescription,
-            "Internal Server Error"
-        )
+    func testLocalizedDescription_invalidFields() {
+        // Given
+        let comicInfoError = ComicInfoError.invalidFields(["UnknownField"])
+        let localizedDescription = "Invalid fields: [\"UnknownField\"]"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
+    }
+
+    func testLocalizedDescription_handlerUnknown() {
+        // Given
+        let comicInfoError = ComicInfoError.handlerUnknown
+        let localizedDescription = "Handler Unknown"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
+    }
+    
+    func testLocalizedDescription_internalServerError() {
+        // Given
+        let comicInfoError = ComicInfoError.internalServerError
+        let localizedDescription = "Internal Server Error"
+        
+        // When
+        let sut = comicInfoError.localizedDescription
+        
+        // Then
+        XCTAssertEqual(sut, localizedDescription)
     }
 
 }

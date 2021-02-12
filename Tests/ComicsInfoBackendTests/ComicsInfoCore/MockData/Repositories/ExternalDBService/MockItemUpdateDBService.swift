@@ -36,10 +36,13 @@ struct MockItemUpdateDBService: ItemUpdateDBService {
         return eventLoop.submit { item.updatedFields(old: oldItem) }
     }
     
-    func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        for summary in summaries {
-            guard let summaryData = try? JSONEncoder().encode(summary) else { continue }
-            TestDatabase.items["\(summary.itemID)|\(summary.summaryID)"] = summaryData
+    func updateSummaries<Summary: ItemSummary>(
+        with criteria: [UpdateSummariesCriteria<Summary>]
+    ) -> EventLoopFuture<Void> {
+        
+        for criterion in criteria {
+            guard let summaryData = try? JSONEncoder().encode(criterion.item) else { continue }
+            TestDatabase.items[criterion.ID] = summaryData
         }
 
         return eventLoop.submit { }

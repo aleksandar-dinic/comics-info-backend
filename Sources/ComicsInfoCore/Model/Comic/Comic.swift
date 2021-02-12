@@ -85,8 +85,6 @@ public struct Comic: SummaryMapper {
         title
     }
     
-    var comicSummaries: [ComicSummary]?
-    
 }
 
 extension Comic {
@@ -131,7 +129,6 @@ extension Comic {
         characters = newItem.characters
         seriesID = newItem.seriesID
         series = newItem.series
-        comicSummaries = newItem.comicSummaries
     }
     
 }

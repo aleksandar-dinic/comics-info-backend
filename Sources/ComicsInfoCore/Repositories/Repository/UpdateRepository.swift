@@ -21,8 +21,12 @@ public final class UpdateRepository {
         dataProvider.update(item, in: table)
     }
     
-    public func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        dataProvider.updateSummaries(summaries, in: table)
+    public func updateSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary],
+        in table: String,
+        strategy: UpdateSummariesStrategy = .default
+    ) -> EventLoopFuture<Void> {
+        dataProvider.updateSummaries(summaries, in: table, strategy: strategy)
     }
 
 }

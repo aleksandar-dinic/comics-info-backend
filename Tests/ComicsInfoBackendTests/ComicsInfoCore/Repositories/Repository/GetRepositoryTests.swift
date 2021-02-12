@@ -80,7 +80,7 @@ final class GetRepositoryTests: XCTestCase {
     func test_whenGetSummaries_returnsSummaries() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(ID: givenItem.itemID, dataSource: .database, table: table, key: .summaryID)
+        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .database, table: table, strategy: .summaryID)
         let databaseItems = MockItemSummaryFactory.makeData()
         sut = GetRepositoryFactory.make(items: databaseItems)
 

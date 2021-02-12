@@ -45,7 +45,7 @@ final class UpdateDataProviderTests: XCTestCase {
         let sut = UpdateDataProviderFactory.make()
         
         // When
-        let feature = sut.updateSummaries([item], in: table)
+        let feature = sut.updateSummaries([item], in: table, strategy: .default)
 
         // Then
         XCTAssertNoThrow(try feature.wait())

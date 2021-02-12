@@ -99,12 +99,17 @@ public extension GetUseCase {
     
     func getSummaries<Summary: ItemSummary>(
         on eventLoop: EventLoop,
-        forID ID: String,
-        dataSource: DataSourceLayer,
-        from table: String,
-        by key: PartitionKey
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
-        repository.getSummaries(with: GetSummariesCriteria(ID: ID, dataSource: dataSource, table: table, key: key))
+        repository.getSummaries(with: criteria)
+            .hop(to: eventLoop)
+    }
+    
+    func getSummary<Summary: ItemSummary>(
+        on eventLoop: EventLoop,
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        repository.getSummary(with: criteria)
             .hop(to: eventLoop)
     }
 

@@ -37,12 +37,16 @@ struct DatabaseMockUpdate: DatabaseUpdate {
         return eventLoop.submit { item.updatedFields(old: oldItem) }
     }
     
-    func updateSummaries<Summary: ItemSummary>(_ items: [Summary], in table: String) -> EventLoopFuture<Void> {
-        logger.log(level: .info, "UpdateSummaries items: \(items))")
+    func updateSummaries<Summary: ItemSummary>(
+        with criteria: [UpdateSummariesCriteria<Summary>]
+    ) -> EventLoopFuture<Void> {
+        logger.log(level: .info, "Update Summaries")
         
-        for item in items {
-            guard let itemData = try? JSONEncoder().encode(item) else { continue }
-            DatabaseMock.items["\(item.itemID)|\(item.summaryID)"] = itemData
+        for criterion in criteria {
+            logger.log(level: .info, "UpdateSummaries items: \(criterion.item))")
+            
+            guard let itemData = criterion.getData(oldData: DatabaseMock.items[criterion.ID]) else { continue }
+            DatabaseMock.items[criterion.ID] = itemData
         }
 
         return eventLoop.submit { }

@@ -78,7 +78,7 @@ struct DatabaseMock: DatabaseGet {
     }
     
     func getSummaries<Summary: ItemSummary>(
-        with criteria: GetSummariesDatabaseCriteria
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
         logger.log(level: .info, "GetSummaries items: itemName = \(criteria.itemName), ID = \(criteria.ID)")
         
@@ -91,6 +91,21 @@ struct DatabaseMock: DatabaseGet {
             items.append(item)
         }
         
+        return eventLoop.submit { !items.isEmpty ? items : nil }
+    }
+    
+    func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        logger.log(level: .info, "Get Summary")
+        
+        var items = [Summary]()
+        for criterion in criteria {
+            guard let data = DatabaseMock.items["\(criterion.itemID)|\(criterion.summaryID)"],
+                  let item = try? JSONDecoder().decode(Summary.self, from: data) else { continue }
+            items.append(item)
+        }
+
         return eventLoop.submit { !items.isEmpty ? items : nil }
     }
 

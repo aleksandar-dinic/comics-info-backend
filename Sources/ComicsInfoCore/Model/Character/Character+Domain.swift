@@ -55,8 +55,7 @@ extension Character {
             comics: comicSummary,
             itemID: .comicInfoID(for: character),
             summaryID: .comicInfoID(for: character),
-            itemName: .getType(from: Character.self),
-            characterSummaries: nil
+            itemName: .getType(from: Character.self)
         )
     }
     

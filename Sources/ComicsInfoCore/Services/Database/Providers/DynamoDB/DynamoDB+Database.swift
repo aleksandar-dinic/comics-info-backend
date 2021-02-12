@@ -99,7 +99,7 @@ extension DynamoDB {
     }
     
     public func getSummaries<Summary: ItemSummary>(
-        with criteria: GetSummariesDatabaseCriteria
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
         let input = criteria.queryInput
 
@@ -111,6 +111,37 @@ extension DynamoDB {
                 }
                 return items
             }
+    }
+    
+    public func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        
+        DynamoDB.logger.log(level: .info, "Get Summary")
+        var futures = [EventLoopFuture<Summary?>]()
+        
+        for criterion in criteria {
+            let input = GetItemInput(
+                key: ["itemID": .s(criterion.itemID), "summaryID": .s(criterion.summaryID)],
+                tableName: criterion.table
+            )
+
+            DynamoDB.logger.log(level: .info, "Get Summary input: \(input)")
+            let future: EventLoopFuture<Summary?> = getItem(input, type: Summary.self).flatMapThrowing {
+                DynamoDB.logger.log(level: .info, "Get Summary output: \($0)")
+                return $0.item
+            }
+            futures.append(future)
+        }
+
+        let futureResult = EventLoopFuture.reduce([Summary](), futures, on: client.eventLoopGroup.next()) { (items, item) in
+            guard let item = item else { return items }
+            var items = items
+            items.append(item)
+            return items
+        }
+        
+        return futureResult.map { !$0.isEmpty ? $0 : nil }
     }
 
 }

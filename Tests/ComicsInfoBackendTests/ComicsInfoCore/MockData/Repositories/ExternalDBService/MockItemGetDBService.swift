@@ -71,17 +71,8 @@ struct MockItemGetDBService: ItemGetDBService {
     }
     
     func getSummaries<Summary: ItemSummary>(
-        _ summaries: String,
-        forID ID: String,
-        from table: String,
-        by key: PartitionKey
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
-        let criteria = GetSummariesDatabaseCriteria(
-            itemName: summaries,
-            ID: ID,
-            table: table,
-            partitionKey: key
-        )
         
         var items = [Summary]()
         for (_, el) in TestDatabase.items.enumerated() {
@@ -92,6 +83,19 @@ struct MockItemGetDBService: ItemGetDBService {
             items.append(item)
         }
         
+        return eventLoop.submit { !items.isEmpty ? items : nil }
+    }
+    
+    func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        var items = [Summary]()
+        for criterion in criteria {
+            guard let data = DatabaseMock.items["\(criterion.itemID)|\(criterion.summaryID)"],
+                  let item = try? JSONDecoder().decode(Summary.self, from: data) else { continue }
+            items.append(item)
+        }
+
         return eventLoop.submit { !items.isEmpty ? items : nil }
     }
     

@@ -14,8 +14,14 @@ public protocol UpdateUseCase {
     associatedtype Item: ComicInfoItem
 
     var repository: UpdateRepository { get }
+    
+    func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
 
-    func addSummaries(to item: Item, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item>
+    func updateSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary],
+        in table: String,
+        strategy: UpdateSummariesStrategy
+    ) -> EventLoopFuture<Void>
     
     func getItem(
         withID ID: String,
@@ -23,20 +29,19 @@ public protocol UpdateUseCase {
         from table: String
     ) -> EventLoopFuture<Item>
     
-    func updateSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
-    func updateExistingSummaries(for item: Item, on eventLoop: EventLoop, fields: Set<String>, in table: String) -> EventLoopFuture<Bool>
-
 }
 
 extension UpdateUseCase {
     
-    public func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        addSummaries(to: item, on: eventLoop, from: table)
-            .flatMap { updateItem($0, on: eventLoop, in: table) }
-            .hop(to: eventLoop)
+    public func updateSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary],
+        in table: String,
+        strategy: UpdateSummariesStrategy = .default
+    ) -> EventLoopFuture<Void> {
+        repository.updateSummaries(summaries, in: table, strategy: strategy)
     }
     
-    private func updateItem(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
+    func updateItem(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Set<String>> {
         getItem(withID: item.id, on: eventLoop, from: table)
             .flatMap { oldItem in
                 let fields = item.updatedFields(old: oldItem)
@@ -45,20 +50,6 @@ extension UpdateUseCase {
                 newItem.update(with: item)
                 return repository.update(newItem, in: table)
             }
-            .flatMap { fields in
-                updateSummaries(for: item, on: eventLoop, in: table)
-                    .and(updateExistingSummaries(for: item, on: eventLoop, fields: fields, in: table))
-                    .map { _ in }
-            }
-    }
-    
-    func updateSummaries<Summary: ItemSummary>(
-        _ summaries: [Summary]?,
-        on eventLoop: EventLoop,
-        in table: String
-    ) -> EventLoopFuture<Void> {
-        guard let summaries = summaries else { return eventLoop.submit { } }
-        return repository.updateSummaries(summaries, in: table)
     }
     
 }

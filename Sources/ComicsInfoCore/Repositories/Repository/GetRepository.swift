@@ -29,8 +29,16 @@ public final class GetRepository<Item, CacheProvider: Cacheable> where CacheProv
         dataProvider.getAllItems(with: criteria)
     }
     
-    public func getSummaries<Summary: ItemSummary>(with criteria: GetSummariesCriteria) -> EventLoopFuture<[Summary]?> {
+    public func getSummaries<Summary: ItemSummary>(
+        with criteria: GetSummariesCriteria<Summary>
+    ) -> EventLoopFuture<[Summary]?> {
         dataProvider.getSummaries(with: criteria)
+    }
+    
+    public func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        dataProvider.getSummary(with: criteria)
     }
 
 }

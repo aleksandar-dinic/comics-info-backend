@@ -56,8 +56,6 @@ public struct Character: SummaryMapper {
     public let summaryID: String
     public let itemName: String
     
-    var characterSummaries: [CharacterSummary]?
-    
 }
 
 extension Character {
@@ -84,7 +82,6 @@ extension Character {
         series = newItem.series
         comicsID = newItem.comicsID
         comics = newItem.comics
-        characterSummaries = newItem.characterSummaries
     }
 
 }

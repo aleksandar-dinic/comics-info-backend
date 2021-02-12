@@ -12,6 +12,8 @@ import NIO
 public protocol DatabaseUpdate {
 
     func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>>
-    func updateSummaries<Summary: ItemSummary>(_ items: [Summary], in table: String) -> EventLoopFuture<Void>
+    func updateSummaries<Summary: ItemSummary>(
+        with criteria: [UpdateSummariesCriteria<Summary>]
+    ) -> EventLoopFuture<Void>
     
 }

@@ -29,11 +29,16 @@ struct ItemGetDBWrapper<Item: ComicInfoItem> {
     }
     
     func getSummaries<Summary: ItemSummary>(
-        forID ID: String,
-        from table: String,
-        by key: PartitionKey
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
-        itemGetDBService.getSummaries(.getType(from: Summary.self), forID: ID, from: table, by: key)
+        itemGetDBService.getSummaries(with: criteria)
+            .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Summary.self) }
+    }
+    
+    func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        itemGetDBService.getSummary(with: criteria)
             .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Summary.self) }
     }
 

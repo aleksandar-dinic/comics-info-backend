@@ -156,5 +156,5 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
             XCTFail("Expected '.itemsNotFound' but got \(error)")
         }
     }
-
+    
 }

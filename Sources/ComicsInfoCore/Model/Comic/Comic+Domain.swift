@@ -62,8 +62,7 @@ extension Comic {
             series: seriesSummary,
             itemID: .comicInfoID(for: comic),
             summaryID: .comicInfoID(for: comic),
-            itemName: .getType(from: Comic.self),
-            comicSummaries: nil
+            itemName: .getType(from: Comic.self)
         )
     }
     

@@ -21,8 +21,10 @@ public final class UpdateDatabaseProvider: ItemUpdateDBService {
         database.update(item, in: table)
     }
     
-    public func updateSummaries<Summary: ItemSummary>(_ items: [Summary], in table: String) -> EventLoopFuture<Void> {
-        database.updateSummaries(items, in: table)
+    public func updateSummaries<Summary: ItemSummary>(
+        with criteria: [UpdateSummariesCriteria<Summary>]
+    ) -> EventLoopFuture<Void> {
+        database.updateSummaries(with: criteria)
     }
     
 }

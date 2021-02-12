@@ -13,26 +13,28 @@ public protocol CreateUseCase {
 
     associatedtype Item: ComicInfoItem
 
-    var repository: CreateRepository { get }
+    var createRepository: CreateRepository { get }
 
-    func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
-    func createSummaries(for item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
+    func create(
+        _ item: Item,
+        on eventLoop: EventLoop,
+        in table: String
+    ) -> EventLoopFuture<Void>
     
-    func addSummaries(to item: Item, on eventLoop: EventLoop, from table: String) -> EventLoopFuture<Item>
+    func createSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary],
+        in table: String
+    ) -> EventLoopFuture<Void>
     
 }
 
 extension CreateUseCase {
     
-    public func create(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        addSummaries(to: item, on: eventLoop, from: table)
-            .flatMap { createItemAndSummaries($0, on: eventLoop, in: table) }
-            .hop(to: eventLoop)
+    public func createSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary],
+        in table: String
+    ) -> EventLoopFuture<Void> {
+        createRepository.createSummaries(summaries, in: table)
     }
-
-    private func createItemAndSummaries(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        repository.create(item, in: table)
-            .flatMap { createSummaries(for: item, on: eventLoop, in: table) }
-    }
-
+    
 }

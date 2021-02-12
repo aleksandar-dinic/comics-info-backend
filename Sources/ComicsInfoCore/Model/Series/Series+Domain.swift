@@ -56,8 +56,7 @@ extension Series {
             comics: comicSummary,
             itemID: .comicInfoID(for: series),
             summaryID: .comicInfoID(for: series),
-            itemName: .getType(from: Series.self),
-            seriesSummaries: nil
+            itemName: .getType(from: Series.self)
         )
     }
     

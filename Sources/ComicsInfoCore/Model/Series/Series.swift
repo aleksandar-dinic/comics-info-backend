@@ -63,8 +63,6 @@ public struct Series: SummaryMapper {
         title
     }
     
-    var seriesSummaries: [SeriesSummary]?
-    
 }
 
 extension Series {
@@ -96,7 +94,6 @@ extension Series {
         characters = newItem.characters
         comicsID = newItem.comicsID
         comics = newItem.comics
-        seriesSummaries = newItem.seriesSummaries
     }
     
 }

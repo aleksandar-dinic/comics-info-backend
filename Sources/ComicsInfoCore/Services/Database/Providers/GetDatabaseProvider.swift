@@ -30,12 +30,15 @@ public final class GetDatabaseProvider: ItemGetDBService {
     }
     
     public func getSummaries<Summary: ItemSummary>(
-        _ summaries: String,
-        forID ID: String,
-        from table: String,
-        by key: PartitionKey
+        with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
-        database.getSummaries(with: GetSummariesDatabaseCriteria(itemName: summaries, ID: ID, table: table, partitionKey: key))
+        database.getSummaries(with: criteria)
+    }
+    
+    public func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
+    ) -> EventLoopFuture<[Summary]?> {
+        database.getSummary(with: criteria)
     }
 
 }

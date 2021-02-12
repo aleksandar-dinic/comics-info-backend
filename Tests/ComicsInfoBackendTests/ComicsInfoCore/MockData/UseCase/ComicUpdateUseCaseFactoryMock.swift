@@ -11,7 +11,7 @@ import Foundation
 import Logging
 import NIO
 
-struct ComicUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
+struct ComicUpdateUseCaseFactoryMock: UpdateUseCaseFactory, CreateRepositoryBuilder {
 
     var eventLoop: EventLoop
     var logger: Logger
@@ -27,6 +27,7 @@ struct ComicUpdateUseCaseFactoryMock: UpdateUseCaseFactory {
     func makeUseCase() -> ComicUpdateUseCase {
         ComicUpdateUseCase(
             repository: makeRepository(),
+            createRepository: makeCreateRepository(),
             characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
             seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()

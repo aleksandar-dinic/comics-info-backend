@@ -16,10 +16,11 @@ public protocol ItemGetDBService {
     func getAll<Item: ComicInfoItem>(_ items: String, from table: String) -> EventLoopFuture<[Item]>
 
     func getSummaries<Summary: ItemSummary>(
-        _ summaries: String,
-        forID ID: String,
-        from table: String,
-        by key: PartitionKey
+        with criteria: GetSummariesCriteria<Summary>
+    ) -> EventLoopFuture<[Summary]?>
+    
+    func getSummary<Summary: ItemSummary>(
+        with criteria: [GetSummaryCriteria<Summary>]
     ) -> EventLoopFuture<[Summary]?>
     
 }

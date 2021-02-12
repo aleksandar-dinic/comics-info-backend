@@ -17,8 +17,12 @@ struct UpdateDataProvider {
         itemUpdateDBWrapper.update(item, in: table)
     }
     
-    func updateSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        itemUpdateDBWrapper.updateSummaries(summaries, in: table)
+    func updateSummaries<Summary: ItemSummary>(
+        _ summaries: [Summary],
+        in table: String,
+        strategy: UpdateSummariesStrategy
+    ) -> EventLoopFuture<Void> {
+        itemUpdateDBWrapper.updateSummaries(summaries, in: table, strategy: strategy)
     }
 
 }

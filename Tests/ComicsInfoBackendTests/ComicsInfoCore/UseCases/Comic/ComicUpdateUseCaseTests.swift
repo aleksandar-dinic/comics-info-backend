@@ -121,4 +121,172 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         XCTAssertNoThrow(try feature.wait())
     }
     
+    func test_whenUpdateComic_existingSummariesAreUpdated() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let comic = ComicFactory.make(
+            id: "ComicID",
+            popularity: 0,
+            title: "Old Comic Title",
+            thumbnail: "Old Comic Thumbnail",
+            description: "Old Comic Description",
+            seriesID: [series.id]
+        )
+        try createComic(comic)
+
+        // When
+        let newComic = ComicFactory.make(
+            id: "ComicID",
+            popularity: 1,
+            title: "New Comic Title",
+            thumbnail: "New Comic Thumbnail",
+            description: "New Comic Description"
+        )
+        let feature = sut.update(newComic, on: eventLoop, in: table)
+
+        // Then
+        XCTAssertNoThrow(try feature.wait())
+        if let data = DatabaseMock.items["Comic#ComicID|Series#SeriesID"],
+           let comicSummary = try? JSONDecoder().decode(ComicSummary.self, from: data) {
+            XCTAssertEqual(comicSummary.popularity, newComic.popularity)
+            XCTAssertEqual(comicSummary.name, newComic.name)
+            XCTAssertEqual(comicSummary.thumbnail, newComic.thumbnail)
+            XCTAssertEqual(comicSummary.description, newComic.description)
+        } else {
+            XCTFail("CoimcSummary with ID: Comic#ComicID|Series#SeriesID doesn't exist")
+        }
+    }
+    
+    func test_whenUpdateComic_characterSummaryForSeriesIsUpdated() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let character = CharacterFactory.make(id: "CharacterID")
+        try createCharacter(character)
+        let comic = ComicFactory.make(id: "ComicID")
+        try createComic(comic)
+
+        // When
+        let newComic = ComicFactory.make(
+            id: "ComicID",
+            charactersID: [character.id],
+            seriesID: [series.id]
+        )
+        let feature = sut.update(newComic, on: eventLoop, in: table)
+
+        // Then
+        XCTAssertNoThrow(try feature.wait())
+        if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
+            XCTAssertEqual(characterSummary.count, 1)
+        } else {
+            XCTFail("characterSummary with ID: Character#CharacterID|Series#SeriesID doesn't exist")
+        }
+    }
+    
+    func test_whenUpdateComic_characterSummaryForSeriesCountIsUpdated() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let character = CharacterFactory.make(id: "CharacterID")
+        try createCharacter(character)
+        let comic = ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id])
+        try createComic(comic)
+        
+        let comic2 = ComicFactory.make(id: "ComicID2")
+        try createComic(comic2)
+
+        // When
+        let newComic = ComicFactory.make(
+            id: "ComicID2",
+            charactersID: [character.id],
+            seriesID: [series.id]
+        )
+        let feature = sut.update(newComic, on: eventLoop, in: table)
+
+        // Then
+        XCTAssertNoThrow(try feature.wait())
+        if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
+           let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
+            XCTAssertEqual(characterSummary.count, 2)
+        } else {
+            XCTFail("characterSummary with ID: Character#CharacterID|Series#SeriesID doesn't exist")
+        }
+    }
+    
+    func test_whenUpdateWithCharacterIDWhichAlreadyExists_throwSummariesAlreadyExist() throws {
+        // Given
+        let character = CharacterFactory.make(id: "CharacterID")
+        try createCharacter(character)
+        let comic = ComicFactory.make(id: "ComicID", charactersID: [character.id])
+        try createComic(comic)
+        var thrownError: Error?
+
+        // When
+        let newComic = ComicFactory.make(id: "ComicID", charactersID: [character.id])
+        let feature = sut.update(newComic, on: eventLoop, in: table)
+        XCTAssertThrowsError(try feature.wait()) {
+            thrownError = $0
+        }
+        
+        // Then
+        let error = try XCTUnwrap(thrownError)
+        if case .summariesAlreadyExist(let IDs) = error as? ComicInfoError {
+            XCTAssertEqual(IDs, ["Character#CharacterID"])
+        } else {
+            XCTFail("Expected '.summariesAlreadyExist' but got \(error)")
+        }
+    }
+    
+    func test_whenUpdateWithSeriesIDWhichAlreadyExists_throwSummariesAlreadyExist() throws {
+        // Given
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let comic = ComicFactory.make(id: "ComicID", seriesID: [series.id])
+        try createComic(comic)
+        var thrownError: Error?
+
+        // When
+        let newComic = ComicFactory.make(id: "ComicID", seriesID: [series.id])
+        let feature = sut.update(newComic, on: eventLoop, in: table)
+        XCTAssertThrowsError(try feature.wait()) {
+            thrownError = $0
+        }
+        
+        // Then
+        let error = try XCTUnwrap(thrownError)
+        if case .summariesAlreadyExist(let IDs) = error as? ComicInfoError {
+            XCTAssertEqual(IDs, ["Series#SeriesID"])
+        } else {
+            XCTFail("Expected '.summariesAlreadyExist' but got \(error)")
+        }
+    }
+    
+    func test_whenUpdateWithCharacterAndSeriesIDWhichAlreadyExists_throwSummariesAlreadyExist() throws {
+        // Given
+        let character = CharacterFactory.make(id: "CharacterID")
+        try createCharacter(character)
+        let series = SeriesFactory.make(id: "SeriesID")
+        try createSeries(series)
+        let comic = ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id])
+        try createComic(comic)
+        var thrownError: Error?
+
+        // When
+        let newComic = ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id])
+        let feature = sut.update(newComic, on: eventLoop, in: table)
+        XCTAssertThrowsError(try feature.wait()) {
+            thrownError = $0
+        }
+        
+        // Then
+        let error = try XCTUnwrap(thrownError)
+        if case .summariesAlreadyExist(let IDs) = error as? ComicInfoError {
+            XCTAssertEqual(IDs.sorted(), ["Character#CharacterID", "Series#SeriesID"].sorted())
+        } else {
+            XCTFail("Expected '.summariesAlreadyExist' but got \(error)")
+        }
+    }
+    
 }
