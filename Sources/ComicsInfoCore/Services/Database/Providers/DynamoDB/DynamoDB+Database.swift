@@ -82,9 +82,9 @@ extension DynamoDB {
 
     public func getAll<Item: Codable>(_ items: String, from table: String) -> EventLoopFuture<[Item]> {
         let input = QueryInput(
-            expressionAttributeValues: [":itemName": .s(items)],
-            indexName: "itemName-summaryID-index",
-            keyConditionExpression: "itemName = :itemName",
+            expressionAttributeValues: [":itemType": .s(items)],
+            indexName: "itemType-summaryID-index",
+            keyConditionExpression: "itemType = :itemType",
             tableName: table
         )
 

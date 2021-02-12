@@ -66,23 +66,68 @@ public struct Comic: SummaryMapper {
     private(set) var published: Date?
 
     /// A resource list containing charactersID which appear in this comic.
-    var charactersID: Set<String>?
+    private(set) var charactersID: Set<String>?
 
     /// A resource list containing the characters which appear in this comic.
     var characters: [CharacterSummary]?
 
     /// A resource list of seriesID in which this comic appears.
-    var seriesID: Set<String>?
+    private(set) var seriesID: Set<String>?
 
     /// A resource list containing the series in which this comic appears.
     var series: [SeriesSummary]?
     
     public let itemID: String
     public let summaryID: String
-    public let itemName: String
+    public let itemType: String
     
     public var name: String {
         title
+    }
+    
+    init(
+        id: String,
+        popularity: Int,
+        title: String,
+        thumbnail: String?,
+        description: String?,
+        number: String?,
+        aliases: [String]?,
+        variantDescription: String?,
+        format: String?,
+        pageCount: Int?,
+        variantsIdentifier: [String]?,
+        collectionsIdentifier: [String]?,
+        collectedIdentifiers: [String]?,
+        images: [String]?,
+        published: Date?,
+        charactersID: Set<String>?,
+        seriesID: Set<String>?
+    ) {
+        let now = Date()
+        
+        self.id = id
+        self.popularity = popularity
+        self.title = title
+        dateAdded = now
+        dateLastUpdated = now
+        self.thumbnail = thumbnail
+        self.description = description
+        self.number = number
+        self.aliases = aliases
+        self.variantDescription = variantDescription
+        self.format = format
+        self.pageCount = pageCount
+        self.variantsIdentifier = variantsIdentifier
+        self.collectionsIdentifier = collectionsIdentifier
+        self.collectedIdentifiers = collectedIdentifiers
+        self.images = images
+        self.published = published
+        self.charactersID = charactersID
+        self.seriesID = seriesID
+        itemID = .comicInfoID(for: Comic.self, ID: id)
+        summaryID = .comicInfoID(for: Comic.self, ID: id)
+        itemType = .getType(from: Comic.self)
     }
     
 }
@@ -155,7 +200,7 @@ extension Comic {
         case published
         case itemID
         case summaryID
-        case itemName
+        case itemType
     }
     
 }

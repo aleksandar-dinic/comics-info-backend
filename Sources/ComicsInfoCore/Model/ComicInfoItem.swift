@@ -12,7 +12,7 @@ public protocol ComicInfoItem: Identifiable, Codable where ID == String {
     
     var itemID: String { get }
     var summaryID: String { get }
-    var itemName: String { get }
+    var itemType: String { get }
     
     mutating func update(with newItem: Self)
     

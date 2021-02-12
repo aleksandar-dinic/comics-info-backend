@@ -14,7 +14,7 @@ struct MockSummaryMapper: SummaryMapper {
     let id: String
     let itemID: String
     let summaryID: String
-    let itemName: String
+    let itemType: String
 
     private(set) var popularity: Int
     private(set) var name: String
@@ -40,7 +40,7 @@ enum MockSummaryMapperFactory {
         id: String = "1",
         itemID: String = "MockSummaryMapper#1",
         summaryID: String = "MockSummaryMapper#1",
-        itemName: String = "MockSummaryMapper",
+        itemType: String = "MockSummaryMapper",
         popularity: Int = 0,
         name: String = "Mock Summary Mapper Name",
         thumbnail: String? = "Mock Summary Mapper Thumbnail",
@@ -50,7 +50,7 @@ enum MockSummaryMapperFactory {
             id: id,
             itemID: itemID,
             summaryID: summaryID,
-            itemName: itemName,
+            itemType: itemType,
             popularity: popularity,
             name: name,
             thumbnail: thumbnail,

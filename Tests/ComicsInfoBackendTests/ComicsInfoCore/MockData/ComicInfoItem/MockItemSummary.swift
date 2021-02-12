@@ -13,7 +13,7 @@ struct MockItemSummary: ItemSummary {
 
     let itemID: String
     let summaryID: String
-    let itemName: String
+    let itemType: String
     let dateAdded: Date
     let dateLastUpdated: Date
     let popularity: Int
@@ -28,7 +28,7 @@ enum MockItemSummaryFactory {
     static func make(
         itemID: String = "MockItemSummary#1",
         summaryID: String = "MockItemSummary#1",
-        itemName: String = "MockItemSummary",
+        itemType: String = "MockItemSummary",
         dateAdded: Date = Date(),
         dateLastUpdated: Date = Date(),
         popularity: Int = 0,
@@ -39,7 +39,7 @@ enum MockItemSummaryFactory {
         MockItemSummary(
             itemID: itemID,
             summaryID: summaryID,
-            itemName: itemName,
+            itemType: itemType,
             dateAdded: dateAdded,
             dateLastUpdated: dateLastUpdated,
             popularity: popularity,

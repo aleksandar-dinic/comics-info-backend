@@ -33,17 +33,13 @@ enum CharacterFactory {
             id: ID,
             popularity: popularity,
             name: "Character Name \(ID)",
-            dateAdded: Date(),
-            dateLastUpdated: Date(),
             thumbnail: "Character Thumbnail \(ID)",
             description: "Character Description \(ID)",
             realName: "Character \(ID) Real Name",
             aliases: ["Character \(ID) Aliases"],
             birth: Date(),
             seriesID: nil,
-            series: nil,
-            comicsID: nil,
-            comics: nil
+            comicsID: nil
         )
     }
     
@@ -51,36 +47,25 @@ enum CharacterFactory {
         id: String = "1",
         popularity: Int = 0,
         name: String = "Character Name",
-        dateAdded: Date = Date(),
-        dateLastUpdated: Date = Date(),
         thumbnail: String? = nil,
         description: String? = nil,
         realName: String? = nil,
         aliases: [String]? = nil,
         birth: Date? = nil,
         seriesID: Set<String>? = nil,
-        series: [SeriesSummary]? = nil,
-        comicsID: Set<String>? = nil,
-        comics: [ComicSummary]? = nil
+        comicsID: Set<String>? = nil
     ) -> Character {
         Character(
             id: id,
             popularity: popularity,
             name: name,
-            dateAdded: dateAdded,
-            dateLastUpdated: dateLastUpdated,
             thumbnail: thumbnail,
             description: description,
             realName: realName,
             aliases: aliases,
             birth: birth,
             seriesID: seriesID,
-            series: series,
-            comicsID: comicsID,
-            comics: comics,
-            itemID: "Character#\(id)",
-            summaryID: "Character#\(id)",
-            itemName: "Character"
+            comicsID: comicsID
         )
     }
     
@@ -96,7 +81,7 @@ enum CharacterFactory {
         [
             "itemID": "Character#1",
             "summaryID": "Character#1",
-            "itemName": "Character",
+            "itemType": "Character",
             "summaryName": "Character",
             "popularity": 0,
             "name": "Character Name",

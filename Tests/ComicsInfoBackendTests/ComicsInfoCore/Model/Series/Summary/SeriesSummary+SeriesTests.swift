@@ -38,8 +38,8 @@ final class SeriesSummary_SeriesTests: XCTestCase {
         XCTAssertEqual(sut.summaryID, "\(String.getType(from: Character.self))#\(character.id)")
     }
     
-    func testItemName_whenInitFromSeries() {
-        XCTAssertEqual(sut.itemName, .getType(from: SeriesSummary.self))
+    func testItemType_whenInitFromSeries() {
+        XCTAssertEqual(sut.itemType, .getType(from: SeriesSummary.self))
     }
     
     func testDateAdded_whenInitFromSeries() {

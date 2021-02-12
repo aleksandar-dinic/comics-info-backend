@@ -7,16 +7,15 @@
 //
 
 @testable import struct ComicsInfoCore.CharacterSummary
+@testable import struct ComicsInfoCore.Character
 import Foundation
 
 enum CharacterSummaryFactory {
     
     static func make(ID: String = "1", popularity: Int = 0) -> CharacterSummary {
         make(
-            itemID: "Character#\(ID)",
-            summaryID: "Character#\(ID)",
-            dateAdded: Date(),
-            dateLastUpdated: Date(),
+            ID: ID,
+            link: CharacterFactory.make(ID: "9"),
             popularity: popularity,
             name: "CharacterSummary \(ID) Name",
             thumbnail: "CharacterSummary \(ID) Thumbnail",
@@ -26,11 +25,8 @@ enum CharacterSummaryFactory {
     }
 
     static func make(
-        itemID: String = "Character#1",
-        summaryID: String = "Character#1",
-        itemName: String = "Character",
-        dateAdded: Date = Date(),
-        dateLastUpdated: Date = Date(),
+        ID: String = "1",
+        link: Character = CharacterFactory.make(ID: "9"),
         popularity: Int = 0,
         name: String = "CharacterSummary 1 Name",
         thumbnail: String? = "CharacterSummary 1 Thumbnail",
@@ -38,11 +34,8 @@ enum CharacterSummaryFactory {
         count: Int? = 1
     ) -> CharacterSummary {
         CharacterSummary(
-            itemID: itemID,
-            summaryID: summaryID,
-            itemName: itemName,
-            dateAdded: dateAdded,
-            dateLastUpdated: dateLastUpdated,
+            ID: ID,
+            link: link,
             popularity: popularity,
             name: name,
             thumbnail: thumbnail,

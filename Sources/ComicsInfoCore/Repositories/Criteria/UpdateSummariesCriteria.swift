@@ -71,26 +71,16 @@ extension UpdateSummariesCriteria {
         }
         
         guard strategy == .characterInSeries,
-              let newSummary = item as? CharacterSummary,
+              var newSummary = item as? CharacterSummary,
               let oldData = oldData,
               let oldSummary = try? JSONDecoder().decode(CharacterSummary.self, from: oldData) else {
             return try? JSONEncoder().encode(item)
         }
+
+        newSummary.incrementCount(oldSummary.count ?? 0)
         
-        let updatedSummary = CharacterSummary(
-            itemID: newSummary.itemID,
-            summaryID: newSummary.summaryID,
-            itemName: newSummary.itemName,
-            dateAdded: newSummary.dateAdded,
-            dateLastUpdated: newSummary.dateLastUpdated,
-            popularity: newSummary.popularity,
-            name: newSummary.name,
-            thumbnail: newSummary.thumbnail,
-            description: newSummary.description,
-            count: (newSummary.count ?? 0) + (oldSummary.count ?? 0)
-        )
-        
-        guard let itemData = try? JSONEncoder().encode(updatedSummary) else { return nil }
+        guard let itemData = try? JSONEncoder().encode(newSummary) else { return nil }
         return itemData
     }
+
 }

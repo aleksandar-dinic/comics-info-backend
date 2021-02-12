@@ -59,7 +59,7 @@ struct MockItemGetDBService: ItemGetDBService {
         var databaseItems = [Item]()
         for value in TestDatabase.items.values {
             guard let item = try? JSONDecoder().decode(Item.self, from: value),
-                  item.itemName == items else { continue }
+                  item.itemType == items else { continue }
             databaseItems.append(item)
         }
 
@@ -78,7 +78,7 @@ struct MockItemGetDBService: ItemGetDBService {
         for (_, el) in TestDatabase.items.enumerated() {
             guard criteria.isValidKey(el.key),
                   let item = try? JSONDecoder().decode(Summary.self, from: el.value),
-                  item.itemName == criteria.itemName
+                  item.itemType == criteria.itemType
             else { continue }
             items.append(item)
         }

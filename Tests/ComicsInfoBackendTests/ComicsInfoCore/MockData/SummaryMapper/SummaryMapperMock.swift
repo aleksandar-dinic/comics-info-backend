@@ -14,7 +14,7 @@ struct SummaryMapperMock: SummaryMapper {
     let id: String
     let itemID: String
     let summaryID: String
-    let itemName: String
+    let itemType: String
     
     private(set) var popularity: Int
     private(set) var name: String
@@ -36,7 +36,7 @@ struct SummaryMapperMock: SummaryMapper {
         id: String = "1",
         itemID: String = "itemID",
         summaryID: String = "summaryID",
-        itemName: String = "itemName",
+        itemType: String = "itemType",
         popularity: Int = 0,
         name: String = "name",
         thumbnail: String? = "thumbnail",
@@ -46,7 +46,7 @@ struct SummaryMapperMock: SummaryMapper {
             id: id,
             itemID: itemID,
             summaryID: summaryID,
-            itemName: itemName,
+            itemType: itemType,
             popularity: popularity,
             name: name,
             thumbnail: thumbnail,

@@ -7,16 +7,15 @@
 //
 
 @testable import struct ComicsInfoCore.ComicSummary
+@testable import struct ComicsInfoCore.Comic
 import Foundation
 
 enum ComicSummaryFactory {
     
     static func make(ID: String = "1", popularity: Int = 0) -> ComicSummary {
         make(
-            itemID: "Comic#\(ID)",
-            summaryID: "Comic#\(ID)",
-            dateAdded: Date(),
-            dateLastUpdated: Date(),
+            ID: ID,
+            link: ComicFactory.make(ID: "9"),
             popularity: 0,
             name: "ComicSummary \(ID) Name",
             thumbnail: "ComicSummary \(ID) Thumbnail",
@@ -26,11 +25,8 @@ enum ComicSummaryFactory {
     }
 
     static func make(
-        itemID: String = "Comic#1",
-        summaryID: String = "Comic#1",
-        itemName: String = "Comic",
-        dateAdded: Date = Date(),
-        dateLastUpdated: Date = Date(),
+        ID: String = "1",
+        link: Comic = ComicFactory.make(ID: "9"),
         popularity: Int = 0,
         name: String = "ComicSummary 1 Name",
         thumbnail: String? = nil,
@@ -38,11 +34,8 @@ enum ComicSummaryFactory {
         number: String? = nil
     ) -> ComicSummary {
         ComicSummary(
-            itemID: itemID,
-            summaryID: summaryID,
-            itemName: itemName,
-            dateAdded: dateAdded,
-            dateLastUpdated: dateLastUpdated,
+            ID: ID,
+            link: link,
             popularity: popularity,
             name: name,
             thumbnail: thumbnail,

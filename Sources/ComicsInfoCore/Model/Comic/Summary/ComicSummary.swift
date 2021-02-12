@@ -12,7 +12,7 @@ struct ComicSummary: ItemSummary {
     
     let itemID: String
     let summaryID: String
-    let itemName: String
+    let itemType: String
     
     let dateAdded: Date
     private(set) var dateLastUpdated: Date
@@ -21,6 +21,29 @@ struct ComicSummary: ItemSummary {
     private(set) var thumbnail: String?
     private(set) var description: String?
     private(set) var number: String?
+    
+    init<Link: Identifiable>(
+        ID: String,
+        link: Link,
+        popularity: Int,
+        name: String,
+        thumbnail: String?,
+        description: String?,
+        number: String?
+    ) {
+        let now = Date()
+        
+        self.itemID = .comicInfoID(for: Comic.self, ID: ID)
+        self.summaryID = .comicInfoID(for: link)
+        itemType = .getType(from: ComicSummary.self)
+        dateAdded = now
+        dateLastUpdated = now
+        self.popularity = popularity
+        self.name = name
+        self.thumbnail = thumbnail
+        self.description = description
+        self.number = number
+    }
     
     mutating func update(with comic: Comic) {
         dateLastUpdated = Date()

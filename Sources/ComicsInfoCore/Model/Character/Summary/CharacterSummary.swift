@@ -12,7 +12,7 @@ struct CharacterSummary: ItemSummary {
     
     let itemID: String
     let summaryID: String
-    let itemName: String
+    let itemType: String
     
     let dateAdded: Date
     private(set) var dateLastUpdated: Date
@@ -22,6 +22,29 @@ struct CharacterSummary: ItemSummary {
     private(set) var description: String?
     private(set) var count: Int?
     
+    init<Link: Identifiable>(
+        ID: String,
+        link: Link,
+        popularity: Int,
+        name: String,
+        thumbnail: String?,
+        description: String?,
+        count: Int?
+    ) {
+        let now = Date()
+        
+        self.itemID = .comicInfoID(for: Character.self, ID: ID)
+        self.summaryID = .comicInfoID(for: link)
+        itemType = .getType(from: CharacterSummary.self)
+        dateAdded = now
+        dateLastUpdated = now
+        self.popularity = popularity
+        self.name = name
+        self.thumbnail = thumbnail
+        self.description = description
+        self.count = count
+    }
+    
     mutating func update(with character: Character) {
         dateLastUpdated = Date()
         popularity = character.popularity
@@ -29,5 +52,14 @@ struct CharacterSummary: ItemSummary {
         thumbnail = character.thumbnail
         description = character.description
     }
+    
 
+}
+
+extension CharacterSummary {
+    
+    mutating func incrementCount(_ newValue: Int) {
+        count = (count ?? 0) + newValue
+    }
+    
 }

@@ -66,7 +66,7 @@ struct DatabaseMock: DatabaseGet {
         var databaseItems = [Item]()
         for value in DatabaseMock.items.values {
             guard let item = try? JSONDecoder().decode(Item.self, from: value),
-                  item.itemName == items else { continue }
+                  item.itemType == items else { continue }
             databaseItems.append(item)
         }
 
@@ -80,13 +80,13 @@ struct DatabaseMock: DatabaseGet {
     func getSummaries<Summary: ItemSummary>(
         with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
-        logger.log(level: .info, "GetSummaries items: itemName = \(criteria.itemName), ID = \(criteria.ID)")
+        logger.log(level: .info, "GetSummaries items: itemType = \(criteria.itemType), ID = \(criteria.ID)")
         
         var items = [Summary]()
         for (_, el) in DatabaseMock.items.enumerated() {
             guard criteria.isValidKey(el.key),
                   let item = try? JSONDecoder().decode(Summary.self, from: el.value),
-                  item.itemName == criteria.itemName
+                  item.itemType == criteria.itemType
             else { continue }
             items.append(item)
         }

@@ -12,14 +12,9 @@ import Foundation
 extension ComicSummary {
     
     init<Summary: Identifiable>(from item: Domain.ItemSummary, link: Summary, number: String?) {
-        let now = Date()
-        
         self.init(
-            itemID: .comicInfoID(for: Comic.self, ID: item.identifier),
-            summaryID: .comicInfoID(for: link),
-            itemName: .getType(from: ComicSummary.self),
-            dateAdded: now,
-            dateLastUpdated: now,
+            ID: item.identifier,
+            link: link,
             popularity: item.popularity,
             name: item.name,
             thumbnail: item.thumbnail,

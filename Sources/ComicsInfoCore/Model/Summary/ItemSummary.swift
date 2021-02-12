@@ -12,7 +12,7 @@ public protocol ItemSummary: Codable {
     
     var itemID: String { get }
     var summaryID: String { get }
-    var itemName: String { get }
+    var itemType: String { get }
     
     var dateAdded: Date { get }
     var dateLastUpdated: Date { get }

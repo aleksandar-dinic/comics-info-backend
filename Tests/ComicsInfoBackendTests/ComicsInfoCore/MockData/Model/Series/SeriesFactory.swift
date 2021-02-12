@@ -33,8 +33,6 @@ enum SeriesFactory {
             id: ID,
             popularity: popularity,
             title: "Series Title \(ID)",
-            dateAdded: Date(),
-            dateLastUpdated: Date(),
             thumbnail: "Series Thumbnail \(ID)",
             description: "Series Description \(ID)",
             startYear: Int.min,
@@ -42,9 +40,7 @@ enum SeriesFactory {
             aliases: ["Series Aliases \(ID)"],
             nextIdentifier: "2",
             charactersID: nil,
-            characters: nil,
-            comicsID: nil,
-            comics: nil
+            comicsID: nil
         )
     }
 
@@ -52,8 +48,6 @@ enum SeriesFactory {
         id: String = "1",
         popularity: Int = 0,
         title: String = "Series Title",
-        dateAdded: Date = Date(),
-        dateLastUpdated: Date = Date(),
         thumbnail: String? = nil,
         description: String? = nil,
         startYear: Int? = nil,
@@ -61,16 +55,12 @@ enum SeriesFactory {
         aliases: [String]? = nil,
         nextIdentifier: String? = nil,
         charactersID: Set<String>? = nil,
-        characters: [CharacterSummary]? = nil,
-        comicsID: Set<String>? = nil,
-        comics: [ComicSummary]? = nil
+        comicsID: Set<String>? = nil
     ) -> Series {
         Series(
             id: id,
             popularity: popularity,
             title: title,
-            dateAdded: dateAdded,
-            dateLastUpdated: dateLastUpdated,
             thumbnail: thumbnail,
             description: description,
             startYear: startYear,
@@ -78,12 +68,7 @@ enum SeriesFactory {
             aliases: aliases,
             nextIdentifier: nextIdentifier,
             charactersID: charactersID,
-            characters: characters,
-            comicsID: comicsID,
-            comics: comics,
-            itemID: "Series#\(id)",
-            summaryID: "Sseries#\(id)",
-            itemName: "Series"
+            comicsID: comicsID
         )
     }
 
@@ -99,7 +84,7 @@ enum SeriesFactory {
         [
             "itemID": "Series#1",
             "summaryID": "Series#1",
-            "itemName": "Series",
+            "itemType": "Series",
             "summaryName": "Series",
             "popularity": 0,
             "title": "Series Title",

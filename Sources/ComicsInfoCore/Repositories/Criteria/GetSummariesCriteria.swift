@@ -16,7 +16,7 @@ public enum GetSummariesStrategy {
 
 public struct GetSummariesCriteria<Summary: ItemSummary> {
     
-    let itemName: String
+    let itemType: String
     let ID: String
     let dataSource: DataSourceLayer
     let table: String
@@ -29,7 +29,7 @@ public struct GetSummariesCriteria<Summary: ItemSummary> {
         table: String,
         strategy: GetSummariesStrategy
     ) {
-        itemName = .getType(from: Summary.self)
+        itemType = .getType(from: Summary.self)
         self.ID = ID
         self.dataSource = dataSource
         self.table = table
@@ -65,27 +65,27 @@ extension GetSummariesCriteria {
     private var expressionAttributeValues: [String: DynamoDB.AttributeValue] {
         switch strategy {
         case .itemID:
-            return [":itemName": .s(itemName), ":itemID": .s(ID)]
+            return [":itemType": .s(itemType), ":itemID": .s(ID)]
         case .summaryID:
-            return [":itemName": .s(itemName), ":summaryID": .s(ID)]
+            return [":itemType": .s(itemType), ":summaryID": .s(ID)]
         }
     }
     
     private var indexName: String {
         switch strategy {
         case .itemID:
-            return "itemName-itemID-index"
+            return "itemType-itemID-index"
         case .summaryID:
-            return "itemName-summaryID-index"
+            return "itemType-summaryID-index"
         }
     }
     
     private var keyConditionExpression: String {
         switch strategy {
         case .itemID:
-            return "itemName = :itemName AND itemID = :itemID"
+            return "itemType = :itemType AND itemID = :itemID"
         case .summaryID:
-            return "itemName = :itemName AND summaryID = :summaryID"
+            return "itemType = :itemType AND summaryID = :summaryID"
         }
     }
     

@@ -33,8 +33,6 @@ enum ComicFactory {
             id: ID,
             popularity: popularity,
             title: "Comic Title \(ID)",
-            dateAdded: Date(),
-            dateLastUpdated: Date(),
             thumbnail: "Comic Thumbnail \(ID)",
             description: "Comic Description \(ID)",
             number: "1",
@@ -48,9 +46,7 @@ enum ComicFactory {
             images: ["Comic Images \(ID)"],
             published: Date(),
             charactersID: nil,
-            characters: nil,
-            seriesID: nil,
-            series: nil
+            seriesID: nil
         )
     }
     
@@ -58,8 +54,6 @@ enum ComicFactory {
         id: String = "1",
         popularity: Int = 0,
         title: String = "Comic Title",
-        dateAdded: Date = Date(),
-        dateLastUpdated: Date = Date(),
         thumbnail: String? = nil,
         description: String? = nil,
         number: String? = nil,
@@ -73,16 +67,12 @@ enum ComicFactory {
         images: [String]? = nil,
         published: Date? = nil,
         charactersID: Set<String>? = nil,
-        characters: [CharacterSummary]? = nil,
-        seriesID: Set<String>? = nil,
-        series: [SeriesSummary]? = nil
+        seriesID: Set<String>? = nil
     ) -> Comic {
         Comic(
             id: id,
             popularity: popularity,
             title: title,
-            dateAdded: dateAdded,
-            dateLastUpdated: dateLastUpdated,
             thumbnail: thumbnail,
             description: description,
             number: number,
@@ -96,12 +86,7 @@ enum ComicFactory {
             images: images,
             published: published,
             charactersID: charactersID,
-            characters: characters,
-            seriesID: seriesID,
-            series: series,
-            itemID: "Comic#\(id)",
-            summaryID: "Comic#\(id)",
-            itemName: "Comic"
+            seriesID: seriesID
         )
     }
 
@@ -117,7 +102,7 @@ enum ComicFactory {
         [
             "itemID": "Comic#1",
             "summaryID": "Comic#1",
-            "itemName": "Comic",
+            "itemType": "Comic",
             "summaryName": "Comic",
             "popularity": 0,
             "title": "Comic Title",

@@ -41,20 +41,51 @@ public struct Character: SummaryMapper {
     private(set) var birth: Date?
 
     /// A resource list of seriesID in which this character appears.
-    var seriesID: Set<String>?
+    private(set) var seriesID: Set<String>?
 
     /// A resource list of series in which this character appears.
     var series: [SeriesSummary]?
 
     /// A resource list containing comicsID which feature this character.
-    var comicsID: Set<String>?
+    private(set) var comicsID: Set<String>?
 
     /// A resource list containing comics which feature this character.
     var comics: [ComicSummary]?
     
     public let itemID: String
     public let summaryID: String
-    public let itemName: String
+    public let itemType: String
+    
+    init(
+        id: String,
+        popularity: Int,
+        name: String,
+        thumbnail: String?,
+        description: String?,
+        realName: String?,
+        aliases: [String]?,
+        birth: Date?,
+        seriesID: Set<String>?,
+        comicsID: Set<String>?
+    ) {
+        let now = Date()
+        
+        self.id = id
+        self.popularity = popularity
+        self.name = name
+        dateAdded = now
+        dateLastUpdated = now
+        self.thumbnail = thumbnail
+        self.description = description
+        self.realName = realName
+        self.aliases = aliases
+        self.birth = birth
+        self.seriesID = seriesID
+        self.comicsID = comicsID
+        itemID = .comicInfoID(for: Character.self, ID: id)
+        summaryID = .comicInfoID(for: Character.self, ID: id)
+        itemType = .getType(from: Character.self)
+    }
     
 }
 
@@ -101,7 +132,7 @@ extension Character {
         case birth
         case itemID
         case summaryID
-        case itemName
+        case itemType
     }
         
 }

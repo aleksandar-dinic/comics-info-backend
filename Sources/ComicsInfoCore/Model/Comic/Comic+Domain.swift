@@ -9,14 +9,6 @@
 import struct Domain.Comic
 import Foundation
 
-extension Domain.Comic: Identifiable {
-    
-    public var id: String {
-        identifier
-    }
-    
-}
-
 extension Comic {
     
     init(from comic: Domain.Comic) {
@@ -24,26 +16,15 @@ extension Comic {
         if let IDs = comic.characters?.map({ $0.identifier }), !IDs.isEmpty {
             charactersID = Set(IDs)
         }
-        var characterSummary: [CharacterSummary]?
-        if let characters = comic.characters?.map({ CharacterSummary(from: $0, link: comic, count: nil) }), !characters.isEmpty {
-            characterSummary = characters
-        }
         var seriesID: Set<String>?
         if let IDs = comic.series?.map({ $0.identifier }), !IDs.isEmpty {
             seriesID = Set(IDs)
         }
-        var seriesSummary: [SeriesSummary]?
-        if let series = comic.series?.map({ SeriesSummary(from: $0, link: comic) }), !series.isEmpty {
-            seriesSummary = series
-        }
         
-        let now = Date()
         self.init(
             id: comic.identifier,
             popularity: comic.popularity,
             title: comic.title,
-            dateAdded: now,
-            dateLastUpdated: now,
             thumbnail: comic.thumbnail,
             description: comic.description,
             number: comic.number,
@@ -57,12 +38,7 @@ extension Comic {
             images: comic.images,
             published: comic.published,
             charactersID: charactersID,
-            characters: characterSummary,
-            seriesID: seriesID,
-            series: seriesSummary,
-            itemID: .comicInfoID(for: comic),
-            summaryID: .comicInfoID(for: comic),
-            itemName: .getType(from: Comic.self)
+            seriesID: seriesID
         )
     }
     

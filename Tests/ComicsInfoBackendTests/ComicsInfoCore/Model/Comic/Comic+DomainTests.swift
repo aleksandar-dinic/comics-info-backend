@@ -126,30 +126,24 @@ final class Comic_DomainTests: XCTestCase {
         XCTAssertEqual(sut.published, domainComic.published)
     }
     
-    func testCharacters_whenInitFromComic_isEqualToComicCharacters() {
-        XCTAssertEqual(
-            sut.characters?.map { $0.itemID },
-            domainComic.characters?.map { "Character#\($0.identifier)" }
-        )
+    func testCharacters_whenInitFromComic_isNil() {
+        XCTAssertNil(sut.characters)
     }
     
-    func testSeries_whenInitFromComic_isEqualToComicSeries() {
-        XCTAssertEqual(
-            sut.series?.map { $0.itemID }.sorted(),
-            domainComic.series?.map { "Series#\($0.identifier)" }.sorted()
-        )
+    func testSeries_whenInitFromComic_isNil() {
+        XCTAssertNil(sut.series)
     }
 
-    func testItemID_whenInitFromComic_isEqualToItemNameID() {
-        XCTAssertEqual(sut.itemID, "\(sut.itemName)#\(domainComic.identifier)")
+    func testItemID_whenInitFromComic_isEqualToItemTypeID() {
+        XCTAssertEqual(sut.itemID, "\(sut.itemType)#\(domainComic.identifier)")
     }
     
-    func testSummaryID_whenInitFromComic_isEqualToItemNameID() {
-        XCTAssertEqual(sut.summaryID, "\(sut.itemName)#\(domainComic.identifier)")
+    func testSummaryID_whenInitFromComic_isEqualToItemTypeID() {
+        XCTAssertEqual(sut.summaryID, "\(sut.itemType)#\(domainComic.identifier)")
     }
     
-    func testItemName_whenInitFromComic_isEqualToComic() {
-        XCTAssertEqual(sut.itemName, "Comic")
+    func testItemType_whenInitFromComic_isEqualToComic() {
+        XCTAssertEqual(sut.itemType, "Comic")
     }
     
     func testCharacters_whenInitFromComicWitmEmptyCharacters_charactersIsNil() {

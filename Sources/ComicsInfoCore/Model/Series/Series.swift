@@ -44,23 +44,56 @@ public struct Series: SummaryMapper {
     private(set) var nextIdentifier: String?
 
     /// A resource list containing charactersID which appear in comics in this series.
-    var charactersID: Set<String>?
+    private(set) var charactersID: Set<String>?
 
     /// A resource list containing characters which appear in comics in this series.
     var characters: [CharacterSummary]?
 
     /// A resource list containing comicsID in this series.
-    var comicsID: Set<String>?
+    private(set) var comicsID: Set<String>?
 
     /// A resource list containing comics in this series.
     var comics: [ComicSummary]?
     
     public let itemID: String
     public let summaryID: String
-    public let itemName: String
+    public let itemType: String
     
     public var name: String {
         title
+    }
+    
+    init(
+        id: String,
+        popularity: Int,
+        title: String,
+        thumbnail: String?,
+        description: String?,
+        startYear: Int?,
+        endYear: Int?,
+        aliases: [String]?,
+        nextIdentifier: String?,
+        charactersID: Set<String>?,
+        comicsID: Set<String>?
+    ) {
+        let now = Date()
+        
+        self.id = id
+        self.popularity = popularity
+        self.title = title
+        dateAdded = now
+        dateLastUpdated = now
+        self.thumbnail = thumbnail
+        self.description = description
+        self.startYear = startYear
+        self.endYear = endYear
+        self.aliases = aliases
+        self.nextIdentifier = nextIdentifier
+        self.charactersID = charactersID
+        self.comicsID = comicsID
+        itemID = .comicInfoID(for: Series.self, ID: id)
+        summaryID = .comicInfoID(for: Series.self, ID: id)
+        itemType = .getType(from: Series.self)
     }
     
 }
@@ -114,7 +147,7 @@ extension Series {
         case nextIdentifier
         case itemID
         case summaryID
-        case itemName
+        case itemType
     }
     
 }

@@ -28,7 +28,7 @@ final class DomainItemSummary_ComicSummaryTests: XCTestCase {
     func testIdentifier_whenInitFromSummary() {
         XCTAssertEqual(
             sut.identifier,
-            summary.summaryID.replacingOccurrences(of: "\(String.getType(from: Comic.self))#", with: "")
+            summary.itemID.replacingOccurrences(of: "\(String.getType(from: Comic.self))#", with: "")
         )
     }
     
