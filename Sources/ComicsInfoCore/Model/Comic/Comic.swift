@@ -11,7 +11,9 @@ import Foundation
 public struct Comic: SummaryMapper {
 
     /// The unique ID of the comic resource.
-    public let id: String
+    public var id: String {
+        itemID.getIDFromComicInfoID(for: Comic.self)
+    }
 
     /// The value of comic popularity.
     public private(set) var popularity: Int
@@ -106,7 +108,6 @@ public struct Comic: SummaryMapper {
     ) {
         let now = Date()
         
-        self.id = id
         self.popularity = popularity
         self.title = title
         dateAdded = now
@@ -181,7 +182,6 @@ extension Comic {
 extension Comic {
     
     enum CodingKeys: String, CodingKey {
-        case id
         case popularity
         case title
         case dateAdded
