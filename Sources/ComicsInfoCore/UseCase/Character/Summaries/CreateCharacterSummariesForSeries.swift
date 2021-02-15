@@ -42,7 +42,7 @@ extension CreateCharacterSummariesForSeries {
             log: logger
         )
         let characterSummariesCriteria = CreateSummariesCriteria(
-            summaries: series.map { CharacterSummary(item, link: $0, count: 1) },
+            summaries: series.map { CharacterSummary(item, link: $0, count: nil) },
             on: eventLoop,
             in: table,
             log: logger

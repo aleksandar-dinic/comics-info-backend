@@ -36,7 +36,7 @@ extension CreateSeriesSummariesForCharacters {
         guard !characters.isEmpty else { return eventLoop.submit { false } }
         
         let characterSummariesCriteria = CreateSummariesCriteria(
-            summaries: characters.map { CharacterSummary($0, link: item, count: 1) },
+            summaries: characters.map { CharacterSummary($0, link: item, count: nil) },
             on: eventLoop,
             in: table,
             log: logger
