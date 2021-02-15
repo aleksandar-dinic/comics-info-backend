@@ -13,15 +13,13 @@ import NIO
 
 final class ComicReadResponseWrapperTests: XCTestCase {
 
-    private typealias Cache = InMemoryCacheProvider<ComicsInfoCore.Comic>
-
     private var eventLoop: EventLoop!
-    private var sut: ComicReadResponseWrapper<GetDatabaseProvider, Cache>!
+    private var sut: ComicReadResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let useCase = ComicUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = ComicReadResponseWrapper(comicUseCase: useCase)
@@ -39,7 +37,7 @@ final class ComicReadResponseWrapperTests: XCTestCase {
         let request = Request()
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
@@ -51,23 +49,23 @@ final class ComicReadResponseWrapperTests: XCTestCase {
         let request = Request(pathParameters: ["invalidID": "-1"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
         XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
     }
 
-    func test_whenHandleReadWithoutItems_statusIsNotFound() throws {
+    func test_whenHandleReadWithoutItems_statusIsNoContent() throws {
         // Given
         let request = Request(pathParameters: ["id": "1"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.notFound.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
     }
 
 
@@ -79,7 +77,7 @@ final class ComicReadResponseWrapperTests: XCTestCase {
         let request = Request(pathParameters: ["id": "1"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
@@ -92,7 +90,7 @@ final class ComicReadResponseWrapperTests: XCTestCase {
 
 extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol  {
 
-    func test_whenHandleReadWithInvalidFields_statusIsForbidden() throws {
+    func test_whenHandleReadWithInvalidFields_statusIsBadRequest() throws {
         // Given
         let items = ComicFactory.makeDatabaseItems()
         let useCase = ComicUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
@@ -100,11 +98,11 @@ extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesPr
         let request = Request(pathParameters: ["id": "1"], queryParameters: ["fields": "invalid"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
         
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.forbidden.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
     }
     
     func test_whenHandleReadWithoutFields_responseItemIsWithoutSummaries() throws {
@@ -119,7 +117,7 @@ extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesPr
         let request = Request(pathParameters: ["id": "1"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
         
         // Then
@@ -142,7 +140,7 @@ extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesPr
         let request = Request(pathParameters: ["id": "1"], queryParameters: ["fields": "characters"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
         
         // Then
@@ -165,7 +163,7 @@ extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesPr
         let request = Request(pathParameters: ["id": "1"], queryParameters: ["fields": "series"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
         
         // Then
@@ -188,7 +186,7 @@ extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesPr
         let request = Request(pathParameters: ["id": "1"], queryParameters: ["fields": "characters,series"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
         
         // Then
@@ -199,7 +197,7 @@ extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesPr
         XCTAssertNotNil(item.series)
     }
     
-    func test_whenHandleReadWithFieldsCharactersSeriesAndInvalid_statusIsForbidden() throws {
+    func test_whenHandleReadWithFieldsCharactersSeriesAndInvalid_statusIsBadRequest() throws {
         // Given
         let character = CharacterFactory.make(id: "1")
         try createCharacter(character)
@@ -211,11 +209,11 @@ extension ComicReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesPr
         let request = Request(pathParameters: ["id": "1"], queryParameters: ["fields": "characters,series,invalid"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
         
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.forbidden.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
     }
 
 }

@@ -7,21 +7,23 @@
 //
 
 import struct Domain.Comic
+import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct ComicReadResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ReadResponseWrapper where CacheProvider.Item == Comic {
+public struct ComicReadResponseWrapper: ReadResponseWrapper {
 
-    private let comicUseCase: ComicUseCase<DBService, CacheProvider>
+    private let comicUseCase: ComicUseCase
 
-    public init(comicUseCase: ComicUseCase<DBService, CacheProvider>) {
+    public init(comicUseCase: ComicUseCase) {
         self.comicUseCase = comicUseCase
     }
 
     public func handleRead(
         on eventLoop: EventLoop,
         request: Request,
-        environment: String?
+        environment: String?,
+        logger: Logger?
     ) -> EventLoopFuture<Response> {
         guard let id = request.pathParameters?["id"] else {
             let response = Response(statusCode: .badRequest)
@@ -31,7 +33,7 @@ public struct ComicReadResponseWrapper<DBService: ItemGetDBService, CacheProvide
         let fields = getFields(from: request.queryParameters)
 
         let table = String.tableName(for: environment)
-        return comicUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table)
+        return comicUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table, logger: logger)
             .map { Response(with: Domain.Comic(from: $0), statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

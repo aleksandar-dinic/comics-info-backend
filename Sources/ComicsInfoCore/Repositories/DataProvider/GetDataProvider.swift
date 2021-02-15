@@ -28,7 +28,7 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     }
 
     private func getItemFromMemory(with criteria: GetItemCriteria) -> EventLoopFuture<Item>  {
-        switch cacheProvider.getItem(withID: criteria.itemID, from: criteria.table) {
+        switch cacheProvider.getItem(withID: criteria.ID, from: criteria.table) {
         case let .success(item):
             return eventLoop.submit { item }
             
@@ -38,7 +38,7 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     }
 
     private func getItemFromDatabase(with criteria: GetItemCriteria) -> EventLoopFuture<Item> {
-        itemGetDBWrapper.getItem(withID: criteria.itemID, from: criteria.table)
+        itemGetDBWrapper.getItem(with: criteria)
             .always { result in
                 guard let item = try? result.get() else { return }
                 cacheProvider.save(items: [item], in: criteria.table)
@@ -50,32 +50,33 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     func getItems(with criteria: GetItemsCriteria) -> EventLoopFuture<[Item]> {
         switch criteria.dataSource {
         case .memory:
-            return getItemsFromMemory(withIDs: criteria.IDs, from: criteria.table)
+            return getItemsFromMemory(with: criteria)
         case .database:
-            return getItemsFromDatabase(withIDs: criteria.IDs, from: criteria.table)
+            return getItemsFromDatabase(with: criteria)
         }
     }
     
-    private func getItemsFromMemory(withIDs IDs: Set<Item.ID>, from table: String) -> EventLoopFuture<[Item]>  {
-        let (items, missingIDs) = cacheProvider.getItems(withIDs: IDs, from: table)
+    private func getItemsFromMemory(with criteria: GetItemsCriteria) -> EventLoopFuture<[Item]>  {
+        let (items, missingIDs) = cacheProvider.getItems(withIDs: criteria.IDs, from: criteria.table)
         
         guard !missingIDs.isEmpty else {
             return eventLoop.submit { items }
         }
-            
-        return getItemsFromDatabase(withIDs: missingIDs, from: table)
+        
+        let newCriteria = GetItemsCriteria(IDs: missingIDs, dataSource: .database, table: criteria.table)
+        return getItemsFromDatabase(with: newCriteria)
             .map { $0 + items }
             .always { result in
                 guard let items = try? result.get() else { return }
-                cacheProvider.save(items: items, in: table)
+                cacheProvider.save(items: items, in: criteria.table)
             }
     }
 
-    private func getItemsFromDatabase(withIDs IDs: Set<Item.ID>, from table: String) -> EventLoopFuture<[Item]> {
-        itemGetDBWrapper.getItems(withIDs: IDs, from: table)
+    private func getItemsFromDatabase(with criteria: GetItemsCriteria) -> EventLoopFuture<[Item]> {
+        itemGetDBWrapper.getItems(with: criteria)
             .always { result in
                 guard let items = try? result.get() else { return }
-                cacheProvider.save(items: items, in: table)
+                cacheProvider.save(items: items, in: criteria.table)
             }
     }
 
@@ -85,27 +86,27 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     func getAllItems(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
         switch criteria.dataSource {
         case .memory:
-            return getAllItemsFromMemory(from: criteria.table)
+            return getAllItemsFromMemory(with: criteria)
 
         case .database:
-            return getAllItemsFromDatabase(from: criteria.table)
+            return getAllItemsFromDatabase(with: criteria)
         }
     }
 
-    private func getAllItemsFromMemory(from table: String) -> EventLoopFuture<[Item]> {
-        switch cacheProvider.getAllItems(from: table) {
+    private func getAllItemsFromMemory(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
+        switch cacheProvider.getAllItems(from: criteria.table) {
         case let .success(items):
             return eventLoop.submit { items }
             
         case .failure:
-            return getAllItemsFromDatabase(from: table)
+            return getAllItemsFromDatabase(with: criteria)
         }
     }
 
-    private func getAllItemsFromDatabase(from table: String) -> EventLoopFuture<[Item]> {
-        itemGetDBWrapper.getAllItems(from: table).always { result in
+    private func getAllItemsFromDatabase(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
+        itemGetDBWrapper.getAllItems(with: criteria).always { result in
             guard let items = try? result.get() else { return }
-            cacheProvider.save(items: items, in: table)
+            cacheProvider.save(items: items, in: criteria.table)
         }
     }
     
@@ -146,44 +147,13 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
         }
     }
     
-    
-    // TODO: 
     // Get Summary
      
-    func getSummary<Summary: ItemSummary>(
-        with criteria: [GetSummaryCriteria<Summary>]
-    ) -> EventLoopFuture<[Summary]?> {
-//        switch criteria.dataSource {
-//        case .memory:
-//            return getSummariesFromMemory(with: criteria)
-//
-//        case .database:
-            return getSummaryFromDatabase(with: criteria)
-//        }
+    func getSummary<Summary: ItemSummary>(with criteria: GetSummaryCriteria) -> EventLoopFuture<[Summary]?> {
+        itemGetDBWrapper.getSummary(with: criteria).always { result in
+            guard let summaries = try? result.get() else { return }
+            cacheProvider.save(summaries: summaries, in: criteria.table)
+        }
     }
-    
-//    private func getSummariesFromMemory<Summary: ItemSummary>(
-//        with criteria: GetSummariesCriteria<Summary>
-//    ) -> EventLoopFuture<[Summary]?>  {
-//        let result: Result<[Summary], CacheError<Item>> = cacheProvider.getSummaries(forID: criteria.ID, from: criteria.table)
-//
-//        switch result {
-//        case let .success(items):
-//            return eventLoop.submit { items }
-//
-//        case .failure:
-//            return getSummariesFromDatabase(with: criteria)
-//        }
-//    }
-//
-    private func getSummaryFromDatabase<Summary: ItemSummary>(
-        with criteria: [GetSummaryCriteria<Summary>]
-    ) -> EventLoopFuture<[Summary]?> {
-        itemGetDBWrapper.getSummary(with: criteria)
-//            .always { result in
-//            guard let summaries = try? result.get() else { return }
-//            cacheProvider.save(summaries: summaries, in: criteria.table)
-//        }
-    }
-    
+        
 }

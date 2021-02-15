@@ -6,17 +6,18 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
-public final class CharacterUseCase<DBService: ItemGetDBService, CacheService: Cacheable>: GetUseCase where CacheService.Item == Character {
+public final class CharacterUseCase: GetUseCase {
 
-    public let repository: GetRepository<Character, CacheService>
+    public let repository: GetRepository<Character, InMemoryCacheProvider<Character>>
     public var availableFields: Set<String> {
         ["series", "comics"]
     }
 
-    public init(repository: GetRepository<Character, CacheService>) {
+    public init(repository: GetRepository<Character, InMemoryCacheProvider<Character>>) {
         self.repository = repository
     }
     
@@ -24,10 +25,11 @@ public final class CharacterUseCase<DBService: ItemGetDBService, CacheService: C
         for item: Item,
         on eventLoop: EventLoop,
         fields: Set<String>,
-        table: String
+        table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Item> {
-        appendSeriesSummaries(fields: fields, item: item, on: eventLoop, from: table)
-            .and(appendComicsSummaries(fields: fields, item: item, on: eventLoop, from: table))
+        appendSeriesSummaries(fields: fields, item: item, on: eventLoop, from: table, logger: logger)
+            .and(appendComicsSummaries(fields: fields, item: item, on: eventLoop, from: table, logger: logger))
             .map { seriesSummaries, comicsSummaries in
                 var item = item
                 item.series = seriesSummaries
@@ -45,10 +47,11 @@ extension CharacterUseCase {
         item: Item,
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
-        from table: String
+        from table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[SeriesSummary]?> {
         guard fields.contains("series") else { return eventLoop.submit { nil } }
-        let criteria = GetSummariesCriteria(SeriesSummary.self, ID: item.itemID, dataSource: dataSource, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(SeriesSummary.self, ID: item.itemID, dataSource: dataSource, table: table, strategy: .summaryID, logger: logger)
         
         return getSummaries(on: eventLoop, with: criteria)
     }
@@ -58,10 +61,11 @@ extension CharacterUseCase {
         item: Item,
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
-        from table: String
+        from table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[ComicSummary]?> {
         guard fields.contains("comics") else { return eventLoop.submit { nil } }
-        let criteria = GetSummariesCriteria(ComicSummary.self, ID: item.itemID, dataSource: dataSource, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(ComicSummary.self, ID: item.itemID, dataSource: dataSource, table: table, strategy: .summaryID, logger: logger)
         
         return getSummaries(on: eventLoop, with: criteria)
     }

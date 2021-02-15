@@ -6,6 +6,7 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
@@ -15,18 +16,17 @@ public protocol UpdateUseCase {
 
     var repository: UpdateRepository { get }
     
-    func update(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void>
+    func update(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Void>
 
     func updateSummaries<Summary: ItemSummary>(
-        _ summaries: [Summary],
-        in table: String,
-        strategy: UpdateSummariesStrategy
+        with criteria: UpdateSummariesCriteria<Summary>
     ) -> EventLoopFuture<Void>
     
     func getItem(
         withID ID: String,
         on eventLoop: EventLoop,
-        from table: String
+        from table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Item>
     
 }
@@ -34,21 +34,20 @@ public protocol UpdateUseCase {
 extension UpdateUseCase {
     
     public func updateSummaries<Summary: ItemSummary>(
-        _ summaries: [Summary],
-        in table: String,
-        strategy: UpdateSummariesStrategy = .default
+        with criteria: UpdateSummariesCriteria<Summary>
     ) -> EventLoopFuture<Void> {
-        repository.updateSummaries(summaries, in: table, strategy: strategy)
+        repository.updateSummaries(with: criteria)
     }
     
-    func updateItem(_ item: Item, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Set<String>> {
-        getItem(withID: item.id, on: eventLoop, from: table)
+    func updateItem(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
+        getItem(withID: criteria.item.id, on: criteria.eventLoop, from: criteria.table, logger: criteria.logger)
             .flatMap { oldItem in
-                let fields = item.updatedFields(old: oldItem)
-                guard !fields.isEmpty else { return eventLoop.submit { fields } }
+                let fields = criteria.updatedFields(oldItem: oldItem)
+                guard !fields.isEmpty else { return criteria.eventLoop.submit { fields } }
                 var newItem = oldItem
-                newItem.update(with: item)
-                return repository.update(newItem, in: table)
+                newItem.update(with: criteria.item)
+                let criteria = UpdateItemCriteria(item: newItem, on: criteria.eventLoop, in: criteria.table)
+                return repository.update(with: criteria)
             }
     }
     

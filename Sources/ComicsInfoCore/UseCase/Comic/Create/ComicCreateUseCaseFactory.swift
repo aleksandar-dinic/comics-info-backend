@@ -6,7 +6,6 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
@@ -14,16 +13,10 @@ public struct ComicCreateUseCaseFactory: CreateUseCaseFactory, UpdateRepositoryB
 
     public let eventLoop: EventLoop
     public let isLocalServer: Bool
-    public let logger: Logger
 
-    public init(
-        on eventLoop: EventLoop,
-        isLocalServer: Bool,
-        logger: Logger
-    ) {
+    public init(on eventLoop: EventLoop, isLocalServer: Bool) {
         self.eventLoop = eventLoop
         self.isLocalServer = isLocalServer
-        self.logger = logger
     }
 
     public func makeUseCase() -> ComicCreateUseCase {

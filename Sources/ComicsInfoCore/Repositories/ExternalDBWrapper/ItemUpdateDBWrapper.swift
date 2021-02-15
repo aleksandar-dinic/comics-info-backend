@@ -9,28 +9,35 @@
 import Foundation
 import NIO
 
-struct ItemUpdateDBWrapper {
+struct ItemUpdateDBWrapper: LoggerProvider {
     
     let itemUpdateDBService: ItemUpdateDBService
 
-    func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>> {
-        itemUpdateDBService.update(item, in: table)
-            .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Item.self) }
+    func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
+        let query = UpdateItemQuery(item: criteria.item, table: criteria.table, logger: criteria.logger)
+        
+        return itemUpdateDBService.update(query)
+            .flatMapErrorThrowing {
+                logError(criteria.logger, error: $0)
+                throw $0.mapToComicInfoError(itemType: Item.self)
+            }
     }
     
     func updateSummaries<Summary: ItemSummary>(
-        _ summaries: [Summary],
-        in table: String,
-        strategy: UpdateSummariesStrategy
+        with criteria: UpdateSummariesCriteria<Summary>
     ) -> EventLoopFuture<Void> {
-        var criteria = [UpdateSummariesCriteria<Summary>]()
+        let query = UpdateSummariesQuery(
+            summaries: criteria.items,
+            table: criteria.table,
+            logger: criteria.logger,
+            strategy: criteria.strategy
+        )
         
-        for summary in summaries {
-            criteria.append(UpdateSummariesCriteria(table: table, item: summary, strategy: strategy))
-        }
-        
-        return itemUpdateDBService.updateSummaries(with: criteria)
-            .flatMapErrorThrowing { throw $0.mapToComicInfoError(itemType: Summary.self) }
+        return itemUpdateDBService.updateSummaries(query)
+            .flatMapErrorThrowing {
+                logError(criteria.logger, error: $0)
+                throw $0.mapToComicInfoError(itemType: Summary.self)
+            }
     }
 
 }

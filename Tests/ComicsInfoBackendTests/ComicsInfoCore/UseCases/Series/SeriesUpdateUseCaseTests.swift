@@ -7,29 +7,25 @@
 //
 
 @testable import ComicsInfoCore
-import Logging
 import NIO
 import XCTest
 
 final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var eventLoop: EventLoop!
-    private var logger: Logger!
     private var sut: SeriesUpdateUseCase!
     private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        logger = Logger(label: self.className)
         table = String.tableName(for: "TEST")
-        sut = SeriesUpdateUseCaseFactoryMock(on: eventLoop, logger: logger).makeUseCase()
+        sut = SeriesUpdateUseCaseFactoryMock(on: eventLoop).makeUseCase()
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
-        logger = nil
         sut = nil
         table = nil
     }
@@ -37,9 +33,10 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
     func test_whenUpdateSeries_seriesIsUpdated() throws {
         // Given
         try createSeries(SeriesFactory.make(title: "Old Title"))
+        let criteria = UpdateItemCriteria(item: SeriesFactory.make(), on: eventLoop, in: table)
 
         // When
-        let feature = sut.update(SeriesFactory.make(), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -49,10 +46,11 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
         // Given
         try createSeries(SeriesFactory.make())
         let charactersID: Set<String> = ["-1"]
+        let criteria = UpdateItemCriteria(item: SeriesFactory.make(charactersID: charactersID), on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.update(SeriesFactory.make(charactersID: charactersID), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -71,10 +69,11 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
         // Given
         try createSeries(SeriesFactory.make())
         let comicsID: Set<String> = ["-1"]
+        let criteria = UpdateItemCriteria(item: SeriesFactory.make(comicsID: comicsID), on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.update(SeriesFactory.make(comicsID: comicsID), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -97,9 +96,10 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
         try createComic(comic)
 
         try createSeries(SeriesFactory.make(charactersID: [character.id], comicsID: [comic.id]))
+        let criteria = UpdateItemCriteria(item: SeriesFactory.make(title: "New Title"), on: eventLoop, in: table)
 
         // When
-        let feature = sut.update(SeriesFactory.make(title: "New Title"), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -113,9 +113,19 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
         try createComic(comic)
 
         try createSeries(SeriesFactory.make())
+        let criteria = UpdateItemCriteria(
+            item: SeriesFactory.make(
+                title: "New Title",
+                charactersID: [character.id],
+                comicsID: [comic.id]
+            ),
+            on: eventLoop,
+            in: table
+        )
+
 
         // When
-        let feature = sut.update(SeriesFactory.make(title: "New Title", charactersID: [character.id], comicsID: [comic.id]), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -143,11 +153,12 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
             thumbnail: "New Series Thumbnail",
             description: "New Series Description"
         )
-        let feature = sut.update(newSeries, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newSeries, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = DatabaseMock.items["Series#SeriesID|Character#CharacterID"],
+        if let data = MockDB["Series#SeriesID|Character#CharacterID"],
            let seriesSummary = try? JSONDecoder().decode(SeriesSummary.self, from: data) {
             XCTAssertEqual(seriesSummary.popularity, newSeries.popularity)
             XCTAssertEqual(seriesSummary.name, newSeries.name)
@@ -168,7 +179,8 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
 
         // When
         let newSeries = SeriesFactory.make(id: "SeriesID", charactersID: [character.id])
-        let feature = sut.update(newSeries, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newSeries, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -192,7 +204,8 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
 
         // When
         let newSeries = SeriesFactory.make(id: "SeriesID", comicsID: [comic.id])
-        let feature = sut.update(newSeries, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newSeries, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -218,7 +231,8 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
 
         // When
         let newSeries = SeriesFactory.make(id: "SeriesID", charactersID: [character.id], comicsID: [comic.id])
-        let feature = sut.update(newSeries, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newSeries, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

@@ -8,17 +8,21 @@
 
 @testable import ComicsInfoCore
 import XCTest
+import NIO
 
 final class ItemUpdateDBWrapperTests: XCTestCase {
     
+    private var eventLoop: EventLoop!
     private var table: String!
     
     override func setUpWithError() throws {
         TestDatabase.removeAll()
+        eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         table = "TEST"
     }
 
     override func tearDownWithError() throws {
+        eventLoop = nil
         table = nil
     }
     
@@ -28,10 +32,11 @@ final class ItemUpdateDBWrapperTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let itemData = MockComicInfoItemFactory.makeData()
+        let criteria = UpdateItemCriteria(item: item, on: eventLoop, in: table)
         let sut = ItemUpdateDBWrapperFactory.make(items: itemData)
         
         // When
-        let feature = sut.update(item, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -41,10 +46,11 @@ final class ItemUpdateDBWrapperTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let sut = ItemUpdateDBWrapperFactory.make()
+        let criteria = UpdateItemCriteria(item: item, on: eventLoop, in: table)
         var thrownError: Error?
         
         // When
-        let feature = sut.update(item, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -64,10 +70,11 @@ final class ItemUpdateDBWrapperTests: XCTestCase {
     func test_whenUpdateSummaries_summariesUpdated() throws {
         // Given
         let item = MockItemSummaryFactory.make()
+        let criteria = UpdateSummariesCriteria(items: [item], table: table)
         let sut = ItemUpdateDBWrapperFactory.make()
         
         // When
-        let feature = sut.updateSummaries([item], in: table, strategy: .default)
+        let feature = sut.updateSummaries(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())

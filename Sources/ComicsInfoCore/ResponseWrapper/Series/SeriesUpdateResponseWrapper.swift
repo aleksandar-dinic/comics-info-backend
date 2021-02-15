@@ -7,6 +7,7 @@
 //
 
 import struct Domain.Series
+import struct Logging.Logger
 import Foundation
 import NIO
 
@@ -21,7 +22,8 @@ public struct SeriesUpdateResponseWrapper: UpdateResponseWrapper {
     public func handleUpdate(
         on eventLoop: EventLoop,
         request: Request,
-        environment: String?
+        environment: String?,
+        logger: Logger
     ) -> EventLoopFuture<Response> {
         guard let data = request.body?.data(using: .utf8) else {
             let response = Response(statusCode: .badRequest)
@@ -31,7 +33,8 @@ public struct SeriesUpdateResponseWrapper: UpdateResponseWrapper {
         let table = String.tableName(for: environment)
         do {
             let item = try JSONDecoder().decode(Domain.Series.self, from: data)
-            return seriesUseCase.update(Series(from: item), on: eventLoop, in: table)
+            let criteria = UpdateItemCriteria(item: Series(from: item), on: eventLoop, in: table, log: logger)
+            return seriesUseCase.update(with: criteria)
                 .map { Response(with: ResponseStatus("\(type(of: item.self)) updated"), statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 

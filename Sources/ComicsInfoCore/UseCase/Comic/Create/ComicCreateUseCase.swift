@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
@@ -13,16 +14,16 @@ public final class ComicCreateUseCase: CreateUseCase, GetComicLinks, CreateComic
     
     public let createRepository: CreateRepository
     private let updateRepository: UpdateRepository
-    let characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>
-    let seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
-    let comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
+    let characterUseCase: CharacterUseCase
+    let seriesUseCase: SeriesUseCase
+    let comicUseCase: ComicUseCase
 
     public init(
         createRepository: CreateRepository,
         updateRepository: UpdateRepository,
-        characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>,
-        seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>,
-        comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
+        characterUseCase: CharacterUseCase,
+        seriesUseCase: SeriesUseCase,
+        comicUseCase: ComicUseCase
     ) {
         self.createRepository = createRepository
         self.updateRepository = updateRepository
@@ -31,20 +32,20 @@ public final class ComicCreateUseCase: CreateUseCase, GetComicLinks, CreateComic
         self.comicUseCase = comicUseCase
     }
     
-    public func create(_ item: Comic, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        getLinks(for: item, on: eventLoop, in: table)
+    public func create(with criteria: CreateItemCriteria<Comic>) -> EventLoopFuture<Void> {
+        getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
             .flatMap { [weak self] (characters, series) -> EventLoopFuture<([Character], [Series])> in
-                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                return self.createRepository.create(item, in: table)
+                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                return self.createRepository.create(with: criteria)
                     .map { (characters, series) }
             }
             .flatMap { [weak self] characters, series -> EventLoopFuture<Void> in
-                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                return self.createLinksSummaries(for: item, characters: characters, series: series, on: eventLoop, in: table)
-                    .and(self.updateSummaries(between: characters, and: series, on: eventLoop, in: table))
+                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                return self.createLinksSummaries(for: criteria.item, characters: characters, series: series, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
+                    .and(self.updateSummaries(between: characters, and: series, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger))
                     .map { _ in }
             }
-            .hop(to: eventLoop)
+            .hop(to: criteria.eventLoop)
     }
     
 }
@@ -55,7 +56,8 @@ extension ComicCreateUseCase {
         between characters: [Character],
         and series: [Series],
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Bool> {
         guard !characters.isEmpty, !series.isEmpty else { return eventLoop.submit { false } }
         var charactersSummaries = [CharacterSummary]()
@@ -66,8 +68,21 @@ extension ComicCreateUseCase {
             seriesSummaries.append(contentsOf: series.map { SeriesSummary($0, link: character) })
         }
         
-        return updateRepository.updateSummaries(charactersSummaries, in: table, strategy: .characterInSeries)
-            .and(updateRepository.updateSummaries(seriesSummaries, in: table))
+        let charactersSummariesCriteria = UpdateSummariesCriteria(
+            items: charactersSummaries,
+            table: table,
+            logger: logger,
+            strategy: .characterInSeries
+        )
+        
+        let seriesSummariesCriteria = UpdateSummariesCriteria(
+            items: seriesSummaries,
+            table: table,
+            logger: logger
+        )
+        
+        return updateRepository.updateSummaries(with: charactersSummariesCriteria)
+            .and(updateRepository.updateSummaries(with: seriesSummariesCriteria))
             .map { _ in true }
     }
     

@@ -17,12 +17,12 @@ public final class CreateRepository {
         self.dataProvider = dataProvider
     }
 
-    public func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
-        dataProvider.create(item, in: table)
+    public func create<Item: ComicInfoItem>(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Void> {
+        dataProvider.create(with: criteria)
     }
     
-    public func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        dataProvider.createSummaries(summaries, in: table)
+    public func createSummaries<Summary: ItemSummary>(with criteria: CreateSummariesCriteria<Summary>) -> EventLoopFuture<Void> {
+        dataProvider.createSummaries(with: criteria)
     }
 
 }

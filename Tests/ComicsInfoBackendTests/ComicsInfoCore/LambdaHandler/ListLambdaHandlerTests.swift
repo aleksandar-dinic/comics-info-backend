@@ -22,7 +22,7 @@ final class ListLambdaHandlerTests: XCTestCase, LambdaMockFactory {
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         request = Request()
         logger = Logger(label: self.className)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
     }
 
     override func tearDownWithError() throws {
@@ -34,7 +34,7 @@ final class ListLambdaHandlerTests: XCTestCase, LambdaMockFactory {
     func test_whenHandle_responseStatusIsOK() throws {
         // Given
         let items = CharacterFactory.makeDatabaseItems()
-        let useCase = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
+        let useCase = CharacterUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
         let listResponseWrapper = CharacterListResponseWrapper(characterUseCase: useCase)
         let sut = ListLambdaHandler(
             makeLambdaInitializationContext(logger: logger, on: eventLoop),

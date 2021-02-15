@@ -25,9 +25,9 @@ struct MockItemGetDBService: ItemGetDBService {
         }
     }
     
-    func getItem<Item: ComicInfoItem>(withID ID: String, from table: String) -> EventLoopFuture<Item> {
-        guard let data = TestDatabase.items[ID] else {
-            return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: ID))
+    func getItem<Item: ComicInfoItem>(_ query: GetItemQuery) -> EventLoopFuture<Item> {
+        guard let data = TestDatabase.items[query.ID] else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: query.ID))
         }
         
         do {
@@ -38,28 +38,28 @@ struct MockItemGetDBService: ItemGetDBService {
         }
     }
     
-    func getItems<Item: ComicInfoItem>(withIDs IDs: Set<String>, from table: String) -> EventLoopFuture<[Item]> {
+    func getItems<Item: ComicInfoItem>(_ query: GetItemsQuery) -> EventLoopFuture<[Item]> {
         var items = [Item]()
-        for id in IDs {
+        for id in query.IDs {
             guard let data = TestDatabase.items[id],
                   let item = try? JSONDecoder().decode(Item.self, from: data) else { continue }
             items.append(item)
         }
 
-        guard items.count == IDs.count else {
+        guard items.count == query.IDs.count else {
             return eventLoop.makeFailedFuture(
-                DatabaseError.itemsNotFound(withIDs: Set(items.map({ $0.itemID })).symmetricDifference(IDs))
+                DatabaseError.itemsNotFound(withIDs: Set(items.map({ $0.itemID })).symmetricDifference(query.IDs))
             )
         }
         
         return eventLoop.submit { items }
     }
     
-    func getAll<Item: ComicInfoItem>(_ items: String, from table: String) -> EventLoopFuture<[Item]> {
+    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery) -> EventLoopFuture<[Item]> {
         var databaseItems = [Item]()
         for value in TestDatabase.items.values {
             guard let item = try? JSONDecoder().decode(Item.self, from: value),
-                  item.itemType == items else { continue }
+                  item.itemType == query.items else { continue }
             databaseItems.append(item)
         }
 
@@ -70,15 +70,12 @@ struct MockItemGetDBService: ItemGetDBService {
         return eventLoop.submit { databaseItems }
     }
     
-    func getSummaries<Summary: ItemSummary>(
-        with criteria: GetSummariesCriteria<Summary>
-    ) -> EventLoopFuture<[Summary]?> {
-        
+    func getSummaries<Summary: ItemSummary>(_ query: GetSummariesQuery) -> EventLoopFuture<[Summary]?> {
         var items = [Summary]()
         for (_, el) in TestDatabase.items.enumerated() {
-            guard criteria.isValidKey(el.key),
+            guard query.isValidKey(el.key),
                   let item = try? JSONDecoder().decode(Summary.self, from: el.value),
-                  item.itemType == criteria.itemType
+                  item.itemType == query.itemType
             else { continue }
             items.append(item)
         }
@@ -86,12 +83,10 @@ struct MockItemGetDBService: ItemGetDBService {
         return eventLoop.submit { !items.isEmpty ? items : nil }
     }
     
-    func getSummary<Summary: ItemSummary>(
-        with criteria: [GetSummaryCriteria<Summary>]
-    ) -> EventLoopFuture<[Summary]?> {
+    func getSummary<Summary: ItemSummary>(_ query: GetSummaryQuery) -> EventLoopFuture<[Summary]?> {
         var items = [Summary]()
-        for criterion in criteria {
-            guard let data = DatabaseMock.items["\(criterion.itemID)|\(criterion.summaryID)"],
+        for item in query.items {
+            guard let data = MockDB["\(item.itemID)|\(item.summaryID)"],
                   let item = try? JSONDecoder().decode(Summary.self, from: data) else { continue }
             items.append(item)
         }

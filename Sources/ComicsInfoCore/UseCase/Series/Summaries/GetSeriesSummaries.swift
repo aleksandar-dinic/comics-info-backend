@@ -5,17 +5,19 @@
 //  Created by Aleksandar Dinic on 12/02/2021.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
 protocol GetSeriesSummaries {
     
-    var seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>> { get }
+    var seriesUseCase: SeriesUseCase { get }
     
     func getSummaries(
         _ item: Series,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[SeriesSummary]?>
     
 }
@@ -25,28 +27,22 @@ extension GetSeriesSummaries {
     func getSummaries(
         _ item: Series,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[SeriesSummary]?> {
-        var criteria = [GetSummaryCriteria<SeriesSummary>]()
+        var items = [(itemID: String, summaryID: String)]()
         
         for id in item.charactersID ?? [] {
-            criteria.append(GetSummaryCriteria(
-                                itemID: .comicInfoID(for: Character.self, ID: id),
-                                summaryID: .comicInfoID(for: item),
-                                table: table
-            ))
+            items.append((.comicInfoID(for: Character.self, ID: id), .comicInfoID(for: item)))
         }
         
         for id in item.comicsID ?? [] {
-            criteria.append(GetSummaryCriteria(
-                                itemID: .comicInfoID(for: Comic.self, ID: id),
-                                summaryID: .comicInfoID(for: item),
-                                table: table
-            ))
+            items.append((.comicInfoID(for: Comic.self, ID: id), .comicInfoID(for: item)))
         }
         
-        guard !criteria.isEmpty else { return eventLoop.submit { nil } }
+        guard !items.isEmpty else { return eventLoop.submit { nil } }
         
+        let criteria = GetSummaryCriteria(items: items, table: table, logger: logger)
         return seriesUseCase.getSummary(on: eventLoop, with: criteria)
     }
     

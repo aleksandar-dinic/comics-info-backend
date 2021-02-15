@@ -29,7 +29,7 @@ final class GetRepositoryTests: XCTestCase {
     func test_whenGetItemWithID_returnsItem() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetItemCriteria(itemID: givenItem.id, dataSource: .database, table: table)
+        let criteria = GetItemCriteria(ID: givenItem.id, dataSource: .database, table: table)
         let items = MockComicInfoItemFactory.makeData()
         sut = GetRepositoryFactory.make(items: items)
 

@@ -7,51 +7,25 @@
 //
 
 import struct SotoDynamoDB.DynamoDB
-import struct Logging.Logger
 import Foundation
 import NIO
 
 public struct DatabaseFectory {
-
-    private let isLocalServer: Bool
-
-    public init(isLocalServer: Bool) {
-        self.isLocalServer = isLocalServer
-    }
-
-    public func makeDatabase(
-        eventLoop: EventLoop,
-        logger: Logger,
-        items: [String: Data] = [:]
-    ) -> DatabaseGet {
-        guard !isLocalServer else {
-            return DatabaseMock(eventLoop: eventLoop, logger: logger, items: items)
-        }
-
-        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, logger: logger)
-    }
     
-    public func makeDatabaseCreate(
-        eventLoop: EventLoop,
-        logger: Logger
-    ) -> DatabaseCreate {
-        guard !isLocalServer else {
-            return DatabaseMockCreate(eventLoop: eventLoop, logger: logger)
-        }
+    typealias DatabaseService = ItemGetDBService & ItemCreateDBService & ItemUpdateDBService
 
-        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, logger: logger)
+    private let database: DatabaseService
+
+    public init(isLocalServer: Bool, eventLoop: EventLoop, items: [String: Data] = [:]) {
+        if isLocalServer {
+            database = MockDB(eventLoop: eventLoop, items: items)
+        } else {
+            database = SotoDynamoDB.DynamoDB(eventLoop: eventLoop)
+        }
     }
-    
-    public func makeDatabaseUpdate(
-        eventLoop: EventLoop,
-        logger: Logger,
-        items: [String: Data] = [:]
-    ) -> DatabaseUpdate {
-        guard !isLocalServer else {
-            return DatabaseMockUpdate(eventLoop: eventLoop, logger: logger, items: items)
-        }
 
-        return SotoDynamoDB.DynamoDB(eventLoop: eventLoop, logger: logger)
+    func makeDatabase() -> DatabaseService {
+        database
     }
 
 }

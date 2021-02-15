@@ -6,27 +6,24 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
 protocol CharacterUseCaseBuilder {
     
     var eventLoop: EventLoop { get }
-    var logger: Logger { get }
     
-    func buildCharacterUseCase() -> CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>
+    func buildCharacterUseCase() -> CharacterUseCase
     
 }
 
 extension CharacterUseCaseBuilder {
     
-    func buildCharacterUseCase() -> CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>> {
+    func buildCharacterUseCase() -> CharacterUseCase {
         CharacterUseCaseFactory(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.characterInMemoryCache,
-            logger: logger
+            cacheProvider: LocalServer.characterInMemoryCache
         ).makeUseCase()
     }
     

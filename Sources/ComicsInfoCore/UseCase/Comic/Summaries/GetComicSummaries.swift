@@ -6,17 +6,19 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
 protocol GetComicSummaries  {
     
-    var comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>> { get }
+    var comicUseCase: ComicUseCase { get }
     
     func getSummaries(
         _ item: Comic,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[ComicSummary]?>
     
 }
@@ -26,28 +28,22 @@ extension GetComicSummaries {
     func getSummaries(
         _ item: Comic,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[ComicSummary]?> {
-        var criteria = [GetSummaryCriteria<ComicSummary>]()
+        var items = [(itemID: String, summaryID: String)]()
         
         for id in item.charactersID ?? [] {
-            criteria.append(GetSummaryCriteria(
-                                itemID: .comicInfoID(for: Character.self, ID: id),
-                                summaryID: .comicInfoID(for: item),
-                                table: table
-            ))
+            items.append((.comicInfoID(for: Character.self, ID: id), .comicInfoID(for: item)))
         }
         
         for id in item.seriesID ?? [] {
-            criteria.append(GetSummaryCriteria(
-                                itemID: .comicInfoID(for: Series.self, ID: id),
-                                summaryID: .comicInfoID(for: item),
-                                table: table
-            ))
+            items.append((.comicInfoID(for: Series.self, ID: id), .comicInfoID(for: item)))
         }
         
-        guard !criteria.isEmpty else { return eventLoop.submit { nil } }
+        guard !items.isEmpty else { return eventLoop.submit { nil } }
         
+        let criteria = GetSummaryCriteria(items: items, table: table, logger: logger)
         return comicUseCase.getSummary(on: eventLoop, with: criteria)
     }
     

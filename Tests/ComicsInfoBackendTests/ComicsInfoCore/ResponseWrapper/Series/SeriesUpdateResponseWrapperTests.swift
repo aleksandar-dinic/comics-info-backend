@@ -7,6 +7,7 @@
 //
 
 @testable import ComicsInfoCore
+import struct Logging.Logger
 import XCTest
 import NIO
 
@@ -14,20 +15,23 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
     private var eventLoop: EventLoop!
     private var sut: SeriesUpdateResponseWrapper!
+    private var logger: Logger!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let useCase = SeriesUpdateUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = SeriesUpdateResponseWrapper(seriesUseCase: useCase)
+        logger = Logger(label: "SeriesUpdateResponseWrapperTests")
         environment = "TEST"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
         sut = nil
+        logger = nil
         environment = nil
     }
 
@@ -36,7 +40,7 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
         let request = Request()
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then
@@ -48,23 +52,23 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
         let request = Request(body: "")
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then
         XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
     }
 
-    func test_whenHandleUpdateNonExistingItem_statusIsForbidden() throws {
+    func test_whenHandleUpdateNonExistingItem_statusIsNoContent() throws {
         // Given
         let request = Request(body: SeriesFactory.requestBody)
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.forbidden.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
     }
 
     func test_whenHandleUpdate_statusIsOk() throws {
@@ -74,7 +78,7 @@ final class SeriesUpdateResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
         let request = Request(body: SeriesFactory.requestBody)
 
         // When
-        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleUpdate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then

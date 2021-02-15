@@ -29,10 +29,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
         let items = MockComicInfoItemFactory.makeData()
+        let criteria = GetItemCriteria(ID: givenItem.id, dataSource: .database, table: table)
         let sut = ItemGetDBWrapperFactory.make(items: items)
 
         // When
-        let feature = sut.getItem(withID: givenItem.id, from: table)
+        let feature = sut.getItem(with: criteria)
         let item = try feature.wait()
 
         // Then
@@ -43,10 +44,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let id = "-1"
         let sut = ItemGetDBWrapperFactory.make()
+        let criteria = GetItemCriteria(ID: id, dataSource: .database, table: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.getItem(withID: id, from: table)
+        let feature = sut.getItem(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -67,10 +69,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
         let databaseItems = MockComicInfoItemFactory.makeData()
+        let criteria = GetItemsCriteria(IDs: [givenItem.id], dataSource: .database, table: table)
         let sut = ItemGetDBWrapperFactory.make(items: databaseItems)
 
         // When
-        let feature = sut.getItems(withIDs: [givenItem.id], from: table)
+        let feature = sut.getItems(with: criteria)
         let items = try feature.wait()
 
         // Then
@@ -81,10 +84,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let ids: Set<String> = ["-1"]
         let sut = ItemGetDBWrapperFactory.make()
+        let criteria = GetItemsCriteria(IDs: ids, dataSource: .database, table: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.getItems(withIDs: ids, from: table)
+        let feature = sut.getItems(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -105,10 +109,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
         let databaseItems = MockComicInfoItemFactory.makeData()
+        let criteria = GetAllItemsCriteria(dataSource: .database, table: table)
         let sut = ItemGetDBWrapperFactory.make(items: databaseItems)
         
         // When
-        let feature = sut.getAllItems(from: table)
+        let feature = sut.getAllItems(with: criteria)
         let items = try feature.wait()
 
         // Then
@@ -118,10 +123,11 @@ final class ItemGetDBWrapperTests: XCTestCase {
     func test_whenGetAllItems_throwsItemsNotFound() throws {
         // Given
         let sut = ItemGetDBWrapperFactory.make()
+        let criteria = GetAllItemsCriteria(dataSource: .database, table: table)
         var thrownError: Error?
         
         // When
-        let feature = sut.getAllItems(from: table)
+        let feature = sut.getAllItems(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

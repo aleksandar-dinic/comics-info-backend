@@ -6,34 +6,30 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
-public struct ComicUseCaseFactory<CacheProvider: Cacheable>: GetUseCaseFactory where CacheProvider.Item == Comic  {
+public struct ComicUseCaseFactory: GetUseCaseFactory  {
 
     public let eventLoop: EventLoop
     public let isLocalServer: Bool
-    public let cacheProvider: CacheProvider
-    public let logger: Logger
+    public let cacheProvider: InMemoryCacheProvider<Comic>
 
     public init(
         on eventLoop: EventLoop,
         isLocalServer: Bool,
-        cacheProvider: CacheProvider,
-        logger: Logger
+        cacheProvider: InMemoryCacheProvider<Comic>
     ) {
         self.eventLoop = eventLoop
         self.isLocalServer = isLocalServer
         self.cacheProvider = cacheProvider
-        self.logger = logger
     }
 
-    public func makeUseCase() -> ComicUseCase<GetDatabaseProvider, CacheProvider> {
+    public func makeUseCase() -> ComicUseCase{
         ComicUseCase(repository: makecomicRepository())
     }
 
-    private func makecomicRepository() -> GetRepository<Comic, CacheProvider> {
+    private func makecomicRepository() -> GetRepository<Comic, InMemoryCacheProvider<Comic>> {
         GetRepositoryFactory(
             eventLoop: eventLoop,
             itemGetDBWrapper: makeItemGetDBWrapper(),

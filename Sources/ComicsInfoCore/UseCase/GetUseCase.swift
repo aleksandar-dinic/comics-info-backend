@@ -6,12 +6,12 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
 public protocol GetUseCase {
 
-    associatedtype DBService: ItemGetDBService
     associatedtype CacheService: Cacheable
 
     typealias Item = CacheService.Item
@@ -23,7 +23,8 @@ public protocol GetUseCase {
         for item: Item,
         on eventLoop: EventLoop,
         fields: Set<String>,
-        table: String
+        table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Item>
     
 }
@@ -35,12 +36,14 @@ public extension GetUseCase {
         withID ID: String,
         fields: Set<String>?,
         from table: String,
+        logger: Logger?,
         dataSource: DataSourceLayer = .memory
     ) -> EventLoopFuture<Item> {
         do {
             let fields = try handleFields(fields)
-            return repository.getItem(with: GetItemCriteria(itemID: ID, dataSource: dataSource, table: table))
-                .flatMap { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table) }
+            let criteria = GetItemCriteria(ID: ID, dataSource: dataSource, table: table, logger: logger)
+            return repository.getItem(with: criteria)
+                .flatMap { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table, logger: logger) }
                 .hop(to: eventLoop)
         } catch {
             return eventLoop.makeFailedFuture(error)
@@ -51,9 +54,11 @@ public extension GetUseCase {
         on eventLoop: EventLoop,
         withIDs IDs: Set<Item.ID>,
         from table: String,
+        logger: Logger?,
         dataSource: DataSourceLayer = .memory
     ) -> EventLoopFuture<[Item]> {
-        repository.getItems(with: GetItemsCriteria(IDs: IDs, dataSource: dataSource, table: table))
+        let criteria = GetItemsCriteria(IDs: IDs, dataSource: dataSource, table: table, logger: logger)
+        return repository.getItems(with: criteria)
             .hop(to: eventLoop)
     }
     
@@ -61,12 +66,14 @@ public extension GetUseCase {
         on eventLoop: EventLoop,
         fields: Set<String>?,
         from table: String,
+        logger: Logger?,
         dataSource: DataSourceLayer = .memory
     ) -> EventLoopFuture<[Item]> {
         do {
             let fields = try handleFields(fields)
-            return repository.getAllItems(with: GetAllItemsCriteria(dataSource: dataSource, table: table))
-                .flatMap { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table) }
+            let criteria =  GetAllItemsCriteria(dataSource: dataSource, table: table, logger: logger)
+            return repository.getAllItems(with: criteria)
+                .flatMap { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table, logger: logger) }
                 .hop(to: eventLoop)
         } catch {
             return eventLoop.makeFailedFuture(error)
@@ -77,9 +84,10 @@ public extension GetUseCase {
         for items: [Item],
         on eventLoop: EventLoop,
         fields: Set<String>,
-        table: String
+        table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[Item]> {
-        let futures = items.map { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table) }
+        let futures = items.map { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table, logger: logger) }
 
         return EventLoopFuture.reduce([Item](), futures, on: eventLoop) { (items, item) in
             var items = items
@@ -107,7 +115,7 @@ public extension GetUseCase {
     
     func getSummary<Summary: ItemSummary>(
         on eventLoop: EventLoop,
-        with criteria: [GetSummaryCriteria<Summary>]
+        with criteria: GetSummaryCriteria
     ) -> EventLoopFuture<[Summary]?> {
         repository.getSummary(with: criteria)
             .hop(to: eventLoop)

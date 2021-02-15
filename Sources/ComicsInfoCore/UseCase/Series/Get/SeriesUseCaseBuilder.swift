@@ -6,27 +6,24 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
 protocol SeriesUseCaseBuilder {
     
     var eventLoop: EventLoop { get }
-    var logger: Logger { get }
     
-    func buildSeriesUseCase() -> SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
+    func buildSeriesUseCase() -> SeriesUseCase
     
 }
 
 extension SeriesUseCaseBuilder {
     
-    func buildSeriesUseCase() -> SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>> {
+    func buildSeriesUseCase() -> SeriesUseCase {
         SeriesUseCaseFactory(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.seriesInMemoryCache,
-            logger: logger
+            cacheProvider: LocalServer.seriesInMemoryCache
         ).makeUseCase()
     }
         

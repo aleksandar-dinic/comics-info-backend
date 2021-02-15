@@ -25,23 +25,24 @@ struct MockItemCreateDBService: ItemCreateDBService {
         }
     }
     
-    func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
-        guard TestDatabase.items[item.itemID] == nil else {
-            return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: item.itemID))
+    func create<Item: ComicInfoItem>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Void> {
+        let mockQuery = query.mockDBQuery
+        guard TestDatabase.items[mockQuery.id] == nil else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: mockQuery.id))
         }
 
         do {
-            let encodedItem = try JSONEncoder().encode(item)
-            TestDatabase.items[item.itemID] = encodedItem
+            let encodedItem = try JSONEncoder().encode(mockQuery.item)
+            TestDatabase.items[mockQuery.id] = encodedItem
             return eventLoop.submit { }
         } catch {
             return eventLoop.makeFailedFuture(error)
         }
     }
     
-    func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
+    func createSummaries<Summary: ItemSummary>(_ query: CreateSummariesQuery<Summary>) -> EventLoopFuture<Void> {
         do {
-            for summary in summaries {
+            for summary in query.summaries {
                 let id = "\(summary.itemID)|\(summary.summaryID)"
                 guard TestDatabase.items[id] == nil else {
                     return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: id))

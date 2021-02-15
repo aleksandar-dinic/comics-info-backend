@@ -73,7 +73,7 @@ final class Error_ComicInfoErrorTests: XCTestCase {
         let sut = givenError.mapToComicInfoError(itemType: Comic.self)
 
         // Then
-        XCTAssertEqual(sut.localizedDescription, givenError.localizedDescription)
+        XCTAssertEqual(sut.localizedDescription, ComicInfoError.internalServerError.localizedDescription)
     }
 
 }

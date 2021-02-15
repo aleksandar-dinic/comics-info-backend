@@ -12,15 +12,15 @@ import NIO
 public final class CharacterCreateUseCase: CreateUseCase, GetCharacterLinks, CreateCharacterLinksSummaries {
     
     public let createRepository: CreateRepository
-    let characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>
-    let seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>
-    let comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
+    let characterUseCase: CharacterUseCase
+    let seriesUseCase: SeriesUseCase
+    let comicUseCase: ComicUseCase
 
     public init(
         createRepository: CreateRepository,
-        characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>,
-        seriesUseCase: SeriesUseCase<GetDatabaseProvider, InMemoryCacheProvider<Series>>,
-        comicUseCase: ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
+        characterUseCase: CharacterUseCase,
+        seriesUseCase: SeriesUseCase,
+        comicUseCase: ComicUseCase
     ) {
         self.createRepository = createRepository
         self.characterUseCase = characterUseCase
@@ -28,18 +28,18 @@ public final class CharacterCreateUseCase: CreateUseCase, GetCharacterLinks, Cre
         self.comicUseCase = comicUseCase
     }
     
-    public func create(_ item: Character, on eventLoop: EventLoop, in table: String) -> EventLoopFuture<Void> {
-        getLinks(for: item, on: eventLoop, in: table)
+    public func create(with criteria: CreateItemCriteria<Character>) -> EventLoopFuture<Void> {
+        getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
             .flatMap { [weak self] (series, comics) -> EventLoopFuture<([Series], [Comic])> in
-                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                return self.createRepository.create(item, in: table)
+                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                return self.createRepository.create(with: criteria)
                     .map { (series, comics) }
             }
             .flatMap { [weak self] series, comics in
-                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                return self.createLinksSummaries(for: item, series: series, comics: comics, on: eventLoop, in: table)
+                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                return self.createLinksSummaries(for: criteria.item, series: series, comics: comics, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
             }
-            .hop(to: eventLoop)
+            .hop(to: criteria.eventLoop)
     }
     
 }

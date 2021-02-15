@@ -7,29 +7,25 @@
 //
 
 @testable import ComicsInfoCore
-import Logging
 import NIO
 import XCTest
 
 final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol, CreateComicProtocol {
 
     private var eventLoop: EventLoop!
-    private var logger: Logger!
     private var sut: ComicUpdateUseCase!
     private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        logger = Logger(label: self.className)
         table = String.tableName(for: "TEST")
-        sut = ComicUpdateUseCaseFactoryMock(on: eventLoop, logger: logger).makeUseCase()
+        sut = ComicUpdateUseCaseFactoryMock(on: eventLoop).makeUseCase()
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
-        logger = nil
         sut = nil
         table = nil
     }
@@ -37,9 +33,10 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
     func test_whenUpdateComic_comicIsUpdated() throws {
         // Given
         try createComic(ComicFactory.make(title: "Old Title"))
+        let criteria = UpdateItemCriteria(item: ComicFactory.make(), on: eventLoop, in: table)
 
         // When
-        let feature = sut.update(ComicFactory.make(), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -49,10 +46,11 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         // Given
         try createComic(ComicFactory.make())
         let seriesID: Set<String> = ["-1"]
+        let criteria = UpdateItemCriteria(item: ComicFactory.make(seriesID: seriesID), on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.update(ComicFactory.make(seriesID: seriesID), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -71,10 +69,11 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         // Given
         try createComic(ComicFactory.make())
         let charactersID: Set<String> = ["-1"]
+        let criteria = UpdateItemCriteria(item: ComicFactory.make(charactersID: charactersID), on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.update(ComicFactory.make(charactersID: charactersID), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -97,9 +96,10 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         try createSeries(series)
 
         try createComic(ComicFactory.make(charactersID: [character.id], seriesID: [series.id]))
+        let criteria = UpdateItemCriteria(item: ComicFactory.make(title: "New Title"), on: eventLoop, in: table)
 
         // When
-        let feature = sut.update(ComicFactory.make(title: "New Title"), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -113,9 +113,14 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         try createSeries(series)
 
         try createComic(ComicFactory.make())
+        let criteria = UpdateItemCriteria(
+            item: ComicFactory.make(title: "New Title", charactersID: [character.id], seriesID: [series.id]),
+            on: eventLoop,
+            in: table
+        )
 
         // When
-        let feature = sut.update(ComicFactory.make(title: "New Title", charactersID: [character.id], seriesID: [series.id]), on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -143,11 +148,12 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
             thumbnail: "New Comic Thumbnail",
             description: "New Comic Description"
         )
-        let feature = sut.update(newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = DatabaseMock.items["Comic#ComicID|Series#SeriesID"],
+        if let data = MockDB["Comic#ComicID|Series#SeriesID"],
            let comicSummary = try? JSONDecoder().decode(ComicSummary.self, from: data) {
             XCTAssertEqual(comicSummary.popularity, newComic.popularity)
             XCTAssertEqual(comicSummary.name, newComic.name)
@@ -173,11 +179,12 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
             charactersID: [character.id],
             seriesID: [series.id]
         )
-        let feature = sut.update(newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
+        if let data = MockDB["Character#CharacterID|Series#SeriesID"],
            let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
             XCTAssertEqual(characterSummary.count, 1)
         } else {
@@ -203,11 +210,12 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
             charactersID: [character.id],
             seriesID: [series.id]
         )
-        let feature = sut.update(newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = DatabaseMock.items["Character#CharacterID|Series#SeriesID"],
+        if let data = MockDB["Character#CharacterID|Series#SeriesID"],
            let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
             XCTAssertEqual(characterSummary.count, 2)
         } else {
@@ -225,7 +233,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
 
         // When
         let newComic = ComicFactory.make(id: "ComicID", charactersID: [character.id])
-        let feature = sut.update(newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -249,7 +258,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
 
         // When
         let newComic = ComicFactory.make(id: "ComicID", seriesID: [series.id])
-        let feature = sut.update(newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -275,7 +285,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
 
         // When
         let newComic = ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id])
-        let feature = sut.update(newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

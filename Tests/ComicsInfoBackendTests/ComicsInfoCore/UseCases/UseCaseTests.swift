@@ -7,28 +7,24 @@
 //
 
 @testable import ComicsInfoCore
-import Logging
 import NIO
 import XCTest
 
 final class UseCaseTests: XCTestCase {
 
     private var eventLoop: EventLoop!
-    private var logger: Logger!
-    private var sut: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>!
+    private var sut: CharacterUseCase!
     private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        logger = Logger(label: self.className)
         table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
-        logger = nil
         sut = nil
         table = nil
     }
@@ -37,10 +33,10 @@ final class UseCaseTests: XCTestCase {
         // Given
         let givenItem = CharacterFactory.make()
         let items = CharacterFactory.makeDatabaseItems()
-        sut = CharacterUseCaseFactoryMock(items: items, on: eventLoop, logger: logger).makeUseCase()
+        sut = CharacterUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -51,10 +47,10 @@ final class UseCaseTests: XCTestCase {
         // Given
         let givenCharacters = CharacterFactory.makeList
         let givenItems = CharacterFactory.makeDatabaseItemsList()
-        sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop, logger: logger).makeUseCase()
+        sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(on: eventLoop, fields: nil, from: table, dataSource: .database)
+        let featureGet = sut.getAllItems(on: eventLoop, fields: nil, from: table, logger: nil, dataSource: .database)
         let items = try featureGet.wait()
 
         // Then

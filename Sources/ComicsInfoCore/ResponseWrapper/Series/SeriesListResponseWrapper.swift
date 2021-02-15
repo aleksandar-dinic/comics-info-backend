@@ -7,26 +7,28 @@
 //
 
 import struct Domain.Series
+import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct SeriesListResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ListResponseWrapper where CacheProvider.Item == Series {
+public struct SeriesListResponseWrapper: ListResponseWrapper {
 
-    private let seriesUseCase: SeriesUseCase<DBService, CacheProvider>
+    private let seriesUseCase: SeriesUseCase
 
-    public init(seriesUseCase: SeriesUseCase<DBService, CacheProvider>) {
+    public init(seriesUseCase: SeriesUseCase) {
         self.seriesUseCase = seriesUseCase
     }
 
     public func handleList(
         on eventLoop: EventLoop,
         request: Request,
-        environment: String?
+        environment: String?,
+        logger: Logger?
     ) -> EventLoopFuture<Response> {
         let table = String.tableName(for: environment)
         let fields = getFields(from: request.queryParameters)
         
-        return seriesUseCase.getAllItems(on: eventLoop, fields: fields, from: table)
+        return seriesUseCase.getAllItems(on: eventLoop, fields: fields, from: table, logger: logger)
             .map { Response(with: $0.map { Domain.Series(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

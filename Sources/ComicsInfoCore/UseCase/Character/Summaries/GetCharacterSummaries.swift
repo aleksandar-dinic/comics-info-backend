@@ -6,17 +6,19 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
 protocol GetCharacterSummaries {
     
-    var characterUseCase: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>> { get }
+    var characterUseCase: CharacterUseCase { get }
     
     func getSummaries(
         _ item: Character,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[CharacterSummary]?>
     
 }
@@ -26,28 +28,22 @@ extension GetCharacterSummaries {
     func getSummaries(
         _ item: Character,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<[CharacterSummary]?> {
-        var criteria = [GetSummaryCriteria<CharacterSummary>]()
+        var items = [(itemID: String, summaryID: String)]()
         
         for id in item.seriesID ?? [] {
-            criteria.append(GetSummaryCriteria(
-                                itemID: .comicInfoID(for: Series.self, ID: id),
-                                summaryID: .comicInfoID(for: item),
-                                table: table
-            ))
+            items.append((.comicInfoID(for: Series.self, ID: id), .comicInfoID(for: item)))
         }
         
         for id in item.comicsID ?? [] {
-            criteria.append(GetSummaryCriteria(
-                                itemID: .comicInfoID(for: Comic.self, ID: id),
-                                summaryID: .comicInfoID(for: item),
-                                table: table
-            ))
+            items.append((.comicInfoID(for: Comic.self, ID: id), .comicInfoID(for: item)))
         }
         
-        guard !criteria.isEmpty else { return eventLoop.submit { nil } }
+        guard !items.isEmpty else { return eventLoop.submit { nil } }
         
+        let criteria = GetSummaryCriteria(items: items, table: table, logger: logger)
         return characterUseCase.getSummary(on: eventLoop, with: criteria)
     }
     

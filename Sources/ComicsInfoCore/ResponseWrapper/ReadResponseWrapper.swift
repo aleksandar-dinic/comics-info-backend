@@ -6,6 +6,7 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
@@ -14,7 +15,8 @@ public protocol ReadResponseWrapper: ErrorResponseWrapper {
     func handleRead(
         on eventLoop: EventLoop,
         request: Request,
-        environment: String?
+        environment: String?,
+        logger: Logger?
     ) -> EventLoopFuture<Response>
 
 }

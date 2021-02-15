@@ -8,44 +8,27 @@
 
 @testable import ComicsInfoCore
 import Foundation
-import Logging
 import NIO
 
 struct ComicCreateUseCaseFactoryMock: CreateUseCaseFactory, UpdateRepositoryBuilder {
 
     var eventLoop: EventLoop
-    var logger: Logger
 
     var isLocalServer: Bool
 
-    init(on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+    init(on eventLoop: EventLoop? = nil) {
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        self.logger = logger ?? Logger(label: "ComicCreateUseCaseFactoryMock")
         isLocalServer = true
     }
 
     func makeUseCase() -> ComicCreateUseCase {
         ComicCreateUseCase(
-            createRepository: makeRepository(),
+            createRepository: makeCreateRepository(),
             updateRepository: makeUpdateRepository(),
             characterUseCase: CharacterUseCaseFactoryMock().makeUseCase(),
             seriesUseCase: SeriesUseCaseFactoryMock().makeUseCase(),
             comicUseCase: ComicUseCaseFactoryMock().makeUseCase()
         )
-    }
-
-    private func makeRepository() -> CreateRepository {
-        ComicsInfoCore.CreateRepositoryFactory(itemCreateDBService: makeItemCreateDBService())
-            .make()
-    }
-    
-    private func makeItemCreateDBService() -> ItemCreateDBService {
-        CreateDatabaseProvider(database: makeDatabase())
-    }
-
-    private func makeDatabase() -> DatabaseCreate {
-        DatabaseFectory(isLocalServer: isLocalServer)
-            .makeDatabaseCreate(eventLoop: eventLoop, logger: logger)
     }
 
 }

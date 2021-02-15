@@ -25,24 +25,24 @@ struct MockItemUpdateDBService: ItemUpdateDBService {
         }
     }
     
-    func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>> {
-        guard let oldItemData = TestDatabase.items[item.itemID],
+    func update<Item: ComicInfoItem>(_ query: UpdateItemQuery<Item>) -> EventLoopFuture<Set<String>> {
+        guard let oldItemData = TestDatabase.items[query.id],
               let oldItem = try? JSONDecoder().decode(Item.self, from: oldItemData),
-              let itemData = try? JSONEncoder().encode(item) else {
-            return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: item.itemID))
+              let itemData = try? JSONEncoder().encode(query.item) else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: query.id))
         }
         
-        TestDatabase.items[item.itemID] = itemData
-        return eventLoop.submit { item.updatedFields(old: oldItem) }
+        TestDatabase.items[query.id] = itemData
+        return eventLoop.submit { query.item.updatedFields(old: oldItem) }
     }
     
     func updateSummaries<Summary: ItemSummary>(
-        with criteria: [UpdateSummariesCriteria<Summary>]
+        _ query: UpdateSummariesQuery<Summary>
     ) -> EventLoopFuture<Void> {
         
-        for criterion in criteria {
-            guard let summaryData = try? JSONEncoder().encode(criterion.item) else { continue }
-            TestDatabase.items[criterion.ID] = summaryData
+        for summary in query.summaries {
+            guard let summaryData = try? JSONEncoder().encode(summary) else { continue }
+            TestDatabase.items[query.getID(for: summary)] = summaryData
         }
 
         return eventLoop.submit { }

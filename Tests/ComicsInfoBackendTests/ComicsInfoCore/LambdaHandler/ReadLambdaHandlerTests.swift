@@ -34,8 +34,7 @@ final class ReadLambdaHandlerTests: XCTestCase, LambdaMockFactory {
         request = Request(pathParameters: ["id": "1"])
         let useCase = CharacterUseCaseFactoryMock(
             items: CharacterFactory.makeDatabaseItems(),
-            on: eventLoop,
-            logger: logger
+            on: eventLoop
         ).makeUseCase()
         let readResponseWrapper = CharacterReadResponseWrapper(characterUseCase: useCase)
         let sut = ReadLambdaHandler(

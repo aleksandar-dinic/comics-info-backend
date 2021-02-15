@@ -11,7 +11,7 @@ import Foundation
 extension Error {
 
     func mapToComicInfoError<Item>(itemType: Item.Type) -> Error {
-        guard let error = self as? DatabaseError else { return self }
+        guard let error = self as? DatabaseError else { return ComicInfoError.internalServerError }
         
         switch error {
         case let .itemAlreadyExists(withID: id):

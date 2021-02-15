@@ -7,6 +7,7 @@
 //
 
 @testable import ComicsInfoCore
+import struct Logging.Logger
 import XCTest
 import NIO
 
@@ -14,19 +15,22 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
 
     private var eventLoop: EventLoop!
     private var sut: SeriesCreateResponseWrapper!
+    private var logger: Logger!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         sut = SeriesCreateResponseWrapperMock.make(on: eventLoop)
+        logger = Logger(label: "SeriesCreateResponseWrapperTest")
         environment = "TEST"
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
         sut = nil
+        logger = nil
         environment = nil
     }
 
@@ -35,7 +39,7 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
         let request = Request()
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then
@@ -47,7 +51,7 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
         let request = Request(body: "")
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then
@@ -59,7 +63,7 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
         let request = Request(body: SeriesFactory.requestBody)
 
         // When
-        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
+        let feature = sut.handleCreate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then
@@ -69,11 +73,11 @@ final class SeriesCreateResponseWrapperTest: XCTestCase {
     func test_whenHandleCreateSameItemTwice_statusIsForbidden() throws {
         // Given
         let request = Request(body: SeriesFactory.requestBody)
-        var feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
+        var feature = sut.handleCreate(on: eventLoop, request: request, environment: environment, logger: logger)
         _ = try feature.wait()
 
         // When
-        feature = sut.handleCreate(on: eventLoop, request: request, environment: environment)
+        feature = sut.handleCreate(on: eventLoop, request: request, environment: environment, logger: logger)
         let response = try feature.wait()
 
         // Then

@@ -7,26 +7,28 @@
 //
 
 import struct Domain.Comic
+import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct ComicListResponseWrapper<DBService: ItemGetDBService, CacheProvider: Cacheable>: ListResponseWrapper where CacheProvider.Item == Comic {
+public struct ComicListResponseWrapper: ListResponseWrapper {
 
-    private let comicUseCase: ComicUseCase<DBService, CacheProvider>
+    private let comicUseCase: ComicUseCase
 
-    public init(comicUseCase: ComicUseCase<DBService, CacheProvider>) {
+    public init(comicUseCase: ComicUseCase) {
         self.comicUseCase = comicUseCase
     }
 
     public func handleList(
         on eventLoop: EventLoop,
         request: Request,
-        environment: String?
+        environment: String?,
+        logger: Logger?
     ) -> EventLoopFuture<Response> {
         let table = String.tableName(for: environment)
         let fields = getFields(from: request.queryParameters)
         
-        return comicUseCase.getAllItems(on: eventLoop, fields: fields, from: table)
+        return comicUseCase.getAllItems(on: eventLoop, fields: fields, from: table, logger: logger)
             .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

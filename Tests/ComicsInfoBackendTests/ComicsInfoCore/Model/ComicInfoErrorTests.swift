@@ -77,34 +77,10 @@ final class ComicInfoErrorTests: XCTestCase {
         XCTAssertEqual(sut, localizedDescription)
     }
 
-    func testLocalizedDescription_invalidItemID() {
-        // Given
-        let comicInfoError = ComicInfoError.invalidItemID("1", itemType: "character")
-        let localizedDescription = "Invalid ItemID: Expected to decode character# but found a 1 instead."
-        
-        // When
-        let sut = comicInfoError.localizedDescription
-        
-        // Then
-        XCTAssertEqual(sut, localizedDescription)
-    }
-    
     func testLocalizedDescription_summariesAlreadyExist() {
         // Given
         let comicInfoError = ComicInfoError.summariesAlreadyExist(["1", "2"])
         let localizedDescription = "Summaries already exist withIDs: [\"1\", \"2\"]"
-        
-        // When
-        let sut = comicInfoError.localizedDescription
-        
-        // Then
-        XCTAssertEqual(sut, localizedDescription)
-    }
-
-    func testLocalizedDescription_invalidSummaryID() {
-        // Given
-        let comicInfoError = ComicInfoError.invalidSummaryID("1", itemType: "character")
-        let localizedDescription = "Invalid SummaryID: Expected to decode character# but found a 1 instead."
         
         // When
         let sut = comicInfoError.localizedDescription

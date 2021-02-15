@@ -7,6 +7,7 @@
 //
 
 import struct Domain.Comic
+import struct Logging.Logger
 import Foundation
 import NIO
 
@@ -21,7 +22,8 @@ public struct ComicCreateResponseWrapper: CreateResponseWrapper {
     public func handleCreate(
         on eventLoop: EventLoop,
         request: Request,
-        environment: String?
+        environment: String?,
+        logger: Logger
     ) -> EventLoopFuture<Response> {
         guard let data = request.body?.data(using: .utf8) else {
             let response = Response(statusCode: .badRequest)
@@ -31,7 +33,8 @@ public struct ComicCreateResponseWrapper: CreateResponseWrapper {
         let table = String.tableName(for: environment)
         do {
             let item = try JSONDecoder().decode(Domain.Comic.self, from: data)
-            return useCase.create(Comic(from: item), on: eventLoop, in: table)
+            let criteria = CreateItemCriteria(item: Comic(from: item), on: eventLoop, in: table, log: logger)
+            return useCase.create(with: criteria)
                 .map { Response(with: ResponseStatus("\(type(of: item.self)) created"), statusCode: .created) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 

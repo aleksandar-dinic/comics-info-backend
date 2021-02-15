@@ -24,7 +24,8 @@ extension CreateSeriesProtocol {
         in table: String = String.tableName(for: "TEST")
     ) throws {
         let useCase = SeriesCreateUseCaseFactoryMock().makeUseCase()
-        let feature = useCase.create(series, on: eventLoop, in: table)
+        let criteria = CreateItemCriteria(item: series, on: eventLoop, in: table)
+        let feature = useCase.create(with: criteria)
         try feature.wait()
     }
 

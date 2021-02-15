@@ -34,7 +34,7 @@ extension GetDataProviderTests {
     func test_whenGetItemFromMemory_retursItem() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetItemCriteria(itemID: givenItem.id, dataSource: .memory, table: table)
+        let criteria = GetItemCriteria(ID: givenItem.id, dataSource: .memory, table: table)
         let cash = TestCache<MockComicInfoItem>(itemsCaches: [table: [givenItem.id: givenItem]])
         sut = GetDataProviderFactory.make(cacheProvider: cash)
         
@@ -49,7 +49,7 @@ extension GetDataProviderTests {
     func test_whenGetItemFromDatabase_retursItem() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetItemCriteria(itemID: givenItem.id, dataSource: .database, table: table)
+        let criteria = GetItemCriteria(ID: givenItem.id, dataSource: .database, table: table)
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -64,7 +64,7 @@ extension GetDataProviderTests {
     func test_whenGetItem_throwsItemNotFound() throws {
         // Given
         let id = "-1"
-        let criteria = GetItemCriteria(itemID: id, dataSource: .memory, table: table)
+        let criteria = GetItemCriteria(ID: id, dataSource: .memory, table: table)
         var thrownError: Error?
         
         // When
@@ -86,7 +86,7 @@ extension GetDataProviderTests {
     func test_whenGetItemFromEmptyMemory_retursItemFromDatabase() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetItemCriteria(itemID: givenItem.id, dataSource: .memory, table: table)
+        let criteria = GetItemCriteria(ID: givenItem.id, dataSource: .memory, table: table)
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -101,7 +101,7 @@ extension GetDataProviderTests {
     func test_whenGetItemFromEmptyMemory_saveItemInCache() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetItemCriteria(itemID: givenItem.id, dataSource: .memory, table: table)
+        let criteria = GetItemCriteria(ID: givenItem.id, dataSource: .memory, table: table)
         let cache = TestCache<MockComicInfoItem>()
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(cacheProvider: cache, items: itemData)

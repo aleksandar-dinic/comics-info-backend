@@ -24,7 +24,8 @@ extension CreateComicProtocol {
         in table: String = String.tableName(for: "TEST")
     ) throws {
         let useCase = ComicCreateUseCaseFactoryMock().makeUseCase()
-        let feature = useCase.create(comic, on: eventLoop, in: table)
+        let criteria = CreateItemCriteria(item: comic, on: eventLoop, in: table)
+        let feature = useCase.create(with: criteria)
         try feature.wait()
     }
     

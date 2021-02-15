@@ -7,38 +7,35 @@
 //
 
 @testable import ComicsInfoCore
-import Logging
 import NIO
 import XCTest
 
 final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, CreateSeriesProtocol {
 
     private var eventLoop: EventLoop!
-    private var logger: Logger!
     private var sut: ComicCreateUseCase!
     private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        logger = Logger(label: self.className)
-        sut = ComicCreateUseCaseFactoryMock(on: eventLoop, logger: logger).makeUseCase()
+        sut = ComicCreateUseCaseFactoryMock(on: eventLoop).makeUseCase()
         table = String.tableName(for: "TEST")
     }
 
     override func tearDownWithError() throws {
         eventLoop = nil
-        logger = nil
         sut = nil
         table = nil
     }
 
     func test_whenCrateComic_comicIsCreated() throws {
         // Given
-
+        let criteria = CreateItemCriteria(item: ComicFactory.make(), on: eventLoop, in: table)
+        
         // When
-        let feature = sut.create(ComicFactory.make(), on: eventLoop, in: table)
+        let feature = sut.create(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -47,10 +44,15 @@ final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
     func test_whenCrateComicWithNotExistingCharacterID_throwsItemsNotFound() throws {
         // Given
         let charactersID: Set<String> = ["-1"]
+        let criteria = CreateItemCriteria(
+            item: ComicFactory.make(charactersID: charactersID),
+            on: eventLoop,
+            in: table
+        )
         var thrownError: Error?
 
         // When
-        let feature = sut.create(ComicFactory.make(charactersID: charactersID), on: eventLoop, in: table)
+        let feature = sut.create(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -68,10 +70,15 @@ final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
     func test_whenCrateComicWithNotExistingSeriesID_throwsItemsNotFound() throws {
         // Given
         let seriesID: Set<String> = ["-1"]
+        let criteria = CreateItemCriteria(
+            item: ComicFactory.make(seriesID: seriesID),
+            on: eventLoop,
+            in: table
+        )
         var thrownError: Error?
 
         // When
-        let feature = sut.create(ComicFactory.make(seriesID: seriesID), on: eventLoop, in: table)
+        let feature = sut.create(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -92,23 +99,20 @@ final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         try createCharacter(character)
         let series = SeriesFactory.make(id: "SeriesID")
         try createSeries(series)
-
-        // When
-        let feature = sut.create(
-            ComicFactory.make(
-                id: "ComicID",
-                charactersID: [character.id],
-                seriesID: [series.id]
-            ),
+        let criteria = CreateItemCriteria(
+            item: ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id]),
             on: eventLoop,
             in: table
         )
 
+        // When
+        let feature = sut.create(with: criteria)
+
         // Then
         XCTAssertNoThrow(try feature.wait())
-        XCTAssertNotNil(DatabaseMock.items["Comic#ComicID"])
-        XCTAssertNotNil(DatabaseMock.items["Character#CharacterID|Comic#ComicID"])
-        XCTAssertNotNil(DatabaseMock.items["Series#SeriesID|Comic#ComicID"])
+        XCTAssertNotNil(MockDB["Comic#ComicID"])
+        XCTAssertNotNil(MockDB["Character#CharacterID|Comic#ComicID"])
+        XCTAssertNotNil(MockDB["Series#SeriesID|Comic#ComicID"])
     }
 
     func test_whenCrateComicWithOneNotExistingSeriesID_throwsItemNotFound() throws {
@@ -116,10 +120,11 @@ final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         let series = SeriesFactory.make(id: "1")
         try createSeries(series)
         let comic = ComicFactory.make(seriesID: [series.id, "-1"])
+        let criteria = CreateItemCriteria(item: comic, on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.create(comic, on: eventLoop, in: table)
+        let feature = sut.create(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -139,10 +144,11 @@ final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         let character = CharacterFactory.make(id: "1")
         try createCharacter(character)
         let comic = ComicFactory.make(charactersID: [character.id, "-1"])
+        let criteria = CreateItemCriteria(item: comic, on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
-        let feature = sut.create(comic, on: eventLoop, in: table)
+        let feature = sut.create(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

@@ -13,12 +13,12 @@ struct CreateDataProvider {
 
     let itemCreateDBWrapper: ItemCreateDBWrapper
 
-    func create<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Void> {
-        itemCreateDBWrapper.create(item, in: table)
+    func create<Item: ComicInfoItem>(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Void> {
+        itemCreateDBWrapper.create(with: criteria)
     }
     
-    func createSummaries<Summary: ItemSummary>(_ summaries: [Summary], in table: String) -> EventLoopFuture<Void> {
-        itemCreateDBWrapper.createSummaries(summaries, in: table)
+    func createSummaries<Summary: ItemSummary>(with criteria: CreateSummariesCriteria<Summary>) -> EventLoopFuture<Void> {
+        itemCreateDBWrapper.createSummaries(with: criteria)
     }
 
 }

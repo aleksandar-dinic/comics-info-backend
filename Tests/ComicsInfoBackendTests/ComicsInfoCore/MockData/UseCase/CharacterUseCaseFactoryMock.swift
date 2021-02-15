@@ -8,27 +8,24 @@
 
 @testable import ComicsInfoCore
 import Foundation
-import Logging
 import NIO
 
 struct CharacterUseCaseFactoryMock: GetUseCaseFactory {
 
     let items: [String: Data]
     var eventLoop: EventLoop
-    var logger: Logger
 
     var isLocalServer: Bool
     var cacheProvider: InMemoryCacheProvider<Character>
 
-    init(items: [String: Data] = [:], on eventLoop: EventLoop? = nil, logger: Logger? = nil) {
+    init(items: [String: Data] = [:], on eventLoop: EventLoop? = nil) {
         self.items = items
         self.eventLoop = eventLoop ?? MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        self.logger = logger ?? Logger(label: "CharacterUseCaseFactoryMock")
         isLocalServer = true
         cacheProvider = InMemoryCacheProvider<Character>()
     }
 
-    func makeUseCase() -> CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>> {
+    func makeUseCase() -> CharacterUseCase {
         CharacterUseCase(repository: makeCharacterRepository())
     }
 
@@ -45,12 +42,8 @@ struct CharacterUseCaseFactoryMock: GetUseCaseFactory {
     }
     
     func makeItemGetDBService() -> ItemGetDBService {
-        GetDatabaseProvider(database: makeDatabase())
-    }
-
-    private func makeDatabase() -> DatabaseGet {
-        DatabaseFectory(isLocalServer: isLocalServer)
-            .makeDatabase(eventLoop: eventLoop, logger: logger, items: items)
+        DatabaseFectory(isLocalServer: isLocalServer, eventLoop: eventLoop, items: items)
+            .makeDatabase()
     }
 
 }

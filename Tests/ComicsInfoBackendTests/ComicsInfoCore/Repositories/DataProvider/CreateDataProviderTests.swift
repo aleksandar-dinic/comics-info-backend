@@ -8,20 +8,24 @@
 
 @testable import ComicsInfoCore
 import XCTest
+import NIO
 
 final class CreateDataProviderTests: XCTestCase {
     
     private var sut: CreateDataProvider!
+    private var eventLoop: EventLoop!
     private var table: String!
 
     override func setUpWithError() throws {
         TestDatabase.removeAll()
         sut = CreateDataProviderFactory.make()
+        eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         table = "TEST"
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        eventLoop = nil
         table = nil
     }
 
@@ -30,9 +34,10 @@ final class CreateDataProviderTests: XCTestCase {
     func test_whenCreate_itemIsCreated() throws {
         // Given
         let item = MockComicInfoItemFactory.make()
+        let criteria = CreateItemCriteria(item: item, on: eventLoop, in: table)
         
         // When
-        let feature = sut.create(item, in: table)
+        let feature = sut.create(with: criteria)
         
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -43,9 +48,10 @@ final class CreateDataProviderTests: XCTestCase {
     func test_whenCreateSummaries_summaryIsCreated() throws {
         // Given
         let summary = MockItemSummaryFactory.make()
+        let criteria = CreateSummariesCriteria(summaries: [summary], on: eventLoop, in: table)
         
         // When
-        let feature = sut.createSummaries([summary], in: table)
+        let feature = sut.createSummaries(with: criteria)
         
         // Then
         XCTAssertNoThrow(try feature.wait())

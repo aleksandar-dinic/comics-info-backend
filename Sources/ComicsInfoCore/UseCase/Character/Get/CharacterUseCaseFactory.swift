@@ -6,34 +6,30 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
-public struct CharacterUseCaseFactory<CacheProvider: Cacheable>: GetUseCaseFactory where CacheProvider.Item == Character  {
+public struct CharacterUseCaseFactory: GetUseCaseFactory  {
 
     public let eventLoop: EventLoop
     public let isLocalServer: Bool
-    public let cacheProvider: CacheProvider
-    public let logger: Logger
+    public let cacheProvider: InMemoryCacheProvider<Character>
 
     public init(
         on eventLoop: EventLoop,
         isLocalServer: Bool,
-        cacheProvider: CacheProvider,
-        logger: Logger
+        cacheProvider: InMemoryCacheProvider<Character>
     ) {
         self.eventLoop = eventLoop
         self.isLocalServer = isLocalServer
         self.cacheProvider = cacheProvider
-        self.logger = logger
     }
 
-    public func makeUseCase() -> CharacterUseCase<GetDatabaseProvider, CacheProvider> {
+    public func makeUseCase() -> CharacterUseCase {
         CharacterUseCase(repository: makeCharacterRepository())
     }
 
-    private func makeCharacterRepository() -> GetRepository<Character, CacheProvider> {
+    private func makeCharacterRepository() -> GetRepository<Character, InMemoryCacheProvider<Character>> {
         GetRepositoryFactory(
             eventLoop: eventLoop,
             itemGetDBWrapper: makeItemGetDBWrapper(),

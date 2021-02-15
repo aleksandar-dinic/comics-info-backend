@@ -13,12 +13,12 @@ import XCTest
 final class CharacterUseCaseTests: XCTestCase {
 
     private var eventLoop: EventLoop!
-    private var sut: CharacterUseCase<GetDatabaseProvider, InMemoryCacheProvider<Character>>!
+    private var sut: CharacterUseCase!
     private var table: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         table = String.tableName(for: "TEST")
         let items = CharacterFactory.makeDatabaseItems()
@@ -48,7 +48,7 @@ final class CharacterUseCaseTests: XCTestCase {
         var thrownError: Error?
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
         XCTAssertThrowsError(try featureGet.wait()) {
             thrownError = $0
         }
@@ -69,7 +69,7 @@ final class CharacterUseCaseTests: XCTestCase {
         var thrownError: Error?
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
         XCTAssertThrowsError(try featureGet.wait()) {
             thrownError = $0
         }
@@ -88,7 +88,7 @@ final class CharacterUseCaseTests: XCTestCase {
         let givenItem = CharacterFactory.make()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -100,7 +100,7 @@ final class CharacterUseCaseTests: XCTestCase {
         let givenItem = CharacterFactory.make()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: nil, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -114,7 +114,7 @@ final class CharacterUseCaseTests: XCTestCase {
         let givenItem = CharacterFactory.make()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -128,7 +128,7 @@ final class CharacterUseCaseTests: XCTestCase {
         let givenItem = CharacterFactory.make()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -150,10 +150,11 @@ final class CharacterUseCaseTests: XCTestCase {
         
         let givenItem = CharacterFactory.make(seriesID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
-        try updateUseCase.update(givenItem, on: eventLoop, in: table).wait()
+        let criteria = UpdateItemCriteria(item: givenItem, on: eventLoop, in: table)
+        try updateUseCase.update(with: criteria).wait()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -175,10 +176,11 @@ final class CharacterUseCaseTests: XCTestCase {
         
         let givenItem = CharacterFactory.make(comicsID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
-        try updateUseCase.update(givenItem, on: eventLoop, in: table).wait()
+        let criteria = UpdateItemCriteria(item: givenItem, on: eventLoop, in: table)
+        try updateUseCase.update(with: criteria).wait()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -206,10 +208,11 @@ final class CharacterUseCaseTests: XCTestCase {
         
         let givenItem = CharacterFactory.make(seriesID: ["1"], comicsID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
-        try updateUseCase.update(givenItem, on: eventLoop, in: table).wait()
+        let criteria = UpdateItemCriteria(item: givenItem, on: eventLoop, in: table)
+        try updateUseCase.update(with: criteria).wait()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, dataSource: .database)
+        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
         let item = try featureGet.wait()
 
         // Then
@@ -219,13 +222,13 @@ final class CharacterUseCaseTests: XCTestCase {
 
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
         // Given
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         let givenCharacters = CharacterFactory.makeList
         let givenItems = CharacterFactory.makeDatabaseItemsList()
         sut = CharacterUseCaseFactoryMock(items: givenItems).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(on: eventLoop, fields: nil, from: table, dataSource: .database)
+        let featureGet = sut.getAllItems(on: eventLoop, fields: nil, from: table, logger: nil, dataSource: .database)
         let items = try featureGet.wait()
 
         // Then

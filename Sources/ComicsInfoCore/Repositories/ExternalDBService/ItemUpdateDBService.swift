@@ -6,15 +6,13 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
+import class NIO.EventLoopFuture
 import Foundation
-import NIO
 
 protocol ItemUpdateDBService {
 
-    func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>>
+    func update<Item: ComicInfoItem>(_ query: UpdateItemQuery<Item>) -> EventLoopFuture<Set<String>>
     
-    func updateSummaries<Summary: ItemSummary>(
-        with criteria: [UpdateSummariesCriteria<Summary>]
-    ) -> EventLoopFuture<Void>
+    func updateSummaries<Summary: ItemSummary>(_ query: UpdateSummariesQuery<Summary>) -> EventLoopFuture<Void>
 
 }

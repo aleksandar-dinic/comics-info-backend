@@ -13,16 +13,14 @@ struct UpdateDataProvider {
 
     let itemUpdateDBWrapper: ItemUpdateDBWrapper
 
-    func update<Item: ComicInfoItem>(_ item: Item, in table: String) -> EventLoopFuture<Set<String>> {
-        itemUpdateDBWrapper.update(item, in: table)
+    func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
+        itemUpdateDBWrapper.update(with: criteria)
     }
     
     func updateSummaries<Summary: ItemSummary>(
-        _ summaries: [Summary],
-        in table: String,
-        strategy: UpdateSummariesStrategy
+        with criteria: UpdateSummariesCriteria<Summary>
     ) -> EventLoopFuture<Void> {
-        itemUpdateDBWrapper.updateSummaries(summaries, in: table, strategy: strategy)
+        itemUpdateDBWrapper.updateSummaries(with: criteria)
     }
 
 }

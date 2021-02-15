@@ -15,15 +15,10 @@ public protocol CreateUseCase {
 
     var createRepository: CreateRepository { get }
 
-    func create(
-        _ item: Item,
-        on eventLoop: EventLoop,
-        in table: String
-    ) -> EventLoopFuture<Void>
+    func create(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Void>
     
     func createSummaries<Summary: ItemSummary>(
-        _ summaries: [Summary],
-        in table: String
+        with criteria: CreateSummariesCriteria<Summary>
     ) -> EventLoopFuture<Void>
     
 }
@@ -31,10 +26,9 @@ public protocol CreateUseCase {
 extension CreateUseCase {
     
     public func createSummaries<Summary: ItemSummary>(
-        _ summaries: [Summary],
-        in table: String
+        with criteria: CreateSummariesCriteria<Summary>
     ) -> EventLoopFuture<Void> {
-        createRepository.createSummaries(summaries, in: table)
+        createRepository.createSummaries(with: criteria)
     }
     
 }

@@ -6,6 +6,7 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
@@ -17,7 +18,8 @@ protocol CreateSeriesSummariesForComics {
         for comics: [Comic],
         item: Series,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Bool>
     
 }
@@ -28,15 +30,26 @@ extension CreateSeriesSummariesForComics {
         for comics: [Comic],
         item: Series,
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Bool> {
         guard !comics.isEmpty else { return eventLoop.submit { false } }
         
-        let comicSummaries = comics.map { ComicSummary($0, link: item) }
-        let seriesSummaries = comics.map { SeriesSummary(item, link: $0) }
+        let comicSummariesCriteria = CreateSummariesCriteria(
+            summaries: comics.map { ComicSummary($0, link: item) },
+            on: eventLoop,
+            in: table,
+            log: logger
+        )
+        let seriesSummariesCriteria = CreateSummariesCriteria(
+            summaries: comics.map { SeriesSummary(item, link: $0) },
+            on: eventLoop,
+            in: table,
+            log: logger
+        )
         
-        return createRepository.createSummaries(comicSummaries, in: table)
-            .and(createRepository.createSummaries(seriesSummaries, in: table))
+        return createRepository.createSummaries(with: comicSummariesCriteria)
+            .and(createRepository.createSummaries(with: seriesSummariesCriteria))
             .map { _ in true }
     }
     

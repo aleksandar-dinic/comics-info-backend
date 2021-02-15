@@ -6,19 +6,15 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
 public protocol GetUseCaseFactory  {
 
-    associatedtype CacheProvider: Cacheable
     associatedtype UseCaseType: GetUseCase
 
     var eventLoop: EventLoop { get }
     var isLocalServer: Bool { get }
-    var cacheProvider: CacheProvider { get }
-    var logger: Logger { get }
 
     func makeUseCase() -> UseCaseType
 
@@ -27,12 +23,8 @@ public protocol GetUseCaseFactory  {
 extension GetUseCaseFactory {
     
     func makeItemGetDBService() -> ItemGetDBService {
-        GetDatabaseProvider(database: makeDatabase())
-    }
-
-    private func makeDatabase() -> DatabaseGet {
-        DatabaseFectory(isLocalServer: isLocalServer)
-            .makeDatabase(eventLoop: eventLoop, logger: logger)
+        DatabaseFectory(isLocalServer: isLocalServer, eventLoop: eventLoop)
+            .makeDatabase()
     }
 
 }

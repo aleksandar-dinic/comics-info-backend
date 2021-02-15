@@ -6,14 +6,12 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
 protocol ComicCreateUseCaseBuilder {
     
     var eventLoop: EventLoop { get }
-    var logger: Logger { get }
     
     func buildComicCreateUseCase() -> ComicCreateUseCase
     
@@ -22,11 +20,8 @@ protocol ComicCreateUseCaseBuilder {
 extension ComicCreateUseCaseBuilder {
     
     func buildComicCreateUseCase() -> ComicCreateUseCase {
-        ComicCreateUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            logger: logger
-        ).makeUseCase()
+        ComicCreateUseCaseFactory(on: eventLoop, isLocalServer: LocalServer.isEnabled)
+            .makeUseCase()
     }
     
 }

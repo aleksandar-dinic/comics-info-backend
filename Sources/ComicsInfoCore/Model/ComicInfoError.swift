@@ -14,13 +14,28 @@ public enum ComicInfoError: Error {
     case itemAlreadyExists(withID: String, itemType: Any.Type)
     case itemNotFound(withID: String, itemType: Any.Type)
     case itemsNotFound(withIDs: Set<String>?, itemType: Any.Type)
-    case invalidItemID(_ itemID: String, itemType: String)
     case summariesAlreadyExist(_ IDs: Set<String>)
-    case invalidSummaryID(_ summaryID: String, itemType: String)
     case invalidFields(_ fields: Set<String>)
     case handlerUnknown
     case internalServerError
 
+}
+
+extension ComicInfoError {
+    
+    var responseStatus: HTTPResponseStatus {
+        switch self {
+        case .requestError:             return .badRequest
+        case .itemAlreadyExists:        return .forbidden
+        case .itemNotFound:             return .noContent
+        case .itemsNotFound:            return .noContent
+        case .summariesAlreadyExist:    return .forbidden
+        case .invalidFields:            return .badRequest
+        case .handlerUnknown:           return .internalServerError
+        case .internalServerError:      return .internalServerError
+        }
+    }
+    
 }
 
 extension ComicInfoError: LocalizedError {
@@ -43,15 +58,9 @@ extension ComicInfoError: LocalizedError {
             }
             return "\(desc) with ids: \(ids.sorted())"
 
-        case let .invalidItemID(itemID, itemType):
-            return "Invalid ItemID: Expected to decode \(itemType)# but found a \(itemID) instead."
-            
         case let .summariesAlreadyExist(IDs):
             return "Summaries already exist withIDs: \(IDs.sorted())"
 
-        case let .invalidSummaryID(summaryID, itemType):
-            return "Invalid SummaryID: Expected to decode \(itemType)# but found a \(summaryID) instead."
-            
         case let .invalidFields(fields):
             return "Invalid fields: \(fields.sorted())"
 

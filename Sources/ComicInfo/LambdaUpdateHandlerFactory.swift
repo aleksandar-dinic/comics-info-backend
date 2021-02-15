@@ -9,27 +9,19 @@
 import AWSLambdaRuntime
 import ComicsInfoCore
 import Foundation
-import struct Logging.Logger
 import protocol NIO.EventLoop
 
 enum LambdaUpdateHandlerFactory {
 
     static func makeHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeUseCaseFactory(on: context.eventLoop, logger: context.logger)
+        let useCaseFactory = makeUseCaseFactory(on: context.eventLoop)
         let updateResponseWrapper = ComicUpdateResponseWrapper(comicUseCase: useCaseFactory.makeUseCase())
 
         return UpdateLambdaHandler(context, updateResponseWrapper: updateResponseWrapper)
     }
 
-    private static func makeUseCaseFactory(
-        on eventLoop: EventLoop,
-        logger: Logger
-    ) -> ComicUpdateUseCaseFactory {
-        ComicUpdateUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            logger: logger
-        )
+    private static func makeUseCaseFactory(on eventLoop: EventLoop) -> ComicUpdateUseCaseFactory {
+        ComicUpdateUseCaseFactory(on: eventLoop, isLocalServer: LocalServer.isEnabled)
     }
 
 }

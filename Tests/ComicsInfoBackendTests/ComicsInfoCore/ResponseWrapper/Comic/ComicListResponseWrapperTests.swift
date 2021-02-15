@@ -12,15 +12,13 @@ import NIO
 
 final class ComicListResponseWrapperTests: XCTestCase {
 
-    private typealias Cache = InMemoryCacheProvider<Comic>
-
     private var eventLoop: EventLoop!
-    private var sut: ComicListResponseWrapper<GetDatabaseProvider, Cache>!
+    private var sut: ComicListResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         environment = "TEST"
     }
@@ -31,17 +29,17 @@ final class ComicListResponseWrapperTests: XCTestCase {
         environment = nil
     }
 
-    func test_whenHandleListWithoutItems_statusIsNotFound() throws {
+    func test_whenHandleListWithoutItems_statusIsNoContent() throws {
         // Given
         let useCase = ComicUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = ComicListResponseWrapper(comicUseCase: useCase)
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.notFound.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
     }
 
     func test_whenHandleList_statusIsOk() throws {
@@ -51,7 +49,7 @@ final class ComicListResponseWrapperTests: XCTestCase {
         sut = ComicListResponseWrapper(comicUseCase: useCase)
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then

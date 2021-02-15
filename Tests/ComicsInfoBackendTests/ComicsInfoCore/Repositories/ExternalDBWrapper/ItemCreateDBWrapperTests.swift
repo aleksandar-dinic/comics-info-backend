@@ -8,13 +8,16 @@
 
 @testable import ComicsInfoCore
 import XCTest
+import NIO
 
 final class ItemCreateDBWrapperTests: XCTestCase {
     
+    private var eventLoop: EventLoop!
     private var table: String!
 
     override func setUpWithError() throws {
         TestDatabase.removeAll()
+        eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         table = "TEST"
     }
 
@@ -28,9 +31,10 @@ final class ItemCreateDBWrapperTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let sut = ItemCreateDBWrapperFactory.make()
+        let criteria = CreateItemCriteria(item: item, on: eventLoop, in: table)
         
         // When
-        let feature = sut.create(item, in: table)
+        let feature = sut.create(with: criteria)
         
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -41,10 +45,11 @@ final class ItemCreateDBWrapperTests: XCTestCase {
         let item = MockComicInfoItemFactory.make()
         let itemData = MockComicInfoItemFactory.makeData()
         let sut = ItemCreateDBWrapperFactory.make(items: itemData)
+        let criteria = CreateItemCriteria(item: item, on: eventLoop, in: table)
         var thrownError: Error?
         
         // When
-        let feature = sut.create(item, in: table)
+        let feature = sut.create(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }
@@ -64,10 +69,11 @@ final class ItemCreateDBWrapperTests: XCTestCase {
     func test_whenCreateSummaries_summaryIsCreated() throws {
         // Given
         let summary = MockItemSummaryFactory.make()
+        let criteria = CreateSummariesCriteria(summaries: [summary], on: eventLoop, in: table)
         let sut = ItemCreateDBWrapperFactory.make()
         
         // When
-        let feature = sut.createSummaries([summary], in: table)
+        let feature = sut.createSummaries(with: criteria)
         
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -78,10 +84,11 @@ final class ItemCreateDBWrapperTests: XCTestCase {
         let summary = MockItemSummaryFactory.make()
         let itemData = MockItemSummaryFactory.makeData()
         let sut = ItemCreateDBWrapperFactory.make(items: itemData)
+        let criteria = CreateSummariesCriteria(summaries: [summary], on: eventLoop, in: table)
         var thrownError: Error?
         
         // When
-        let feature = sut.createSummaries([summary], in: table)
+        let feature = sut.createSummaries(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
         }

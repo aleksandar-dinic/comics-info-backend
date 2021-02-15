@@ -21,12 +21,10 @@ extension ErrorResponseWrapper {
             return Response(with: ResponseStatus(error.localizedDescription), statusCode: statusCode)
         }
         
-        switch comicInfoError {
-        case .invalidFields:
-            return Response(with: ResponseStatus(error.localizedDescription), statusCode: .forbidden)
-        default:
-            return Response(with: ResponseStatus(error.localizedDescription), statusCode: statusCode)
-        }
+        return Response(
+            with: ResponseStatus(comicInfoError.localizedDescription),
+            statusCode: comicInfoError.responseStatus
+        )
     }
 
 }

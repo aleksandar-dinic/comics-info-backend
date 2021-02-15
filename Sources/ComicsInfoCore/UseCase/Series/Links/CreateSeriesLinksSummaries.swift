@@ -6,6 +6,7 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
+import struct Logging.Logger
 import Foundation
 import NIO
 
@@ -16,7 +17,8 @@ protocol CreateSeriesLinksSummaries: CreateSeriesSummariesForCharacters, CreateS
         characters: [Character],
         comics: [Comic],
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Void>
     
 }
@@ -28,10 +30,11 @@ extension CreateSeriesLinksSummaries {
         characters: [Character],
         comics: [Comic],
         on eventLoop: EventLoop,
-        in table: String
+        in table: String,
+        logger: Logger?
     ) -> EventLoopFuture<Void> {
-        createSummaries(for: characters, item: item, on: eventLoop, in: table)
-            .and(createSummaries(for: comics, item: item, on: eventLoop, in: table))
+        createSummaries(for: characters, item: item, on: eventLoop, in: table, logger: logger)
+            .and(createSummaries(for: comics, item: item, on: eventLoop, in: table, logger: logger))
             .map { _ in }
     }
     

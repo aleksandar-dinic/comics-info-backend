@@ -12,15 +12,13 @@ import NIO
 
 final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtocol {
 
-    private typealias Cache = InMemoryCacheProvider<Character>
-
     private var eventLoop: EventLoop!
-    private var sut: CharacterListResponseWrapper<GetDatabaseProvider, Cache>!
+    private var sut: CharacterListResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let useCase = CharacterUseCaseFactoryMock(items: [:], on: eventLoop).makeUseCase()
         sut = CharacterListResponseWrapper(characterUseCase: useCase)
@@ -33,15 +31,15 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         environment = nil
     }
 
-    func test_whenHandleListWithoutItems_statusIsNotFound() throws {
+    func test_whenHandleListWithoutItems_statusIsNoContent() throws {
         // Given
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.notFound.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
     }
 
     func test_whenHandleList_statusIsOk() throws {
@@ -49,7 +47,7 @@ final class CharacterListResponseWrapperTests: XCTestCase, CreateCharacterProtoc
         try createCharacter(CharacterFactory.make())
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then

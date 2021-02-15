@@ -8,18 +8,22 @@
 
 @testable import ComicsInfoCore
 import XCTest
+import NIO
 
 final class UpdateRepositoryTests: XCTestCase {
     
     private var sut: UpdateRepository!
+    private var eventLoop: EventLoop!
     private var table: String!
     
     override func setUpWithError() throws {
         TestDatabase.removeAll()
+        eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         table = "TEST"
     }
 
     override func tearDownWithError() throws {
+        eventLoop = nil
         table = nil
     }
     
@@ -29,10 +33,11 @@ final class UpdateRepositoryTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let itemData = MockComicInfoItemFactory.makeData()
+        let criteria = UpdateItemCriteria(item: item, on: eventLoop, in: table)
         sut = UpdateRepositoryFactory.make(items: itemData)
         
         // When
-        let feature = sut.update(item, in: table)
+        let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
@@ -43,10 +48,11 @@ final class UpdateRepositoryTests: XCTestCase {
     func test_whenUpdateSummaries_summariesUpdated() throws {
         // Given
         let item = MockItemSummaryFactory.make()
+        let criteria = UpdateSummariesCriteria(items: [item], table: table)
         sut = UpdateRepositoryFactory.make()
         
         // When
-        let feature = sut.updateSummaries([item], in: table)
+        let feature = sut.updateSummaries(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())

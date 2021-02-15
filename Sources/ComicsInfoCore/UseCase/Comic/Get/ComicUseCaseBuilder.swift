@@ -6,27 +6,24 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
-import Logging
 import Foundation
 import NIO
 
 protocol ComicUseCaseBuilder {
     
     var eventLoop: EventLoop { get }
-    var logger: Logger { get }
     
-    func buildComicUseCase() -> ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>>
+    func buildComicUseCase() -> ComicUseCase
     
 }
 
 extension ComicUseCaseBuilder {
     
-    func buildComicUseCase() -> ComicUseCase<GetDatabaseProvider, InMemoryCacheProvider<Comic>> {
+    func buildComicUseCase() -> ComicUseCase {
         ComicUseCaseFactory(
             on: eventLoop,
             isLocalServer: LocalServer.isEnabled,
-            cacheProvider: LocalServer.comicInMemoryCache,
-            logger: logger
+            cacheProvider: LocalServer.comicInMemoryCache
         ).makeUseCase()
     }
     

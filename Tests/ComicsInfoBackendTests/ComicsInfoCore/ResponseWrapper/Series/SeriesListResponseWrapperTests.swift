@@ -12,15 +12,13 @@ import NIO
 
 final class SeriesListResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
 
-    private typealias Cache = InMemoryCacheProvider<Series>
-
     private var eventLoop: EventLoop!
-    private var sut: SeriesListResponseWrapper<GetDatabaseProvider, Cache>!
+    private var sut: SeriesListResponseWrapper!
     private var environment: String!
 
     override func setUpWithError() throws {
         _ = LocalServer(enabled: true)
-        DatabaseMock.removeAll()
+        MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         let useCase = SeriesUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = SeriesListResponseWrapper(seriesUseCase: useCase)
@@ -33,15 +31,15 @@ final class SeriesListResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
         environment = nil
     }
 
-    func test_whenHandleListWithoutItems_statusIsNotFound() throws {
+    func test_whenHandleListWithoutItems_statusIsNoContent() throws {
         // Given
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.notFound.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
     }
 
     func test_whenHandleList_statusIsOk() throws {
@@ -49,7 +47,7 @@ final class SeriesListResponseWrapperTests: XCTestCase, CreateSeriesProtocol {
         try createSeries(SeriesFactory.make())
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment)
+        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
