@@ -10,7 +10,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public final class ComicUpdateUseCase: UpdateUseCase, GetComicLinks, CreateComicLinksSummaries {
+public final class ComicUpdateUseCase: UpdateUseCase, GetComicLinks, CreateComicLinksSummaries, GetCharacterSummariesForSeries {
     
     public let repository: UpdateRepository
     let createRepository: CreateRepository
@@ -39,11 +39,18 @@ public final class ComicUpdateUseCase: UpdateUseCase, GetComicLinks, CreateComic
                 return self.updateItem(with: criteria)
                     .map { ($0, characters, series) }
             }
-            .flatMap { [weak self] fields, characters, series in
+            .flatMap { [weak self] fields, characters, series -> EventLoopFuture<([Character], [Series])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createLinksSummaries(for: criteria.item, characters: characters, series: series, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
                     .and(self.updateSummaries(for: criteria.item, on: criteria.eventLoop, fields: fields, in: criteria.table, logger: criteria.logger))
-                    .and(self.updateSummaries(between: characters, and: series, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger))
+                    .map { _ in (characters, series) }
+            }
+            .flatMap { [weak self] characters, series in
+                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                return self.getCharacterSummariesForSeries(characters: characters, series: series, on: criteria.eventLoop, from: criteria.table, logger: criteria.logger)
+                    .flatMap {
+                        self.updateSummaries(between: characters, and: series, characterSummaries: $0, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
+                    }
                     .map { _ in }
             }
             .hop(to: criteria.eventLoop)
@@ -93,33 +100,23 @@ extension ComicUpdateUseCase {
     private func updateSummaries(
         between characters: [Character],
         and series: [Series],
+        characterSummaries: [CharacterSummary]?,
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
     ) -> EventLoopFuture<Bool> {
         guard !characters.isEmpty, !series.isEmpty else { return eventLoop.submit { false } }
-        var charactersSummaries = [CharacterSummary]()
-        var seriesSummaries = [SeriesSummary]()
         
-        for character in characters {
-            charactersSummaries.append(contentsOf: series.map { CharacterSummary(character, link: $0, count: 1) })
-            seriesSummaries.append(contentsOf: series.map { SeriesSummary($0, link: character) })
-        }
-        
-        let charactersSummariesCriteria = UpdateSummariesCriteria(
-            items: charactersSummaries,
-            table: table,
-            logger: logger,
-            strategy: .characterInSeries
-        )
-        let seriesSummariesCriteria = UpdateSummariesCriteria(
-            items: seriesSummaries,
+        let (charactersSummaries, seriesSummaries) = getUpdateSummariesCriteria(
+            characters: characters,
+            series: series,
+            characterSummaries: characterSummaries,
             table: table,
             logger: logger
         )
         
-        return updateSummaries(with: charactersSummariesCriteria)
-            .and(updateSummaries(with: seriesSummariesCriteria))
+        return updateSummaries(with: charactersSummaries)
+            .and(updateSummaries(with: seriesSummaries))
             .map { _ in true }
     }
     

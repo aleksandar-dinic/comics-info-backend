@@ -55,11 +55,3 @@ struct CharacterSummary: ItemSummary {
     
 
 }
-
-extension CharacterSummary {
-    
-    mutating func incrementCount(_ newValue: Int) {
-        count = (count ?? 0) + newValue
-    }
-    
-}

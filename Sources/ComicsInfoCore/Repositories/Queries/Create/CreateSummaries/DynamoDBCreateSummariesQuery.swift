@@ -18,7 +18,6 @@ struct DynamoDBCreateSummariesQuery<Summary: ItemSummary>: Loggable {
         var inputs = [DynamoDB.PutItemCodableInput<Summary>]()
         for summary in summaries {
             let put = DynamoDB.PutItemCodableInput(
-                conditionExpression: "attribute_not_exists(itemID) AND attribute_not_exists(summaryID)",
                 item: summary,
                 tableName: table
             )

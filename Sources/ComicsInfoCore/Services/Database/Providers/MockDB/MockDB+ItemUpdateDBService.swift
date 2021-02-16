@@ -24,7 +24,7 @@ extension MockDB: ItemUpdateDBService {
     
     func updateSummaries<Summary: ItemSummary>(_ query: UpdateSummariesQuery<Summary>) -> EventLoopFuture<Void> {
         for summary in query.summaries {
-            guard let itemData = query.getData(for: summary, oldData: MockDB[query.getID(for: summary)]) else { continue }
+            guard let itemData = try? JSONEncoder().encode(summary) else { continue }
             MockDB[query.getID(for: summary)] = itemData
         }
 

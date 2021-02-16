@@ -29,8 +29,7 @@ struct ItemUpdateDBWrapper: LoggerProvider {
         let query = UpdateSummariesQuery(
             summaries: criteria.items,
             table: criteria.table,
-            logger: criteria.logger,
-            strategy: criteria.strategy
+            logger: criteria.logger
         )
         
         return itemUpdateDBService.updateSummaries(query)

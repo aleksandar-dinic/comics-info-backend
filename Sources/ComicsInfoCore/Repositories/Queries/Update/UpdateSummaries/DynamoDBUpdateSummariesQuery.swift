@@ -13,7 +13,6 @@ struct DynamoDBUpdateSummariesQuery<Summary: ItemSummary>: Loggable {
     
     let summaries: [Summary]
     let table: String
-    let strategy: UpdateSummariesStrategy
     
     var inputs: [DynamoDB.UpdateItemCodableInput<Summary>] {
         var inputs = [DynamoDB.UpdateItemCodableInput<Summary>]()
@@ -22,21 +21,11 @@ struct DynamoDBUpdateSummariesQuery<Summary: ItemSummary>: Loggable {
             let update = DynamoDB.UpdateItemCodableInput(
                 key: ["itemID", "summaryID"],
                 tableName: table,
-                updateExpression: updateExpression,
                 updateItem: summary
             )
             inputs.append(update)
         }
         return inputs
-    }
-    
-    private var updateExpression: String? {
-        switch strategy {
-        case .default:
-            return nil
-        case .characterInSeries:
-            return "SET count = count + :count"
-        }
     }
     
     func getLogs() -> [Log] {
