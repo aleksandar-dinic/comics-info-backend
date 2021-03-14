@@ -15,5 +15,9 @@ public struct ResponseStatus: Codable {
     public init(_ status: String) {
         self.status = status
     }
+    
+    public init(for error: Error) {
+        status = error.localizedDescription
+    }
 
 }

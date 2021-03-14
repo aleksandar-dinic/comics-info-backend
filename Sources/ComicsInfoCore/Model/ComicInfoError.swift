@@ -16,6 +16,8 @@ public enum ComicInfoError: Error {
     case itemsNotFound(withIDs: Set<String>?, itemType: Any.Type)
     case summariesAlreadyExist(_ IDs: Set<String>)
     case invalidFields(_ fields: Set<String>)
+    case pathParameterIDIsMissing
+    case queryParameterSeriesIDIsMissing
     case handlerUnknown
     case internalServerError
 
@@ -31,6 +33,8 @@ extension ComicInfoError {
         case .itemsNotFound:            return .noContent
         case .summariesAlreadyExist:    return .forbidden
         case .invalidFields:            return .badRequest
+        case .pathParameterIDIsMissing: return .badRequest
+        case .queryParameterSeriesIDIsMissing:  return .methodNotAllowed
         case .handlerUnknown:           return .internalServerError
         case .internalServerError:      return .internalServerError
         }
@@ -63,6 +67,12 @@ extension ComicInfoError: LocalizedError {
 
         case let .invalidFields(fields):
             return "Invalid fields: \(fields.sorted())"
+            
+        case .pathParameterIDIsMissing:
+            return "Required path parameter id is missing."
+            
+        case .queryParameterSeriesIDIsMissing:
+            return "Method not allowed: You need to specify query parameter seriesID."
 
         case .handlerUnknown:
             return "Handler Unknown"

@@ -79,7 +79,6 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
                 cacheProvider.save(items: items, in: criteria.table)
             }
     }
-
     
     // Get all items
 
@@ -94,7 +93,7 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     }
 
     private func getAllItemsFromMemory(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
-        switch cacheProvider.getAllItems(from: criteria.table) {
+        switch cacheProvider.getAllItems(forSummaryID: criteria.summaryID, from: criteria.table) {
         case let .success(items):
             return eventLoop.submit { items }
             

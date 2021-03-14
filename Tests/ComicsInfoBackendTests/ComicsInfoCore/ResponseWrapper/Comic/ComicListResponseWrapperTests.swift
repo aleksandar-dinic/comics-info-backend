@@ -33,13 +33,17 @@ final class ComicListResponseWrapperTests: XCTestCase {
         // Given
         let useCase = ComicUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = ComicListResponseWrapper(comicUseCase: useCase)
+        let request = Request(queryParameters: ["seriesID": "1"])
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let feature = sut.handleList(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
+        XCTAssertEqual(
+            response.statusCode.code,
+            ComicsInfoCore.HTTPResponseStatus.noContent.code
+        )
     }
 
     func test_whenHandleList_statusIsOk() throws {
@@ -47,13 +51,35 @@ final class ComicListResponseWrapperTests: XCTestCase {
         let items = ComicFactory.makeDatabaseItems()
         let useCase = ComicUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
         sut = ComicListResponseWrapper(comicUseCase: useCase)
+        let request = Request(queryParameters: ["seriesID": "1"])
 
         // When
-        let feature = sut.handleList(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let feature = sut.handleList(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.ok.code)
+        XCTAssertEqual(
+            response.statusCode.code,
+            ComicsInfoCore.HTTPResponseStatus.ok.code
+        )
+    }
+    
+    func test_whenHandleListWithoutSeriesID_statusIsMethodNotAllowed() throws {
+        // Given
+        let items = ComicFactory.makeDatabaseItems()
+        let useCase = ComicUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
+        sut = ComicListResponseWrapper(comicUseCase: useCase)
+        let request = Request()
+
+        // When
+        let feature = sut.handleList(on: eventLoop, request: request, environment: environment, logger: nil)
+        let response = try feature.wait()
+
+        // Then
+        XCTAssertEqual(
+            response.statusCode.code,
+            ComicsInfoCore.HTTPResponseStatus.methodNotAllowed.code
+        )
     }
 
 }

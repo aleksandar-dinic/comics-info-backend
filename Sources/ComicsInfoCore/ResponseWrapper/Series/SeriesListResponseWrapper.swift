@@ -28,7 +28,13 @@ public struct SeriesListResponseWrapper: ListResponseWrapper {
         let table = String.tableName(for: environment)
         let fields = getFields(from: request.queryParameters)
         
-        return seriesUseCase.getAllItems(on: eventLoop, fields: fields, from: table, logger: logger)
+        return seriesUseCase.getAllItems(
+            on: eventLoop,
+            summaryID: nil,
+            fields: fields,
+            from: table,
+            logger: logger
+        )
             .map { Response(with: $0.map { Domain.Series(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

@@ -228,7 +228,7 @@ final class CharacterUseCaseTests: XCTestCase {
         sut = CharacterUseCaseFactoryMock(items: givenItems).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(on: eventLoop, fields: nil, from: table, logger: nil, dataSource: .database)
+        let featureGet = sut.getAllItems(on: eventLoop, summaryID: nil, fields: nil, from: table, logger: nil, dataSource: .database)
         let items = try featureGet.wait()
 
         // Then

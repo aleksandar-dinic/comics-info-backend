@@ -28,7 +28,13 @@ public struct CharacterListResponseWrapper: ListResponseWrapper {
         let table = String.tableName(for: environment)
         let fields = getFields(from: request.queryParameters)
         
-        return characterUseCase.getAllItems(on: eventLoop, fields: fields, from: table, logger: logger)
+        return characterUseCase.getAllItems(
+            on: eventLoop,
+            summaryID: nil,
+            fields: fields,
+            from: table,
+            logger: logger
+        )
             .map { Response(with: $0.map { Domain.Character(from: $0) }, statusCode: .ok) }
             .flatMapErrorThrowing { self.catch($0) }
     }

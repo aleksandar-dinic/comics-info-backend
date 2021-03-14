@@ -109,7 +109,7 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
         let databaseItems = MockComicInfoItemFactory.makeData()
-        let criteria = GetAllItemsCriteria(dataSource: .database, table: table)
+        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .database, table: table)
         let sut = ItemGetDBWrapperFactory.make(items: databaseItems)
         
         // When
@@ -123,7 +123,7 @@ final class ItemGetDBWrapperTests: XCTestCase {
     func test_whenGetAllItems_throwsItemsNotFound() throws {
         // Given
         let sut = ItemGetDBWrapperFactory.make()
-        let criteria = GetAllItemsCriteria(dataSource: .database, table: table)
+        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .database, table: table)
         var thrownError: Error?
         
         // When

@@ -12,11 +12,16 @@ import Foundation
 public struct GetAllItemsQuery: LoggerProvider {
     
     let items: String
+    let summaryID: String?
     let table: String
     let logger: Logger?
     
     var dynamoDBQuery: DynamoDBGetAllItemsQuery {
-        let query = DynamoDBGetAllItemsQuery(items: items, table: table)
+        let query = DynamoDBGetAllItemsQuery(
+            itemType: items,
+            summaryID: summaryID,
+            table: table
+        )
         
         guard let logger = logger else {
             return query

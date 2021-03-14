@@ -44,6 +44,7 @@ struct ItemGetDBWrapper<Item: ComicInfoItem>: LoggerProvider {
     func getAllItems(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
         let query = GetAllItemsQuery(
             items: .getType(from: Item.self),
+            summaryID: criteria.summaryID,
             table: criteria.table,
             logger: criteria.logger
         )

@@ -14,7 +14,7 @@ public protocol Cacheable {
 
     func getItem(withID itemID: Item.ID, from table: String) -> Result<Item, CacheError<Item>>
     func getItems(withIDs IDs: Set<Item.ID>, from table: String) -> (items: [Item], missingIDs: Set<Item.ID>)
-    func getAllItems(from table: String) -> Result<[Item], CacheError<Item>>
+    func getAllItems(forSummaryID summaryID: String?, from table: String) -> Result<[Item], CacheError<Item>>
     func save(items: [Item], in table: String)
     
     func getSummaries<Summary: ItemSummary>(forID ID: String, from table: String) -> Result<[Summary], CacheError<Item>>

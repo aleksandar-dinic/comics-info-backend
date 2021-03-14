@@ -64,6 +64,7 @@ public extension GetUseCase {
     
     func getAllItems(
         on eventLoop: EventLoop,
+        summaryID: String?,
         fields: Set<String>?,
         from table: String,
         logger: Logger?,
@@ -71,7 +72,7 @@ public extension GetUseCase {
     ) -> EventLoopFuture<[Item]> {
         do {
             let fields = try handleFields(fields)
-            let criteria =  GetAllItemsCriteria(dataSource: dataSource, table: table, logger: logger)
+            let criteria = GetAllItemsCriteria(summaryID: summaryID, dataSource: dataSource, table: table, logger: logger)
             return repository.getAllItems(with: criteria)
                 .flatMap { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table, logger: logger) }
                 .hop(to: eventLoop)

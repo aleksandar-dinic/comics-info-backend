@@ -30,10 +30,9 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
     }
 
     public func getItems(withIDs IDs: Set<Item.ID>, from table: String) -> (items: [Item], missingIDs: Set<Item.ID>) {
-        print("InMemoryCacheProvider getItems withIDs: \(IDs)")
+        
         var items = [Item]()
         guard let cache = itemsCaches[table], !cache.isEmpty else {
-            print("InMemoryCacheProvider getItems missingIDs: \(IDs)")
             return (items, IDs)
         }
         
@@ -42,16 +41,28 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
             items.append(item)
         }
 
-        print("InMemoryCacheProvider getItems missingIDs: \(Set(items.map({ $0.id })).symmetricDifference(IDs))")
-        return (items, Set(items.map({ $0.id })).symmetricDifference(IDs))
+        return (
+            items.sorted { $0.popularity < $1.popularity },
+            Set(items.map({ $0.id })
+        ).symmetricDifference(IDs))
     }
     
-    public func getAllItems(from table: String) -> Result<[Item], CacheError<Item>> {
+    public func getAllItems(
+        forSummaryID summaryID: String?,
+        from table: String
+    ) -> Result<[Item], CacheError<Item>> {
         guard let cache = itemsCaches[table], !cache.isEmpty else {
             return .failure(.itemsNotFound(itemType: Item.self))
         }
-
-        return .success(cache.values)
+        
+        guard let summaryID = summaryID else {
+            return .success(cache.values)
+        }
+        
+        let values = cache.values.filter { $0.summaryID == summaryID }
+        return !values.isEmpty ?
+            .success(values.sorted { $0.popularity < $1.popularity }) :
+            .failure(.itemsNotFound(itemType: Item.self))
     }
 
     public func save(items: [Item], in table: String) {
@@ -74,7 +85,9 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
             items.append(item)
         }
 
-        return !items.isEmpty ? .success(items) : .failure(.summariesNotFound(String.getType(from: Summary.self)))
+        return !items.isEmpty ?
+            .success(items.sorted { $0.popularity < $1.popularity }) :
+            .failure(.summariesNotFound(String.getType(from: Summary.self)))
     }
     
     public func save<Summary: ItemSummary>(summaries: [Summary], in table: String) {

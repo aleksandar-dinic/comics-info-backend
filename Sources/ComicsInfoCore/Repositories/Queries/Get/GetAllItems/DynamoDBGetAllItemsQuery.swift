@@ -11,18 +11,48 @@ import SotoDynamoDB
 
 struct DynamoDBGetAllItemsQuery: Loggable {
 
-    let items: String
+    let itemType: String
+    let summaryID: String?
     let table: String
+    
+    init(
+        itemType: String,
+        summaryID: String? = nil,
+        table: String
+    ) {
+        self.itemType = itemType
+        self.summaryID = summaryID
+        self.table = table
+    }
 
     var input: DynamoDB.QueryInput {
         DynamoDB.QueryInput(
-            expressionAttributeValues: [":itemType": .s(items)],
+            expressionAttributeValues: expressionAttributeValues,
             indexName: "itemType-summaryID-index",
-            keyConditionExpression: "itemType = :itemType",
+            keyConditionExpression: keyConditionExpression,
             tableName: table
         )
     }
     
+    private var expressionAttributeValues: [String: DynamoDB.AttributeValue] {
+        var attributeValues: [String: DynamoDB.AttributeValue] = [":itemType": .s(itemType)]
+        guard let summaryID = summaryID else {
+            return attributeValues
+        }
+        
+        attributeValues[":summaryID"] = .s(summaryID)
+        return attributeValues
+    }
+    
+    private var keyConditionExpression: String {
+        let keyCondition = "itemType = :itemType"
+        guard summaryID != nil else {
+            return keyCondition
+        }
+        
+        return "\(keyCondition) AND summaryID = :summaryID"
+    }
+
     func getLogs() -> [Log] {
         [Log("GetAllItems input: \(input)")]
     }

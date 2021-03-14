@@ -240,7 +240,7 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromMemory_retursItems() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
         let cash = TestCache<MockComicInfoItem>(itemsCaches: [table: [givenItem.id: givenItem]])
         sut = GetDataProviderFactory.make(cacheProvider: cash)
         
@@ -255,7 +255,7 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromDatabase_retursItems() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(dataSource: .database, table: table)
+        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .database, table: table)
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -269,7 +269,7 @@ extension GetDataProviderTests {
     
     func test_whenGetAllItems_throwsItemsNotFound() throws {
         // Given
-        let criteria = GetAllItemsCriteria(dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
         var thrownError: Error?
         
         // When
@@ -291,7 +291,7 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromEmptyMemory_retursItemsFromDatabase() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -306,7 +306,7 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromEmptyMemory_saveItemsInCache() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
         let cache = TestCache<MockComicInfoItem>()
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(cacheProvider: cache, items: itemData)
@@ -316,7 +316,7 @@ extension GetDataProviderTests {
         XCTAssertNoThrow(try feature.wait())
         
         // Then
-        let result = cache.getAllItems(from: table)
+        let result = cache.getAllItems(forSummaryID: nil, from: table)
         switch result {
         case let .success(items):
             XCTAssertEqual(items.map { $0.id }, [givenItem.id])
