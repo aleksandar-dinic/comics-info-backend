@@ -150,16 +150,23 @@ final class CharacterUseCaseTests: XCTestCase {
         
         let givenItem = CharacterFactory.make(seriesID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
-        let criteria = UpdateItemCriteria(item: givenItem, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: givenItem, oldSortValue: givenItem.sortValue, on: eventLoop, in: table)
         try updateUseCase.update(with: criteria).wait()
 
         // When
-        let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
+        let featureGet = sut.getItem(
+            on: eventLoop,
+            withID: givenItem.id,
+            fields: fields,
+            from: table,
+            logger: nil,
+            dataSource: .database
+        )
         let item = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(item.series?.first?.itemID, "Series#1")
-        XCTAssertEqual(item.series?.first?.summaryID, "Character#1")
+        XCTAssertEqual(item.series?.first?.itemID, "SeriesSummary#1")
+        XCTAssertEqual(item.series?.first?.summaryID, "CharacterSummary#1")
     }
     
     func test_whenGetItemComicsField_returnItemWithComics() throws {
@@ -176,7 +183,7 @@ final class CharacterUseCaseTests: XCTestCase {
         
         let givenItem = CharacterFactory.make(comicsID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
-        let criteria = UpdateItemCriteria(item: givenItem, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: givenItem, oldSortValue: givenItem.sortValue, on: eventLoop, in: table)
         try updateUseCase.update(with: criteria).wait()
 
         // When
@@ -184,8 +191,8 @@ final class CharacterUseCaseTests: XCTestCase {
         let item = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(item.comics?.first?.itemID, "Comic#1")
-        XCTAssertEqual(item.comics?.first?.summaryID, "Character#1")
+        XCTAssertEqual(item.comics?.first?.itemID, "ComicSummary#1")
+        XCTAssertEqual(item.comics?.first?.summaryID, "CharacterSummary#1")
     }
     
     func testGetItem_whenFieldsAreSeriesAndComics_returnItemWithSeriesAndComics() throws {
@@ -208,7 +215,7 @@ final class CharacterUseCaseTests: XCTestCase {
         
         let givenItem = CharacterFactory.make(seriesID: ["1"], comicsID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
-        let criteria = UpdateItemCriteria(item: givenItem, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: givenItem, oldSortValue: givenItem.sortValue, on: eventLoop, in: table)
         try updateUseCase.update(with: criteria).wait()
 
         // When
@@ -216,8 +223,8 @@ final class CharacterUseCaseTests: XCTestCase {
         let item = try featureGet.wait()
 
         // Then
-        XCTAssertEqual(item.series?.first?.itemID, "Series#1")
-        XCTAssertEqual(item.comics?.first?.itemID, "Comic#1")
+        XCTAssertEqual(item.series?.first?.itemID, "SeriesSummary#1")
+        XCTAssertEqual(item.comics?.first?.itemID, "ComicSummary#1")
     }
 
     func test_whenGetAllItemsFromDatabase_returnsItems() throws {
@@ -228,7 +235,15 @@ final class CharacterUseCaseTests: XCTestCase {
         sut = CharacterUseCaseFactoryMock(items: givenItems).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(on: eventLoop, summaryID: nil, fields: nil, from: table, logger: nil, dataSource: .database)
+        let featureGet = sut.getAllItems(
+            on: eventLoop,
+            afterID: nil,
+            fields: nil,
+            limit: 100,
+            from: table,
+            logger: nil,
+            dataSource: .database
+        )
         let items = try featureGet.wait()
 
         // Then

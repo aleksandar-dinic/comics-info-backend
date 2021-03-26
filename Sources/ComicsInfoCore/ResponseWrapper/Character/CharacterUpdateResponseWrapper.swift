@@ -33,7 +33,14 @@ public struct CharacterUpdateResponseWrapper: UpdateResponseWrapper {
         let table = String.tableName(for: environment)
         do {
             let item = try JSONDecoder().decode(Domain.Character.self, from: data)
-            let criteria = UpdateItemCriteria(item: Character(from: item), on: eventLoop, in: table, log: logger)
+            let character = Character(from: item)
+            let criteria = UpdateItemCriteria(
+                item: character,
+                oldSortValue: character.sortValue,
+                on: eventLoop,
+                in: table,
+                log: logger
+            )
             return characterUseCase.update(with: criteria)
                 .map { Response(with: ResponseStatus("\(type(of: item.self)) updated"), statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }

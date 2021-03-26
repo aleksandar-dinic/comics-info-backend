@@ -18,6 +18,7 @@ public struct GetSummariesCriteria<Summary: ItemSummary> {
     
     let itemType: String
     let ID: String
+    let limit: Int
     let dataSource: DataSourceLayer
     let table: String
     let strategy: GetSummariesStrategy
@@ -27,13 +28,15 @@ public struct GetSummariesCriteria<Summary: ItemSummary> {
         _ summaryType: Summary.Type,
         ID: String,
         dataSource: DataSourceLayer,
+        limit: Int,
         table: String,
         strategy: GetSummariesStrategy,
         logger: Logger? = nil
     ) {
         itemType = .getType(from: Summary.self)
-        self.ID = ID
+        self.ID = .comicInfoID(for: Summary.self, ID: ID)
         self.dataSource = dataSource
+        self.limit = limit
         self.table = table
         self.strategy = strategy
         self.logger = logger

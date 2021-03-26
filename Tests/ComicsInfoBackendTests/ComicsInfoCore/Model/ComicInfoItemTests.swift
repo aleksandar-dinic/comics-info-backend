@@ -26,7 +26,7 @@ final class ComicInfoItemTests: XCTestCase {
         let fields = newItem.updatedFields(old: oldItem)
         
         // Then
-        XCTAssertEqual(fields.count, 1)
+        XCTAssertEqual(fields.count, 2)
         XCTAssertTrue(fields.contains("popularity"))
     }
     
@@ -39,7 +39,7 @@ final class ComicInfoItemTests: XCTestCase {
         let fields = newItem.updatedFields(old: oldItem)
         
         // Then
-        XCTAssertEqual(fields.count, 1)
+        XCTAssertEqual(fields.count, 2)
         XCTAssertTrue(fields.contains("name"))
     }
     

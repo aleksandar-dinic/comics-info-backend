@@ -12,15 +12,22 @@ import SotoDynamoDB
 struct DynamoDBUpdateItemQuery<Item: ComicInfoItem>: Loggable {
 
     let item: Item
+    let oldSortValue: String
     let table: String
 
     var input: DynamoDB.UpdateItemCodableInput<Item> {
         DynamoDB.UpdateItemCodableInput(
-            conditionExpression: "attribute_exists(itemID) AND attribute_exists(summaryID)",
-            key: ["itemID", "summaryID"],
+            key: ["itemID", "sortValue"],
             returnValues: .updatedOld,
             tableName: table,
             updateItem: item
+        )
+    }
+    
+    var deleteInput: DynamoDB.DeleteItemInput {
+        DynamoDB.DeleteItemInput(
+            key: ["itemID": .s(item.itemID), "sortValue": .s(oldSortValue)],
+            tableName: table
         )
     }
     

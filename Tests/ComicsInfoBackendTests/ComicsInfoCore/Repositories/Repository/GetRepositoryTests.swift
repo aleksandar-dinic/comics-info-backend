@@ -63,7 +63,13 @@ final class GetRepositoryTests: XCTestCase {
     func test_whenGetAllItems_returnsItems() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .database, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .database,
+            limit: 100,
+            table: table
+        )
         let databaseItems = MockComicInfoItemFactory.makeData()
         sut = GetRepositoryFactory.make(items: databaseItems)
         
@@ -80,7 +86,14 @@ final class GetRepositoryTests: XCTestCase {
     func test_whenGetSummaries_returnsSummaries() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .database, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: givenItem.id,
+            dataSource: .database,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         let databaseItems = MockItemSummaryFactory.makeData()
         sut = GetRepositoryFactory.make(items: databaseItems)
 

@@ -111,8 +111,8 @@ final class SeriesCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
         // Then
         XCTAssertNoThrow(try feature.wait())
         XCTAssertNotNil(MockDB["Series#SeriesID"])
-        XCTAssertNotNil(MockDB["Character#CharacterID|Series#SeriesID"])
-        XCTAssertNotNil(MockDB["Comic#ComicID|Series#SeriesID"])
+        XCTAssertNotNil(MockDB["CharacterSummary#CharacterID|SeriesSummary#SeriesID"])
+        XCTAssertNotNil(MockDB["ComicSummary#ComicID|SeriesSummary#SeriesID"])
     }
 
     func test_whenCrateSeriesWithOneNotExistingCharacterID_throwsItemNotFound() throws {

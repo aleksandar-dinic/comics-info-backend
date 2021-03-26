@@ -75,7 +75,7 @@ final class InMemoryCacheProviderTests: XCTestCase {
         sut = InMemoryCacheProvider(itemsCaches: [table: inMemoryCache])
 
         // When
-        let result = sut.getAllItems(forSummaryID: nil, from: table)
+        let result = sut.getAllItems(afterID: nil, limit: givenData.count, from: table)
 
         // Then
         switch result {
@@ -91,7 +91,7 @@ final class InMemoryCacheProviderTests: XCTestCase {
         sut = InMemoryCacheProvider()
 
         // When
-        let result = sut.getAllItems(forSummaryID: nil, from: table)
+        let result = sut.getAllItems(afterID: nil, limit: 100, from: table)
 
         // Then
         switch result {

@@ -16,6 +16,7 @@ struct MockComicInfoItem: ComicInfoItem {
     let summaryID: String
     let itemType: String
     
+    private(set) var sortValue: String
     private(set) var popularity: Int
     private(set) var name: String
     
@@ -28,6 +29,7 @@ struct MockComicInfoItem: ComicInfoItem {
         if let dummyField = newItem.dummyField {
             self.dummyField = dummyField
         }
+        sortValue = "\(summaryID)#Popularity=\(popularity)#Name=\(name)"
     }
     
 }
@@ -58,6 +60,7 @@ enum MockComicInfoItemFactory {
             itemID: itemID,
             summaryID: summaryID,
             itemType: itemType,
+            sortValue: "\(summaryID)#Popularity=\(popularity)#Name=\(name)",
             popularity: popularity,
             name: name,
             dummyField: dummyField

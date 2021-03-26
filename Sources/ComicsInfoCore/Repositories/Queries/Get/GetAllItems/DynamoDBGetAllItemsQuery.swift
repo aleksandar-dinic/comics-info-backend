@@ -12,45 +12,51 @@ import SotoDynamoDB
 struct DynamoDBGetAllItemsQuery: Loggable {
 
     let itemType: String
-    let summaryID: String?
+    let afterID: String?
+    let sortValue: String?
+    let limit: Int
     let table: String
     
     init(
         itemType: String,
-        summaryID: String? = nil,
+        afterID: String?,
+        sortValue: String?,
+        limit: Int,
         table: String
     ) {
         self.itemType = itemType
-        self.summaryID = summaryID
+        self.afterID = afterID
+        self.sortValue = sortValue
+        self.limit = limit
         self.table = table
     }
 
     var input: DynamoDB.QueryInput {
         DynamoDB.QueryInput(
+            exclusiveStartKey: exclusiveStartKey,
             expressionAttributeValues: expressionAttributeValues,
-            indexName: "itemType-summaryID-index",
+            indexName: "itemType-sortValue-index",
             keyConditionExpression: keyConditionExpression,
+            limit: limit,
             tableName: table
         )
     }
     
+    private var exclusiveStartKey: [String: DynamoDB.AttributeValue]? {
+        guard let afterID = afterID, let sortValue = sortValue else { return nil }
+        return [
+            "itemID": .s("\(itemType)#\(afterID)"),
+            "itemType": .s(itemType),
+            "sortValue": .s(sortValue)
+        ]
+    }
+    
     private var expressionAttributeValues: [String: DynamoDB.AttributeValue] {
-        var attributeValues: [String: DynamoDB.AttributeValue] = [":itemType": .s(itemType)]
-        guard let summaryID = summaryID else {
-            return attributeValues
-        }
-        
-        attributeValues[":summaryID"] = .s(summaryID)
-        return attributeValues
+        [":itemType": .s(itemType)]
     }
     
     private var keyConditionExpression: String {
-        let keyCondition = "itemType = :itemType"
-        guard summaryID != nil else {
-            return keyCondition
-        }
-        
-        return "\(keyCondition) AND summaryID = :summaryID"
+        "itemType = :itemType"
     }
 
     func getLogs() -> [Log] {

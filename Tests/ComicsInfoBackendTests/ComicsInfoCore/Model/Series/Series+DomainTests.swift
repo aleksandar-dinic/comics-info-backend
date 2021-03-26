@@ -108,10 +108,6 @@ final class Series_DomainTests: XCTestCase {
         XCTAssertEqual(sut.itemID, "\(sut.itemType)#\(domainSeries.identifier)")
     }
     
-    func testSummaryID_whenInitFromCharacter_isEqualToItemTypeID() {
-        XCTAssertEqual(sut.summaryID, "\(sut.itemType)#\(domainSeries.identifier)")
-    }
-    
     func testItemType_whenInitFromCharacter_isEqualToComic() {
         XCTAssertEqual(sut.itemType, "Series")
     }

@@ -11,7 +11,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct SeriesUpdateResponseWrapper: UpdateResponseWrapper {
+public struct SeriesUpdateResponseWrapper: GetQueryParameterLimit, UpdateResponseWrapper {
 
     private let seriesUseCase: SeriesUpdateUseCase
 
@@ -33,7 +33,14 @@ public struct SeriesUpdateResponseWrapper: UpdateResponseWrapper {
         let table = String.tableName(for: environment)
         do {
             let item = try JSONDecoder().decode(Domain.Series.self, from: data)
-            let criteria = UpdateItemCriteria(item: Series(from: item), on: eventLoop, in: table, log: logger)
+            let series = Series(from: item)
+            let criteria = UpdateItemCriteria(
+                item: series,
+                oldSortValue: series.sortValue,
+                on: eventLoop,
+                in: table,
+                log: logger
+            )
             return seriesUseCase.update(with: criteria)
                 .map { Response(with: ResponseStatus("\(type(of: item.self)) updated"), statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }

@@ -11,7 +11,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct ComicListResponseWrapper: GetQueryParameterSeriesID, ListResponseWrapper {
+public struct ComicListResponseWrapper: GetQueryParameterSeriesID, GetQueryParameterAfterID, GetQueryParameterLimit, ListResponseWrapper {
 
     private let comicUseCase: ComicUseCase
 
@@ -26,15 +26,12 @@ public struct ComicListResponseWrapper: GetQueryParameterSeriesID, ListResponseW
         logger: Logger?
     ) -> EventLoopFuture<Response> {
         do {
-            let table = String.tableName(for: environment)
-            let fields = getFields(from: request.queryParameters)
-            let seriesID = try getSeriesID(from: request.queryParameters)
-        
             return comicUseCase.getAllItems(
                 on: eventLoop,
-                summaryID: seriesID,
-                fields: fields,
-                from: table,
+                afterID: getAfterID(from: request.queryParameters),
+                fields: getFields(from: request.queryParameters),
+                limit: try getLimit(from: request.queryParameters),
+                from: String.tableName(for: environment),
                 logger: logger
             )
                 .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }

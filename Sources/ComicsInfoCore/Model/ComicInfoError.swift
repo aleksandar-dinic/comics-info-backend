@@ -18,6 +18,8 @@ public enum ComicInfoError: Error {
     case invalidFields(_ fields: Set<String>)
     case pathParameterIDIsMissing
     case queryParameterSeriesIDIsMissing
+    case invalidQueryParameterLimit(message: String)
+    case invalidQueryParameterOffset(message: String)
     case handlerUnknown
     case internalServerError
 
@@ -27,16 +29,42 @@ extension ComicInfoError {
     
     var responseStatus: HTTPResponseStatus {
         switch self {
-        case .requestError:             return .badRequest
-        case .itemAlreadyExists:        return .forbidden
-        case .itemNotFound:             return .noContent
-        case .itemsNotFound:            return .noContent
-        case .summariesAlreadyExist:    return .forbidden
-        case .invalidFields:            return .badRequest
-        case .pathParameterIDIsMissing: return .badRequest
-        case .queryParameterSeriesIDIsMissing:  return .methodNotAllowed
-        case .handlerUnknown:           return .internalServerError
-        case .internalServerError:      return .internalServerError
+        case .requestError:
+            return .badRequest
+            
+        case .itemAlreadyExists:
+            return .forbidden
+            
+        case .itemNotFound:
+            return .noContent
+            
+        case .itemsNotFound:
+            return .noContent
+            
+        case .summariesAlreadyExist:
+            return .forbidden
+            
+        case .invalidFields:
+            return .badRequest
+            
+        case .pathParameterIDIsMissing:
+            return .badRequest
+            
+        case .queryParameterSeriesIDIsMissing:
+            return .methodNotAllowed
+            
+        case .invalidQueryParameterLimit:
+            return .badRequest
+            
+        case .invalidQueryParameterOffset:
+            return .badRequest
+            
+        case .handlerUnknown:
+            return .internalServerError
+            
+        case .internalServerError:
+            return .internalServerError
+            
         }
     }
     
@@ -73,6 +101,12 @@ extension ComicInfoError: LocalizedError {
             
         case .queryParameterSeriesIDIsMissing:
             return "Method not allowed: You need to specify query parameter seriesID."
+            
+        case let .invalidQueryParameterLimit(message):
+            return "Invalid query parameter limit: \(message)"
+            
+        case let .invalidQueryParameterOffset(message):
+            return "Invalid query parameter offset: \(message)"
 
         case .handlerUnknown:
             return "Handler Unknown"

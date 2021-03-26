@@ -13,16 +13,23 @@ struct DynamoDBGetSummariesQuery: Loggable {
 
     let itemType: String
     let ID: String
+    let limit: Int
     let table: String
     let strategy: GetSummariesStrategy
 
     var input: DynamoDB.QueryInput {
         DynamoDB.QueryInput(
+            exclusiveStartKey: exclusiveStartKey,
             expressionAttributeValues: expressionAttributeValues,
             indexName: indexName,
             keyConditionExpression: keyConditionExpression,
+            limit: limit,
             tableName: table
         )
+    }
+    
+    private var exclusiveStartKey: [String: DynamoDB.AttributeValue]? {
+        nil
     }
     
     private var expressionAttributeValues: [String: DynamoDB.AttributeValue] {

@@ -32,11 +32,11 @@ final class SeriesSummary_DomainTests: XCTestCase {
     }
     
     func testItemID_whenInitFromItem() throws {
-        XCTAssertEqual(sut.itemID, "\(String.getType(from: Series.self))#\(item.identifier)")
+        XCTAssertEqual(sut.itemID, "\(String.getType(from: SeriesSummary.self))#\(item.identifier)")
     }
     
     func testSummaryID_whenInitFromItem() {
-        XCTAssertEqual(sut.summaryID, "\(String.getType(from: Character.self))#\(character.id)")
+        XCTAssertEqual(sut.summaryID, "\(String.getType(from: CharacterSummary.self))#\(character.id)")
     }
     
     func testItemType_whenInitFromItem() {

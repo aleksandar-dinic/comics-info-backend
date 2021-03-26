@@ -32,7 +32,7 @@ final class ItemUpdateDBWrapperTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let itemData = MockComicInfoItemFactory.makeData()
-        let criteria = UpdateItemCriteria(item: item, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
         let sut = ItemUpdateDBWrapperFactory.make(items: itemData)
         
         // When
@@ -46,7 +46,7 @@ final class ItemUpdateDBWrapperTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let sut = ItemUpdateDBWrapperFactory.make()
-        let criteria = UpdateItemCriteria(item: item, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
         var thrownError: Error?
         
         // When

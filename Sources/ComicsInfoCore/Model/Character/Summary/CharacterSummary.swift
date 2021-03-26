@@ -11,6 +11,7 @@ import Foundation
 struct CharacterSummary: ItemSummary {
     
     let itemID: String
+    private(set) var sortValue: String
     let summaryID: String
     let itemType: String
     
@@ -21,6 +22,7 @@ struct CharacterSummary: ItemSummary {
     private(set) var thumbnail: String?
     private(set) var description: String?
     private(set) var count: Int?
+    private(set) var oldSortValue: String?
     
     init<Link: Identifiable>(
         ID: String,
@@ -33,8 +35,9 @@ struct CharacterSummary: ItemSummary {
     ) {
         let now = Date()
         
-        self.itemID = .comicInfoID(for: Character.self, ID: ID)
-        self.summaryID = .comicInfoID(for: link)
+        self.itemID = .comicInfoID(for: CharacterSummary.self, ID: ID)
+        self.summaryID = .comicInfoSummaryID(for: link)
+        sortValue = "Popularity=\(abs(popularity-100))#Count=\(count ?? 10_000_000)#Name=\(name)#SummaryID=\(summaryID)"
         itemType = .getType(from: CharacterSummary.self)
         dateAdded = now
         dateLastUpdated = now
@@ -43,6 +46,7 @@ struct CharacterSummary: ItemSummary {
         self.thumbnail = thumbnail
         self.description = description
         self.count = count
+        oldSortValue = nil
     }
     
     mutating func update(with character: Character) {
@@ -51,7 +55,8 @@ struct CharacterSummary: ItemSummary {
         name = character.name
         thumbnail = character.thumbnail
         description = character.description
+        oldSortValue = sortValue
+        sortValue = "Popularity=\(abs(popularity-100))#Count=\(count ?? 10_000_000)#Name=\(name)#SummaryID=\(summaryID)"
     }
     
-
 }

@@ -109,7 +109,13 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
         let databaseItems = MockComicInfoItemFactory.makeData()
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .database, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .database,
+            limit: 100,
+            table: table
+        )
         let sut = ItemGetDBWrapperFactory.make(items: databaseItems)
         
         // When
@@ -123,7 +129,13 @@ final class ItemGetDBWrapperTests: XCTestCase {
     func test_whenGetAllItems_throwsItemsNotFound() throws {
         // Given
         let sut = ItemGetDBWrapperFactory.make()
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .database, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .database,
+            limit: 100,
+            table: table
+        )
         var thrownError: Error?
         
         // When
@@ -148,7 +160,14 @@ final class ItemGetDBWrapperTests: XCTestCase {
         // Given
         let givenItem = MockItemSummaryFactory.make()
         let databaseItems = MockItemSummaryFactory.makeData()
-        let criterion = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .memory, table: table, strategy: .summaryID)
+        let criterion = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: givenItem.id,
+            dataSource: .memory,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         let sut = ItemGetDBWrapperFactory.make(items: databaseItems)
 
         // When
@@ -163,7 +182,14 @@ final class ItemGetDBWrapperTests: XCTestCase {
     func test_whenGetSummaries_returnsNil() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .memory, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: givenItem.itemID,
+            dataSource: .memory,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         let sut = ItemGetDBWrapperFactory.make()
         
         // When

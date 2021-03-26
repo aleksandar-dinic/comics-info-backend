@@ -12,8 +12,8 @@ import SotoDynamoDB
 extension DynamoDB: ItemGetDBService {
 
     func getItem<Item: Codable>(_ query: GetItemQuery) -> EventLoopFuture<Item> {
-        getItem(query.dynamoDBQuery.input, type: Item.self).flatMapThrowing {
-            guard let item = $0.item else {
+        self.query(query.dynamoDBQuery.input, type: Item.self).flatMapThrowing {
+            guard let item = $0.items?.first else {
                 throw DatabaseError.itemNotFound(withID: query.dynamoDBQuery.ID)
             }
             return item
@@ -24,8 +24,8 @@ extension DynamoDB: ItemGetDBService {
         var futures = [EventLoopFuture<Item>]()
         
         for (id, input) in query.dynamoDBQuery.inputs {
-            let future: EventLoopFuture<Item> = getItem(input, type: Item.self).flatMapThrowing {
-                guard let item = $0.item else {
+            let future: EventLoopFuture<Item> = self.query(input, type: Item.self).flatMapThrowing {
+                guard let item = $0.items?.first else {
                     throw DatabaseError.itemNotFound(withID: id)
                 }
                 return item
@@ -46,9 +46,14 @@ extension DynamoDB: ItemGetDBService {
         }
     }
 
-    func getAll<Item: Codable>(_ query: GetAllItemsQuery) -> EventLoopFuture<[Item]> {
-        self.query(query.dynamoDBQuery.input, type: Item.self).flatMapThrowing {
-            guard let items = $0.items, !items.isEmpty else {
+    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery<Item>) -> EventLoopFuture<[Item]> {
+        queryPaginator(query.dynamoDBQuery.input, query.initialValue, type: Item.self) { (result, output, eventLoop) -> EventLoopFuture<(Bool, [Item])> in
+            guard let items = output.items, !items.isEmpty else {
+                return eventLoop.submit { (false, result) }
+            }
+            return eventLoop.submit { (false, result + items) }
+        }.flatMapThrowing { items in
+            guard !items.isEmpty else {
                 throw DatabaseError.itemsNotFound(withIDs: nil)
             }
             return items
@@ -57,18 +62,18 @@ extension DynamoDB: ItemGetDBService {
     
     func getSummaries<Summary: ItemSummary>(_ query: GetSummariesQuery) -> EventLoopFuture<[Summary]?> {
         self.query(query.dynamoDBQuery.input, type: Summary.self).flatMapThrowing {
-                guard let items = $0.items, !items.isEmpty else {
-                    return nil
-                }
-                return items
+            guard let items = $0.items, !items.isEmpty else {
+                return nil
             }
+            return items
+        }
     }
     
     func getSummary<Summary: ItemSummary>(_ query: GetSummaryQuery) -> EventLoopFuture<[Summary]?> {
         var futures = [EventLoopFuture<Summary?>]()
         
         for input in query.dynamoDBQuery.inputs {
-            futures.append(getItem(input, type: Summary.self).map { $0.item })
+            futures.append(self.query(input, type: Summary.self).map { $0.items?.first })
         }
 
         let futureResult = EventLoopFuture.reduce([Summary](), futures, on: client.eventLoopGroup.next()) { (items, item) in

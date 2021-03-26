@@ -41,12 +41,15 @@ struct ItemGetDBWrapper<Item: ComicInfoItem>: LoggerProvider {
             }
     }
     
-    func getAllItems(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
+    func getAllItems(with criteria: GetAllItemsCriteria<Item>) -> EventLoopFuture<[Item]> {
         let query = GetAllItemsQuery(
             items: .getType(from: Item.self),
-            summaryID: criteria.summaryID,
+            afterID: criteria.afterID,
+            sortValue: criteria.sortValue,
+            limit: criteria.limit,
             table: criteria.table,
-            logger: criteria.logger
+            logger: criteria.logger,
+            initialValue: criteria.initialValue
         )
         
         return itemGetDBService.getAll(query)
@@ -62,6 +65,7 @@ struct ItemGetDBWrapper<Item: ComicInfoItem>: LoggerProvider {
         let query = GetSummariesQuery(
             itemType: criteria.itemType,
             ID: criteria.ID,
+            limit: criteria.limit,
             table: criteria.table,
             strategy: criteria.strategy,
             logger: criteria.logger

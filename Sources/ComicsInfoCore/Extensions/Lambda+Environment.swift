@@ -26,5 +26,9 @@ public extension Lambda {
         }
         return Lambda.env("\(tableName)_\(environment)")
     }
+    
+    static var queryLimit: String? {
+        Lambda.env("QUERY_LIMIT")
+    }
 
 }

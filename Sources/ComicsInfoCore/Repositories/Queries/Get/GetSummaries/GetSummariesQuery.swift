@@ -13,12 +13,13 @@ public struct GetSummariesQuery: LoggerProvider {
     
     let itemType: String
     let ID: String
+    let limit: Int
     let table: String
     let strategy: GetSummariesStrategy
     let logger: Logger?
     
     var dynamoDBQuery: DynamoDBGetSummariesQuery {
-        let query = DynamoDBGetSummariesQuery(itemType: itemType, ID: ID, table: table, strategy: strategy)
+        let query = DynamoDBGetSummariesQuery(itemType: itemType, ID: ID, limit: limit, table: table, strategy: strategy)
         
         guard let logger = logger else {
             return query

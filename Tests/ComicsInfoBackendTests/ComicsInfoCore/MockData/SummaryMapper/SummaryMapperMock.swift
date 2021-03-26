@@ -16,6 +16,7 @@ struct SummaryMapperMock: SummaryMapper {
     let summaryID: String
     let itemType: String
     
+    private(set) var sortValue: String
     private(set) var popularity: Int
     private(set) var name: String
     private(set) var thumbnail: String?
@@ -30,6 +31,7 @@ struct SummaryMapperMock: SummaryMapper {
         if let description = newItem.description {
             self.description = description
         }
+        sortValue = "\(summaryID)#Popularity=\(popularity)#Name=\(name)"
     }
     
     static func make(
@@ -47,6 +49,7 @@ struct SummaryMapperMock: SummaryMapper {
             itemID: itemID,
             summaryID: summaryID,
             itemType: itemType,
+            sortValue: "\(summaryID)#Popularity=\(popularity)#Name=\(name)",
             popularity: popularity,
             name: name,
             thumbnail: thumbnail,

@@ -16,7 +16,7 @@ struct DynamoDBCreateItemQuery<Item: ComicInfoItem>: Loggable {
 
     var input: DynamoDB.PutItemCodableInput<Item> {
         DynamoDB.PutItemCodableInput(
-            conditionExpression: "attribute_not_exists(itemID) AND attribute_not_exists(summaryID)",
+            conditionExpression: "attribute_not_exists(itemID)",
             item: item,
             tableName: table
         )

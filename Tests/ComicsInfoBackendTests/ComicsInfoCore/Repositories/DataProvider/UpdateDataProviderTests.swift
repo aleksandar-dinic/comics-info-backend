@@ -32,7 +32,7 @@ final class UpdateDataProviderTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let itemData = MockComicInfoItemFactory.makeData()
-        let criteria = UpdateItemCriteria(item: item, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: "", on: eventLoop, in: table)
         let sut = UpdateDataProviderFactory.make(items: itemData)
         
         // When

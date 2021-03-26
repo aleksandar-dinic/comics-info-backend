@@ -28,11 +28,11 @@ final class ComicSummary_ComicTests: XCTestCase {
     }
     
     func testItemID_whenInitFromComic() throws {
-        XCTAssertEqual(sut.itemID, "\(String.getType(from: Comic.self))#\(comic.id)")
+        XCTAssertEqual(sut.itemID, "\(String.getType(from: ComicSummary.self))#\(comic.id)")
     }
     
     func testSummaryID_whenInitFromComic() {
-        XCTAssertEqual(sut.summaryID, "\(String.getType(from: Series.self))#\(series.id)")
+        XCTAssertEqual(sut.summaryID, "\(String.getType(from: SeriesSummary.self))#\(series.id)")
     }
     
     func testItemType_whenInitFromComic() {

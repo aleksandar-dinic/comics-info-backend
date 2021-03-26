@@ -13,12 +13,20 @@ import Foundation
 public struct UpdateItemCriteria<Item: ComicInfoItem> {
     
     let item: Item
+    let oldSortValue: String
     let eventLoop: EventLoop
     let table: String
     let logger: Logger?
     
-    init(item: Item, on eventLoop: EventLoop, in table: String, log logger: Logger? = nil) {
+    init(
+        item: Item,
+        oldSortValue: String,
+        on eventLoop: EventLoop,
+        in table: String,
+        log logger: Logger? = nil
+    ) {
         self.item = item
+        self.oldSortValue = oldSortValue
         self.eventLoop = eventLoop
         self.table = table
         self.logger = logger

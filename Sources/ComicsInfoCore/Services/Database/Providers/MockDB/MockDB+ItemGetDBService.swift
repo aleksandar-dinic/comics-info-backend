@@ -36,7 +36,7 @@ extension MockDB: ItemGetDBService {
         return eventLoop.submit { items }
     }
 
-    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery) -> EventLoopFuture<[Item]> {
+    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery<Item>) -> EventLoopFuture<[Item]> {
         var databaseItems = [Item]()
         for value in MockDB.values {
             guard let item = try? JSONDecoder().decode(Item.self, from: value),

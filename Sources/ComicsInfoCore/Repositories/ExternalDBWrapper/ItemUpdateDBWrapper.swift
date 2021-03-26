@@ -14,7 +14,12 @@ struct ItemUpdateDBWrapper: LoggerProvider {
     let itemUpdateDBService: ItemUpdateDBService
 
     func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
-        let query = UpdateItemQuery(item: criteria.item, table: criteria.table, logger: criteria.logger)
+        let query = UpdateItemQuery(
+            item: criteria.item,
+            oldSortValue: criteria.oldSortValue,
+            table: criteria.table,
+            logger: criteria.logger
+        )
         
         return itemUpdateDBService.update(query)
             .flatMapErrorThrowing {

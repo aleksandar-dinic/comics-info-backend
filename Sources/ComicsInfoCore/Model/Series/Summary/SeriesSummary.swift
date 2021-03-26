@@ -11,6 +11,7 @@ import Foundation
 struct SeriesSummary: ItemSummary {
     
     let itemID: String
+    private(set) var sortValue: String
     let summaryID: String
     let itemType: String
     
@@ -20,6 +21,7 @@ struct SeriesSummary: ItemSummary {
     private(set) var name: String
     private(set) var thumbnail: String?
     private(set) var description: String?
+    private(set) var oldSortValue: String?
     
     init<Link: Identifiable>(
         ID: String,
@@ -31,8 +33,9 @@ struct SeriesSummary: ItemSummary {
     ) {
         let now = Date()
         
-        self.itemID = .comicInfoID(for: Series.self, ID: ID)
-        self.summaryID = .comicInfoID(for: link)
+        self.itemID = .comicInfoID(for: SeriesSummary.self, ID: ID)
+        self.summaryID = .comicInfoSummaryID(for: link)
+        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)#SummaryID=\(summaryID)"
         itemType = .getType(from: SeriesSummary.self)
         dateAdded = now
         dateLastUpdated = now
@@ -40,6 +43,7 @@ struct SeriesSummary: ItemSummary {
         self.name = name
         self.thumbnail = thumbnail
         self.description = description
+        oldSortValue = nil
     }
     
     mutating func update(with series: Series) {
@@ -48,6 +52,8 @@ struct SeriesSummary: ItemSummary {
         name = series.name
         thumbnail = series.thumbnail
         description = series.description
+        oldSortValue = sortValue
+        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)#SummaryID=\(summaryID)"
     }
 
 }

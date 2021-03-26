@@ -39,7 +39,7 @@ extension GetCharacterSummariesForSeries {
         
         for character in characters {
             for series in series {
-                items.append((character.itemID, series.itemID))
+                items.append((.comicInfoSummaryID(for: character), .comicInfoSummaryID(for: series)))
             }
         }
         
@@ -65,7 +65,7 @@ extension GetCharacterSummariesForSeries {
         
         for character in characters {
             for series in series {
-                let count = 1 + (dict["\(character.itemID)|\(series.itemID)"] ?? 0)
+                let count = 1 + (dict["\(String.comicInfoSummaryID(for: character))|\(String.comicInfoSummaryID(for: series))"] ?? 0)
                 charactersSummaries.append(CharacterSummary(character, link: series, count: count))
                 seriesSummaries.append(SeriesSummary(series, link: character))
             }

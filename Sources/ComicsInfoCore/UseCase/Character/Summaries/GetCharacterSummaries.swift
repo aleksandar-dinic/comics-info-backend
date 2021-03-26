@@ -34,11 +34,11 @@ extension GetCharacterSummaries {
         var items = [(itemID: String, summaryID: String)]()
         
         for id in item.seriesID ?? [] {
-            items.append((.comicInfoID(for: Series.self, ID: id), .comicInfoID(for: item)))
+            items.append((.comicInfoID(for: SeriesSummary.self, ID: id), .comicInfoSummaryID(for: item)))
         }
         
         for id in item.comicsID ?? [] {
-            items.append((.comicInfoID(for: Comic.self, ID: id), .comicInfoID(for: item)))
+            items.append((.comicInfoID(for: ComicSummary.self, ID: id), .comicInfoSummaryID(for: item)))
         }
         
         guard !items.isEmpty else { return eventLoop.submit { nil } }

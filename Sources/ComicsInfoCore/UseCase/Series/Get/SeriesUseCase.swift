@@ -47,11 +47,20 @@ extension SeriesUseCase {
         item: Item,
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
+        limit: Int = .queryLimit,
         from table: String,
         logger: Logger?
     ) -> EventLoopFuture<[CharacterSummary]?> {
         guard fields.contains("characters") else { return eventLoop.submit { nil } }
-        let criteria = GetSummariesCriteria(CharacterSummary.self, ID: item.itemID, dataSource: dataSource, table: table, strategy: .summaryID, logger: logger)
+        let criteria = GetSummariesCriteria(
+            CharacterSummary.self,
+            ID: item.id,
+            dataSource: dataSource,
+            limit: limit,
+            table: table,
+            strategy: .itemID,
+            logger: logger
+        )
         return getSummaries(on: eventLoop, with: criteria)
     }
     
@@ -60,11 +69,21 @@ extension SeriesUseCase {
         item: Item,
         on eventLoop: EventLoop,
         dataSource: DataSourceLayer = .memory,
+        limit: Int = .queryLimit,
         from table: String,
         logger: Logger?
     ) -> EventLoopFuture<[ComicSummary]?> {
         guard fields.contains("comics") else { return eventLoop.submit { nil } }
-        let criteria = GetSummariesCriteria(ComicSummary.self, ID: item.itemID, dataSource: dataSource, table: table, strategy: .summaryID, logger: logger)
+        let criteria = GetSummariesCriteria(
+            ComicSummary.self,
+            ID: item.id,
+            dataSource: dataSource,
+            limit: limit,
+            table: table,
+            strategy: .itemID,
+            logger: logger
+        )
+        
         return getSummaries(on: eventLoop, with: criteria)
     }
 

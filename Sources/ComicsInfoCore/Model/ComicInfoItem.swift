@@ -8,14 +8,26 @@
 
 import Foundation
 
-public protocol ComicInfoItem: Identifiable, Codable where ID == String {
+public protocol ComicInfoItem: Identifiable, Codable, Comparable where ID == String {
     
     var itemID: String { get }
-    var summaryID: String { get }
+    var sortValue: String { get }
     var itemType: String { get }
     var popularity: Int { get }
     
     mutating func update(with newItem: Self)
+    
+}
+
+public extension ComicInfoItem {
+    
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.sortValue < rhs.sortValue
+    }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.itemID == rhs.itemID
+    }
     
 }
 

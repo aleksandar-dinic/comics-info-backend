@@ -12,6 +12,7 @@ import Foundation
 public struct UpdateItemQuery<Item: ComicInfoItem>: LoggerProvider {
     
     let item: Item
+    let oldSortValue: String
     let table: String
     let logger: Logger?
     
@@ -20,7 +21,7 @@ public struct UpdateItemQuery<Item: ComicInfoItem>: LoggerProvider {
     }
     
     var dynamoDBQuery: DynamoDBUpdateItemQuery<Item> {
-        let query = DynamoDBUpdateItemQuery(item: item, table: table)
+        let query = DynamoDBUpdateItemQuery(item: item, oldSortValue: oldSortValue, table: table)
         
         guard let logger = logger else {
             return query

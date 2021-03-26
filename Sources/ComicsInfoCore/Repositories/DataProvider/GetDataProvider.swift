@@ -82,7 +82,7 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     
     // Get all items
 
-    func getAllItems(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
+    func getAllItems(with criteria: GetAllItemsCriteria<Item>) -> EventLoopFuture<[Item]> {
         switch criteria.dataSource {
         case .memory:
             return getAllItemsFromMemory(with: criteria)
@@ -92,17 +92,27 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
         }
     }
 
-    private func getAllItemsFromMemory(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
-        switch cacheProvider.getAllItems(forSummaryID: criteria.summaryID, from: criteria.table) {
+    private func getAllItemsFromMemory(with criteria: GetAllItemsCriteria<Item>) -> EventLoopFuture<[Item]> {
+        switch cacheProvider.getAllItems(
+            afterID: criteria.afterID,
+            limit: criteria.limit,
+            from: criteria.table
+        ) {
         case let .success(items):
-            return eventLoop.submit { items }
+            guard items.count < criteria.limit else {
+                return eventLoop.submit { items }
+            }
+            
+            var criteria = criteria
+            criteria.initialValue = items
+            return getAllItemsFromDatabase(with: criteria)
             
         case .failure:
             return getAllItemsFromDatabase(with: criteria)
         }
     }
 
-    private func getAllItemsFromDatabase(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
+    private func getAllItemsFromDatabase(with criteria: GetAllItemsCriteria<Item>) -> EventLoopFuture<[Item]> {
         itemGetDBWrapper.getAllItems(with: criteria).always { result in
             guard let items = try? result.get() else { return }
             cacheProvider.save(items: items, in: criteria.table)

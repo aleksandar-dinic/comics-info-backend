@@ -48,20 +48,28 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
     }
     
     public func getAllItems(
-        forSummaryID summaryID: String?,
+        afterID: String?,
+        limit: Int,
         from table: String
     ) -> Result<[Item], CacheError<Item>> {
         guard let cache = itemsCaches[table], !cache.isEmpty else {
             return .failure(.itemsNotFound(itemType: Item.self))
         }
         
-        guard let summaryID = summaryID else {
-            return .success(cache.values)
-        }
+        var items = cache.values.sorted()
+        var start = 0
+        let count = items.count
         
-        let values = cache.values.filter { $0.summaryID == summaryID }
-        return !values.isEmpty ?
-            .success(values.sorted { $0.popularity < $1.popularity }) :
+        if let afterID = afterID {
+            guard let firstIndex = items.firstIndex(where: { $0.itemID == afterID }) else {
+                return .failure(.itemsNotFound(itemType: Item.self))
+            }
+            start = firstIndex + 1
+        }
+
+        items = Array(items[start..<min(count, start+limit)])
+        return !items.isEmpty ?
+            .success(items) :
             .failure(.itemsNotFound(itemType: Item.self))
     }
 

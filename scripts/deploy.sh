@@ -23,8 +23,8 @@ echo "-------------------------------------------------------------------------"
 echo "uploading \"$executable\" lambda to AWS S3"
 echo "-------------------------------------------------------------------------"
 
-read -p "S3 bucket name to upload zip file (must exist in AWS S3): " s3_bucket
-s3_bucket=${s3_bucket:-swift-lambda-test} # default for easy testing
+#read -p "S3 bucket name to upload zip file (must exist in AWS S3): " s3_bucket
+s3_bucket=${s3_bucket:-comics-info-backend} # default for easy testing
 
 aws s3 cp ".build/lambda/$executable/lambda.zip" "s3://$s3_bucket/"
 

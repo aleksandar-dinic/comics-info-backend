@@ -33,11 +33,11 @@ extension GetSeriesSummaries {
         var items = [(itemID: String, summaryID: String)]()
         
         for id in item.charactersID ?? [] {
-            items.append((.comicInfoID(for: Character.self, ID: id), .comicInfoID(for: item)))
+            items.append((.comicInfoID(for: CharacterSummary.self, ID: id), .comicInfoSummaryID(for: item)))
         }
         
         for id in item.comicsID ?? [] {
-            items.append((.comicInfoID(for: Comic.self, ID: id), .comicInfoID(for: item)))
+            items.append((.comicInfoID(for: ComicSummary.self, ID: id), .comicInfoSummaryID(for: item)))
         }
         
         guard !items.isEmpty else { return eventLoop.submit { nil } }

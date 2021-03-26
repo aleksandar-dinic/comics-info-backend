@@ -14,9 +14,11 @@ struct DynamoDBGetItemQuery: Loggable {
     let ID: String
     let table: String
 
-    var input: DynamoDB.GetItemInput {
-        DynamoDB.GetItemInput(
-            key: ["itemID": .s(ID), "summaryID": .s(ID)],
+    var input: DynamoDB.QueryInput {
+        DynamoDB.QueryInput(
+            expressionAttributeValues: [":itemID": .s(ID)],
+            indexName: "itemID-index",
+            keyConditionExpression: "itemID = :itemID",
             tableName: table
         )
     }

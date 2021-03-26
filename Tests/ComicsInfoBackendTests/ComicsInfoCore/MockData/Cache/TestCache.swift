@@ -42,22 +42,18 @@ final class TestCache<Item: ComicInfoItem>: Cacheable {
         return (items, Set(items.map({ $0.id })).symmetricDifference(IDs))
     }
     
-    func getAllItems(forSummaryID summaryID: String?, from table: String) -> Result<[Item], CacheError<Item>> {
+    func getAllItems(
+        afterID: String?,
+        limit: Int,
+        from table: String
+    ) -> Result<[Item], CacheError<Item>> {
         guard let cache = itemsCaches[table], !cache.isEmpty else {
             return .failure(.itemsNotFound(itemType: Item.self))
         }
 
         let items = cache.values.compactMap { $0 as? Item }
-        guard !items.isEmpty else {
-            return .failure(.itemsNotFound(itemType: Item.self))
-        }
-        
-        guard let summaryID = summaryID else {
-            return .success(items)
-        }
-        let values = items.filter { $0.summaryID == summaryID }
-        return !values.isEmpty ?
-            .success(values.sorted { $0.popularity < $1.popularity }) :
+        return !items.isEmpty ?
+            .success(items.sorted { $0.sortValue < $1.sortValue }) :
             .failure(.itemsNotFound(itemType: Item.self))
     }
     

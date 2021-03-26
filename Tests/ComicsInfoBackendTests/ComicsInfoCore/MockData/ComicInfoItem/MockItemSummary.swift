@@ -20,6 +20,12 @@ struct MockItemSummary: ItemSummary {
     let name: String
     let thumbnail: String?
     let description: String?
+    let sortValue: String
+    let oldSortValue: String?
+    
+    var id: String {
+        itemID.getIDFromComicInfoID(for: MockItemSummary.self)
+    }
     
 }
 
@@ -45,7 +51,9 @@ enum MockItemSummaryFactory {
             popularity: popularity,
             name: name,
             thumbnail: thumbnail,
-            description: description
+            description: description,
+            sortValue: "Popularity=\(popularity)#Name=\(name)",
+            oldSortValue: "Popularity=\(popularity)#Name=\(name)"
         )
     }
     

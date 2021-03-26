@@ -33,7 +33,7 @@ final class UpdateRepositoryTests: XCTestCase {
         // Given
         let item = MockComicInfoItemFactory.make()
         let itemData = MockComicInfoItemFactory.makeData()
-        let criteria = UpdateItemCriteria(item: item, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
         sut = UpdateRepositoryFactory.make(items: itemData)
         
         // When

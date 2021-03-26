@@ -14,16 +14,20 @@ struct DynamoDBUpdateSummariesQuery<Summary: ItemSummary>: Loggable {
     let summaries: [Summary]
     let table: String
     
-    var inputs: [DynamoDB.UpdateItemCodableInput<Summary>] {
-        var inputs = [DynamoDB.UpdateItemCodableInput<Summary>]()
+    var inputs: [(DynamoDB.DeleteItemInput, DynamoDB.UpdateItemCodableInput<Summary>)] {
+        var inputs = [(DynamoDB.DeleteItemInput, DynamoDB.UpdateItemCodableInput<Summary>)]()
         
         for summary in summaries {
+            let delete = DynamoDB.DeleteItemInput(
+                key: ["itemID": .s(summary.itemID), "sortValue": .s(summary.oldSortValue ?? summary.sortValue)],
+                tableName: table
+            )
             let update = DynamoDB.UpdateItemCodableInput(
-                key: ["itemID", "summaryID"],
+                key: ["itemID", "sortValue"],
                 tableName: table,
                 updateItem: summary
             )
-            inputs.append(update)
+            inputs.append((delete, update))
         }
         return inputs
     }

@@ -23,7 +23,11 @@ public extension String {
         "\(String.getType(from: Item.self))#\(item.id)"
     }
     
-    static func comicInfoID<Item: Identifiable>(for item: Item.Type, ID: String) -> String {
+    static func comicInfoSummaryID<Item: Identifiable>(for item: Item) -> String {
+        "\(String.getType(from: Item.self))Summary#\(item.id)"
+    }
+    
+    static func comicInfoID<Item>(for item: Item.Type, ID: String) -> String {
         "\(String.getType(from: Item.self))#\(ID)"
     }
     

@@ -54,7 +54,14 @@ public final class SeriesUpdateUseCase: UpdateUseCase, GetSeriesLinks, CreateSer
         from table: String,
         logger: Logger?
     ) -> EventLoopFuture<Series> {
-        seriesUseCase.getItem(on: eventLoop, withID: ID, fields: nil, from: table, logger: logger)
+        seriesUseCase.getItem(
+            on: eventLoop,
+            withID: ID,
+            fields: nil,
+            from: table,
+            logger: logger,
+            dataSource: .database
+        )
     }
     
 }
@@ -65,12 +72,21 @@ extension SeriesUpdateUseCase {
         for item: Item,
         on eventLoop: EventLoop,
         fields: Set<String>,
+        limit: Int = .queryLimit,
         in table: String,
         logger: Logger?
     ) -> EventLoopFuture<Bool> {
         guard item.shouldUpdateExistingSummaries(fields) else { return eventLoop.submit { false } }
 
-        let criteria = GetSummariesCriteria(SeriesSummary.self, ID: item.itemID, dataSource: .database, table: table, strategy: .itemID, logger: logger)
+        let criteria = GetSummariesCriteria(
+            SeriesSummary.self,
+            ID: item.id,
+            dataSource: .database,
+            limit: limit,
+            table: table,
+            strategy: .itemID,
+            logger: logger
+        )
 
         return seriesUseCase.getSummaries(on: eventLoop, with: criteria)
             .flatMap { [weak self] summaries -> EventLoopFuture<Bool> in

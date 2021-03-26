@@ -240,7 +240,13 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromMemory_retursItems() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .memory,
+            limit: 100,
+            table: table
+        )
         let cash = TestCache<MockComicInfoItem>(itemsCaches: [table: [givenItem.id: givenItem]])
         sut = GetDataProviderFactory.make(cacheProvider: cash)
         
@@ -255,7 +261,13 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromDatabase_retursItems() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .database, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .database,
+            limit: 100,
+            table: table
+        )
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -269,7 +281,13 @@ extension GetDataProviderTests {
     
     func test_whenGetAllItems_throwsItemsNotFound() throws {
         // Given
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .memory,
+            limit: 100,
+            table: table
+        )
         var thrownError: Error?
         
         // When
@@ -291,7 +309,13 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromEmptyMemory_retursItemsFromDatabase() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .memory,
+            limit: 100,
+            table: table
+        )
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -306,7 +330,13 @@ extension GetDataProviderTests {
     func test_whenGetAllItemsFromEmptyMemory_saveItemsInCache() throws {
         // Given
         let givenItem = MockComicInfoItemFactory.make()
-        let criteria = GetAllItemsCriteria(summaryID: nil, dataSource: .memory, table: table)
+        let criteria = GetAllItemsCriteria<MockComicInfoItem>(
+            afterID: nil,
+            sortValue: nil,
+            dataSource: .memory,
+            limit: 100,
+            table: table
+        )
         let cache = TestCache<MockComicInfoItem>()
         let itemData = MockComicInfoItemFactory.makeData()
         sut = GetDataProviderFactory.make(cacheProvider: cache, items: itemData)
@@ -316,7 +346,7 @@ extension GetDataProviderTests {
         XCTAssertNoThrow(try feature.wait())
         
         // Then
-        let result = cache.getAllItems(forSummaryID: nil, from: table)
+        let result = cache.getAllItems(afterID: nil, limit: 100, from: table)
         switch result {
         case let .success(items):
             XCTAssertEqual(items.map { $0.id }, [givenItem.id])
@@ -334,7 +364,14 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromMemory_retursSummaries() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: "1", dataSource: .memory, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: "1",
+            dataSource: .memory,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         let cash = TestCache<MockComicInfoItem>(itemsSummaries: [table: [givenItem.itemID: givenItem]])
         sut = GetDataProviderFactory.make(cacheProvider: cash)
         
@@ -349,7 +386,14 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromDatabase_retursSummaries() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .database, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: givenItem.id,
+            dataSource: .database,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         let itemData = MockItemSummaryFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -363,7 +407,14 @@ extension GetDataProviderTests {
     
     func test_whenGetSummaries_returnsNil() throws {
         // Given
-        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: "-1", dataSource: .memory, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: "-1",
+            dataSource: .memory,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         
         // When
         let feature = sut.getSummaries(with: criteria)
@@ -376,7 +427,14 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromEmptyMemory_retursSummariesFromDatabase() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: givenItem.itemID, dataSource: .memory, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: givenItem.id,
+            dataSource: .memory,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         let itemData = MockItemSummaryFactory.makeData()
         sut = GetDataProviderFactory.make(items: itemData)
         
@@ -391,7 +449,14 @@ extension GetDataProviderTests {
     func test_whenGetSummariesFromEmptyMemory_saveSummariesInCache() throws {
         // Given
         let givenItem = MockItemSummaryFactory.make()
-        let criteria = GetSummariesCriteria(MockItemSummary.self, ID: "", dataSource: .memory, table: table, strategy: .summaryID)
+        let criteria = GetSummariesCriteria(
+            MockItemSummary.self,
+            ID: givenItem.id,
+            dataSource: .memory,
+            limit: .queryLimit,
+            table: table,
+            strategy: .summaryID
+        )
         let cache = TestCache<MockComicInfoItem>()
         let itemData = MockItemSummaryFactory.makeData()
         sut = GetDataProviderFactory.make(cacheProvider: cache, items: itemData)
@@ -401,7 +466,7 @@ extension GetDataProviderTests {
         XCTAssertNoThrow(try feature.wait())
         
         // Then
-        let result: Result<[MockItemSummary], CacheError<MockComicInfoItem>> = cache.getSummaries(forID: "", from: table)
+        let result: Result<[MockItemSummary], CacheError<MockComicInfoItem>> = cache.getSummaries(forID: givenItem.id, from: table)
         switch result {
         case let .success(items):
             XCTAssertEqual(items.map { $0.itemID }, [givenItem.itemID])

@@ -33,7 +33,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
     func test_whenUpdateComic_comicIsUpdated() throws {
         // Given
         try createComic(ComicFactory.make(title: "Old Title"))
-        let criteria = UpdateItemCriteria(item: ComicFactory.make(), on: eventLoop, in: table)
+        let item = ComicFactory.make()
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
 
         // When
         let feature = sut.update(with: criteria)
@@ -46,7 +47,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         // Given
         try createComic(ComicFactory.make())
         let seriesID: Set<String> = ["-1"]
-        let criteria = UpdateItemCriteria(item: ComicFactory.make(seriesID: seriesID), on: eventLoop, in: table)
+        let item = ComicFactory.make(seriesID: seriesID)
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
@@ -69,7 +71,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         // Given
         try createComic(ComicFactory.make())
         let charactersID: Set<String> = ["-1"]
-        let criteria = UpdateItemCriteria(item: ComicFactory.make(charactersID: charactersID), on: eventLoop, in: table)
+        let item = ComicFactory.make(charactersID: charactersID)
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
         var thrownError: Error?
 
         // When
@@ -96,7 +99,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         try createSeries(series)
 
         try createComic(ComicFactory.make(charactersID: [character.id], seriesID: [series.id]))
-        let criteria = UpdateItemCriteria(item: ComicFactory.make(title: "New Title"), on: eventLoop, in: table)
+        let item = ComicFactory.make(title: "New Title")
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
 
         // When
         let feature = sut.update(with: criteria)
@@ -113,11 +117,8 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         try createSeries(series)
 
         try createComic(ComicFactory.make())
-        let criteria = UpdateItemCriteria(
-            item: ComicFactory.make(title: "New Title", charactersID: [character.id], seriesID: [series.id]),
-            on: eventLoop,
-            in: table
-        )
+        let item = ComicFactory.make(title: "New Title", charactersID: [character.id], seriesID: [series.id])
+        let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
 
         // When
         let feature = sut.update(with: criteria)
@@ -148,19 +149,19 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
             thumbnail: "New Comic Thumbnail",
             description: "New Comic Description"
         )
-        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, oldSortValue: newComic.sortValue, on: eventLoop, in: table)
         let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = MockDB["Comic#ComicID|Series#SeriesID"],
+        if let data = MockDB["ComicSummary#ComicID|SeriesSummary#SeriesID"],
            let comicSummary = try? JSONDecoder().decode(ComicSummary.self, from: data) {
             XCTAssertEqual(comicSummary.popularity, newComic.popularity)
             XCTAssertEqual(comicSummary.name, newComic.name)
             XCTAssertEqual(comicSummary.thumbnail, newComic.thumbnail)
             XCTAssertEqual(comicSummary.description, newComic.description)
         } else {
-            XCTFail("CoimcSummary with ID: Comic#ComicID|Series#SeriesID doesn't exist")
+            XCTFail("CoimcSummary with ID: Comic#ComicID|SeriesSummary#SeriesID doesn't exist")
         }
     }
     
@@ -179,16 +180,16 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
             charactersID: [character.id],
             seriesID: [series.id]
         )
-        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, oldSortValue: newComic.sortValue, on: eventLoop, in: table)
         let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = MockDB["Character#CharacterID|Series#SeriesID"],
+        if let data = MockDB["CharacterSummary#CharacterID|SeriesSummary#SeriesID"],
            let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
             XCTAssertEqual(characterSummary.count, 1)
         } else {
-            XCTFail("characterSummary with ID: Character#CharacterID|Series#SeriesID doesn't exist")
+            XCTFail("characterSummary with ID: Character#CharacterID|SeriesSummary#SeriesID doesn't exist")
         }
     }
     
@@ -205,21 +206,17 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         try createComic(comic2)
 
         // When
-        let newComic = ComicFactory.make(
-            id: "ComicID2",
-            charactersID: [character.id],
-            seriesID: [series.id]
-        )
-        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let newComic = ComicFactory.make(id: "ComicID2", charactersID: [character.id], seriesID: [series.id])
+        let criteria = UpdateItemCriteria(item: newComic, oldSortValue: newComic.sortValue, on: eventLoop, in: table)
         let feature = sut.update(with: criteria)
 
         // Then
         XCTAssertNoThrow(try feature.wait())
-        if let data = MockDB["Character#CharacterID|Series#SeriesID"],
+        if let data = MockDB["CharacterSummary#CharacterID|SeriesSummary#SeriesID"],
            let characterSummary = try? JSONDecoder().decode(CharacterSummary.self, from: data) {
             XCTAssertEqual(characterSummary.count, 2)
         } else {
-            XCTFail("characterSummary with ID: Character#CharacterID|Series#SeriesID doesn't exist")
+            XCTFail("characterSummary with ID: CharacterSummary#CharacterID|SeriesSummary#SeriesID doesn't exist")
         }
     }
     
@@ -233,7 +230,7 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
 
         // When
         let newComic = ComicFactory.make(id: "ComicID", charactersID: [character.id])
-        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, oldSortValue: newComic.sortValue, on: eventLoop, in: table)
         let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
@@ -242,7 +239,7 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .summariesAlreadyExist(let IDs) = error as? ComicInfoError {
-            XCTAssertEqual(IDs, ["Character#CharacterID"])
+            XCTAssertEqual(IDs, ["CharacterSummary#CharacterID"])
         } else {
             XCTFail("Expected '.summariesAlreadyExist' but got \(error)")
         }
@@ -258,7 +255,7 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
 
         // When
         let newComic = ComicFactory.make(id: "ComicID", seriesID: [series.id])
-        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, oldSortValue: newComic.sortValue, on: eventLoop, in: table)
         let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
@@ -267,7 +264,7 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .summariesAlreadyExist(let IDs) = error as? ComicInfoError {
-            XCTAssertEqual(IDs, ["Series#SeriesID"])
+            XCTAssertEqual(IDs, ["SeriesSummary#SeriesID"])
         } else {
             XCTFail("Expected '.summariesAlreadyExist' but got \(error)")
         }
@@ -285,7 +282,7 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
 
         // When
         let newComic = ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id])
-        let criteria = UpdateItemCriteria(item: newComic, on: eventLoop, in: table)
+        let criteria = UpdateItemCriteria(item: newComic, oldSortValue: newComic.sortValue, on: eventLoop, in: table)
         let feature = sut.update(with: criteria)
         XCTAssertThrowsError(try feature.wait()) {
             thrownError = $0
@@ -294,7 +291,7 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         // Then
         let error = try XCTUnwrap(thrownError)
         if case .summariesAlreadyExist(let IDs) = error as? ComicInfoError {
-            XCTAssertEqual(IDs.sorted(), ["Character#CharacterID", "Series#SeriesID"].sorted())
+            XCTAssertEqual(IDs.sorted(), ["CharacterSummary#CharacterID", "SeriesSummary#SeriesID"].sorted())
         } else {
             XCTFail("Expected '.summariesAlreadyExist' but got \(error)")
         }

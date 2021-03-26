@@ -11,7 +11,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct SeriesListResponseWrapper: ListResponseWrapper {
+public struct SeriesListResponseWrapper: GetQueryParameterAfterID, GetQueryParameterLimit, ListResponseWrapper {
 
     private let seriesUseCase: SeriesUseCase
 
@@ -25,18 +25,26 @@ public struct SeriesListResponseWrapper: ListResponseWrapper {
         environment: String?,
         logger: Logger?
     ) -> EventLoopFuture<Response> {
-        let table = String.tableName(for: environment)
-        let fields = getFields(from: request.queryParameters)
-        
-        return seriesUseCase.getAllItems(
-            on: eventLoop,
-            summaryID: nil,
-            fields: fields,
-            from: table,
-            logger: logger
-        )
-            .map { Response(with: $0.map { Domain.Series(from: $0) }, statusCode: .ok) }
-            .flatMapErrorThrowing { self.catch($0) }
+        do {
+            return seriesUseCase.getAllItems(
+                on: eventLoop,
+                afterID: getAfterID(from: request.queryParameters),
+                fields: getFields(from: request.queryParameters),
+                limit: try getLimit(from: request.queryParameters),
+                from: String.tableName(for: environment),
+                logger: logger
+            )
+                .map { Response(with: $0.map { Domain.Series(from: $0) }, statusCode: .ok) }
+                .flatMapErrorThrowing { self.catch($0) }
+        } catch {
+            guard let responseError = error as? ComicInfoError else {
+                let message = ResponseStatus(error.localizedDescription)
+                return eventLoop.submit { Response(with: message, statusCode: .badRequest) }
+            }
+            
+            let message = ResponseStatus(for: responseError)
+            return eventLoop.submit { Response(with: message, statusCode: responseError.responseStatus) }
+        }
     }
 
 }

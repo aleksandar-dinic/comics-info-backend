@@ -80,8 +80,8 @@ public struct Comic: SummaryMapper {
     var series: [SeriesSummary]?
     
     public let itemID: String
-    public let summaryID: String
     public let itemType: String
+    public private(set) var sortValue: String
     
     public var name: String {
         title
@@ -127,8 +127,8 @@ public struct Comic: SummaryMapper {
         self.charactersID = charactersID
         self.seriesID = seriesID
         itemID = .comicInfoID(for: Comic.self, ID: id)
-        summaryID = .comicInfoID(for: Comic.self, ID: id)
         itemType = .getType(from: Comic.self)
+        sortValue = "Popularity=\(abs(popularity-100))#Title=\(title)"
     }
     
 }
@@ -175,6 +175,7 @@ extension Comic {
         characters = newItem.characters
         seriesID = newItem.seriesID
         series = newItem.series
+        sortValue = "Popularity=\(abs(popularity-100))#Title=\(title)"
     }
     
 }
@@ -199,8 +200,9 @@ extension Comic {
         case images
         case published
         case itemID
-        case summaryID
         case itemType
+        case sortValue
     }
     
 }
+

@@ -62,7 +62,14 @@ public final class ComicUpdateUseCase: UpdateUseCase, GetComicLinks, CreateComic
         from table: String,
         logger: Logger?
     ) -> EventLoopFuture<Comic> {
-        comicUseCase.getItem(on: eventLoop, withID: ID, fields: nil, from: table, logger: logger)
+        comicUseCase.getItem(
+            on: eventLoop,
+            withID: ID,
+            fields: nil,
+            from: table,
+            logger: logger,
+            dataSource: .database
+        )
     }
     
 }
@@ -73,12 +80,21 @@ extension ComicUpdateUseCase {
         for item: Item,
         on eventLoop: EventLoop,
         fields: Set<String>,
+        limit: Int = .queryLimit,
         in table: String,
         logger: Logger?
     ) -> EventLoopFuture<Bool> {
         guard item.shouldUpdateExistingSummaries(fields) else { return eventLoop.submit { false } }
         
-        let criteria = GetSummariesCriteria(ComicSummary.self, ID: item.itemID, dataSource: .database, table: table, strategy: .itemID, logger: logger)
+        let criteria = GetSummariesCriteria(
+            ComicSummary.self,
+            ID: item.id,
+            dataSource: .database,
+            limit: limit,
+            table: table,
+            strategy: .itemID,
+            logger: logger
+        )
         
         return comicUseCase.getSummaries(on: eventLoop, with: criteria)
             .flatMap { [weak self] summaries -> EventLoopFuture<Bool> in

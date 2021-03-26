@@ -64,21 +64,53 @@ public extension GetUseCase {
     
     func getAllItems(
         on eventLoop: EventLoop,
-        summaryID: String?,
+        afterID: String?,
         fields: Set<String>?,
+        limit: Int,
         from table: String,
         logger: Logger?,
         dataSource: DataSourceLayer = .memory
     ) -> EventLoopFuture<[Item]> {
         do {
             let fields = try handleFields(fields)
-            let criteria = GetAllItemsCriteria(summaryID: summaryID, dataSource: dataSource, table: table, logger: logger)
-            return repository.getAllItems(with: criteria)
-                .flatMap { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table, logger: logger) }
-                .hop(to: eventLoop)
+            var criteria = GetAllItemsCriteria<Item>(
+                afterID: afterID,
+                sortValue: nil,
+                dataSource: dataSource,
+                limit: limit,
+                table: table,
+                logger: logger
+            )
+            
+            guard let afterID = afterID else {
+                return getAll(on: eventLoop, fields: fields, criteria: criteria)
+            }
+            
+            return getItem(on: eventLoop, withID: afterID, fields: nil, from: table, logger: logger)
+                .flatMap {
+                    criteria.sortValue = $0.sortValue
+                    return getAll(on: eventLoop, fields: fields, criteria: criteria)
+                }
         } catch {
             return eventLoop.makeFailedFuture(error)
         }
+    }
+    
+    private func getAll(
+        on eventLoop: EventLoop,
+        fields: Set<String>,
+        criteria: GetAllItemsCriteria<Item>
+    ) -> EventLoopFuture<[Item]> {
+        repository.getAllItems(with: criteria)
+            .flatMap {
+                appendSummaries(
+                    for: $0,
+                    on: eventLoop,
+                    fields: fields,
+                    table: criteria.table,
+                    logger: criteria.logger
+                )
+            }
     }
     
     private func appendSummaries(

@@ -55,7 +55,22 @@ struct MockItemGetDBService: ItemGetDBService {
         return eventLoop.submit { items }
     }
     
-    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery) -> EventLoopFuture<[Item]> {
+    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery<Item>) -> EventLoopFuture<[Item]> {
+        var databaseItems = [Item]()
+        for value in TestDatabase.items.values {
+            guard let item = try? JSONDecoder().decode(Item.self, from: value),
+                  item.itemType == query.items else { continue }
+            databaseItems.append(item)
+        }
+
+        guard !databaseItems.isEmpty else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemsNotFound(withIDs: nil))
+        }
+
+        return eventLoop.submit { databaseItems }
+    }
+    
+    func getAllPaginator<Item: ComicInfoItem>(_ query: GetAllItemsQuery<Item>) -> EventLoopFuture<[Item]> {
         var databaseItems = [Item]()
         for value in TestDatabase.items.values {
             guard let item = try? JSONDecoder().decode(Item.self, from: value),

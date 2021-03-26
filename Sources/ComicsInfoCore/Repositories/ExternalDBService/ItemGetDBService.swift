@@ -13,7 +13,7 @@ protocol ItemGetDBService {
     
     func getItem<Item: ComicInfoItem>(_ query: GetItemQuery) -> EventLoopFuture<Item>
     func getItems<Item: ComicInfoItem>(_ query: GetItemsQuery) -> EventLoopFuture<[Item]>
-    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery) -> EventLoopFuture<[Item]>
+    func getAll<Item: ComicInfoItem>(_ query: GetAllItemsQuery<Item>) -> EventLoopFuture<[Item]>
 
     func getSummaries<Summary: ItemSummary>(_ query: GetSummariesQuery) -> EventLoopFuture<[Summary]?>
     func getSummary<Summary: ItemSummary>(_ query: GetSummaryQuery) -> EventLoopFuture<[Summary]?>

@@ -25,7 +25,7 @@ public final class GetRepository<Item, CacheProvider: Cacheable> where CacheProv
         dataProvider.getItems(with: criteria)
     }
 
-    public func getAllItems(with criteria: GetAllItemsCriteria) -> EventLoopFuture<[Item]> {
+    public func getAllItems(with criteria: GetAllItemsCriteria<Item>) -> EventLoopFuture<[Item]> {
         dataProvider.getAllItems(with: criteria)
     }
     

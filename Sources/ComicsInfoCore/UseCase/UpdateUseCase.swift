@@ -46,7 +46,12 @@ extension UpdateUseCase {
                 guard !fields.isEmpty else { return criteria.eventLoop.submit { fields } }
                 var newItem = oldItem
                 newItem.update(with: criteria.item)
-                let criteria = UpdateItemCriteria(item: newItem, on: criteria.eventLoop, in: criteria.table)
+                let criteria = UpdateItemCriteria(
+                    item: newItem,
+                    oldSortValue: oldItem.sortValue,
+                    on: criteria.eventLoop,
+                    in: criteria.table
+                )
                 return repository.update(with: criteria)
             }
     }

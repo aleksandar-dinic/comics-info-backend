@@ -50,7 +50,15 @@ final class UseCaseTests: XCTestCase {
         sut = CharacterUseCaseFactoryMock(items: givenItems, on: eventLoop).makeUseCase()
 
         // When
-        let featureGet = sut.getAllItems(on: eventLoop, summaryID: nil, fields: nil, from: table, logger: nil, dataSource: .database)
+        let featureGet = sut.getAllItems(
+            on: eventLoop,
+            afterID: nil,
+            fields: nil,
+            limit: 100,
+            from: table,
+            logger: nil,
+            dataSource: .database
+        )
         let items = try featureGet.wait()
 
         // Then

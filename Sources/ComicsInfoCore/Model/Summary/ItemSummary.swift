@@ -11,6 +11,7 @@ import Foundation
 public protocol ItemSummary: Codable {
     
     var itemID: String { get }
+    var sortValue: String { get }
     var summaryID: String { get }
     var itemType: String { get }
     
@@ -20,5 +21,6 @@ public protocol ItemSummary: Codable {
     var name: String { get }
     var thumbnail: String? { get }
     var description: String? { get }
+    var oldSortValue: String? { get }
     
 }
