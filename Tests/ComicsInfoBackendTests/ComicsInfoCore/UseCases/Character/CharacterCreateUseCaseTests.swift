@@ -32,13 +32,15 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
 
     func test_whenCrateCharacter_characterIsCreated() throws {
         // Given
-        let criteria = CreateItemCriteria(item: CharacterFactory.make(), on: eventLoop, in: table)
+        let givenCharacter = CharacterFactory.make()
+        let criteria = CreateItemCriteria(item: givenCharacter, on: eventLoop, in: table)
 
         // When
         let feature = sut.create(with: criteria)
+        let character = try feature.wait()
 
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(character.id, givenCharacter.id)
     }
     
     func test_whenCrateCharacterWithNotExistingSeriesID_throwsItemsNotFound() throws {
@@ -99,20 +101,17 @@ final class CharacterCreateUseCaseTests: XCTestCase, CreateSeriesProtocol, Creat
         try createSeries(series)
         let comic = ComicFactory.make(id: "ComicID")
         try createComic(comic)
-        let criteria = CreateItemCriteria(
-            item: CharacterFactory.make(id: "CharacterID", seriesID: [series.id], comicsID: [comic.id]),
-            on: eventLoop,
-            in: table
-        )
+        let givenCharacter = CharacterFactory.make(id: "CharacterID", seriesID: [series.id], comicsID: [comic.id])
+        let criteria = CreateItemCriteria(item: givenCharacter, on: eventLoop, in: table)
 
         // When
         let feature = sut.create(with: criteria)
+        let character = try feature.wait()
 
         // Then
-        XCTAssertNoThrow(try feature.wait())
-        XCTAssertNotNil(MockDB["Character#CharacterID"])
-        XCTAssertNotNil(MockDB["SeriesSummary#SeriesID|CharacterSummary#CharacterID"])
-        XCTAssertNotNil(MockDB["ComicSummary#ComicID|CharacterSummary#CharacterID"])
+        XCTAssertEqual(character.id, givenCharacter.id)
+        XCTAssertEqual(character.series?.first?.itemID, String.comicInfoSummaryID(for: series))
+        XCTAssertEqual(character.comics?.first?.itemID, String.comicInfoSummaryID(for: comic))
     }
 
     func test_whenCrateCharacterWithOneNotExistingSeriesID_throwsItemsNotFound() throws {

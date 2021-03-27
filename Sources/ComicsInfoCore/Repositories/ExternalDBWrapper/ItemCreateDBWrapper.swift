@@ -13,7 +13,7 @@ struct ItemCreateDBWrapper: LoggerProvider {
     
     var itemCreateDBService: ItemCreateDBService
     
-    func create<Item: ComicInfoItem>(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Void> {
+    func create<Item: ComicInfoItem>(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Item> {
         let query = CreateItemQuery(item: criteria.item, table: criteria.table, logger: criteria.logger)
         
         return itemCreateDBService.create(query)
@@ -25,7 +25,7 @@ struct ItemCreateDBWrapper: LoggerProvider {
     
     func createSummaries<Summary: ItemSummary>(
         with criteria: CreateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<[Summary]> {
         let query = CreateSummariesQuery(summaries: criteria.summaries, table: criteria.table, logger: criteria.logger)
         
         return itemCreateDBService.createSummaries(query)

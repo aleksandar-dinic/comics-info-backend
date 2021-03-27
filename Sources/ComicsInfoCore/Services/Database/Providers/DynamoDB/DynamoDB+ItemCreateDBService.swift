@@ -11,18 +11,24 @@ import SotoDynamoDB
 
 extension DynamoDB: ItemCreateDBService {
     
-    func create<Item: Codable>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Void> {
-        putItem(query.dynamoDBQuery.input).map { _ in }
+    func create<Item: Codable>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Item> {
+        putItem(query.dynamoDBQuery.input).map { _ in query.item }
     }
 
-    func createSummaries<Summary: Codable>(_ query: CreateSummariesQuery<Summary>) -> EventLoopFuture<Void> {
-        var futures = [EventLoopFuture<Void>]()
+    func createSummaries<Summary: Codable>(
+        _ query: CreateSummariesQuery<Summary>
+    ) -> EventLoopFuture<[Summary]> {
+        var futures = [EventLoopFuture<Summary>]()
         
         for input in query.dynamoDBQuery.inputs {
-            futures.append(putItem(input).map { _ in })
+            futures.append(putItem(input).map { _ in input.item })
         }
 
-        return EventLoopFuture.reduce((), futures, on: client.eventLoopGroup.next()) { (_, _) in }
+        return EventLoopFuture.reduce([], futures, on: client.eventLoopGroup.next()) { (items, item) in
+            var items = items
+            items.append(item)
+            return items
+        }
     }
 
 }

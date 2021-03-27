@@ -17,11 +17,13 @@ public final class CreateRepository {
         self.dataProvider = dataProvider
     }
 
-    public func create<Item: ComicInfoItem>(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Void> {
+    public func create<Item: ComicInfoItem>(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Item> {
         dataProvider.create(with: criteria)
     }
     
-    public func createSummaries<Summary: ItemSummary>(with criteria: CreateSummariesCriteria<Summary>) -> EventLoopFuture<Void> {
+    public func createSummaries<Summary: ItemSummary>(
+        with criteria: CreateSummariesCriteria<Summary>
+    ) -> EventLoopFuture<[Summary]> {
         dataProvider.createSummaries(with: criteria)
     }
 

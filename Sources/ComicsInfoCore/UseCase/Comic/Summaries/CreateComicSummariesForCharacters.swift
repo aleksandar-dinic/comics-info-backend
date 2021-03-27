@@ -20,7 +20,7 @@ protocol CreateComicSummariesForCharacters {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Bool>
+    ) -> EventLoopFuture<([CharacterSummary], [ComicSummary])?>
     
 }
 
@@ -32,8 +32,8 @@ extension CreateComicSummariesForCharacters {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Bool> {
-        guard !characters.isEmpty else { return eventLoop.submit { false } }
+    ) -> EventLoopFuture<([CharacterSummary], [ComicSummary])?> {
+        guard !characters.isEmpty else { return eventLoop.submit { nil } }
         
         let characterSummariesCriteria = CreateSummariesCriteria(
             summaries: characters.map { CharacterSummary($0, link: item, count: nil) },
@@ -50,7 +50,7 @@ extension CreateComicSummariesForCharacters {
         
         return createRepository.createSummaries(with: characterSummariesCriteria)
             .and(createRepository.createSummaries(with: comicSummariesCriteria))
-            .map { _ in true }
+            .map { $0 }
     }
     
 }

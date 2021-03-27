@@ -20,7 +20,7 @@ protocol CreateSeriesSummariesForCharacters {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Bool>
+    ) -> EventLoopFuture<([CharacterSummary], [SeriesSummary])?>
     
 }
 
@@ -32,8 +32,8 @@ extension CreateSeriesSummariesForCharacters {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Bool> {
-        guard !characters.isEmpty else { return eventLoop.submit { false } }
+    ) -> EventLoopFuture<([CharacterSummary], [SeriesSummary])?> {
+        guard !characters.isEmpty else { return eventLoop.submit { nil } }
         
         let characterSummariesCriteria = CreateSummariesCriteria(
             summaries: characters.map { CharacterSummary($0, link: item, count: nil) },
@@ -50,8 +50,7 @@ extension CreateSeriesSummariesForCharacters {
         
         return createRepository.createSummaries(with: characterSummariesCriteria)
             .and(createRepository.createSummaries(with: seriesSummariesCriteria))
-            .map { _ in true }
+            .map { $0 }
     }
-    
     
 }

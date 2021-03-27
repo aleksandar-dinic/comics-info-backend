@@ -32,25 +32,30 @@ public final class ComicCreateUseCase: CreateUseCase, GetComicLinks, CreateComic
         self.comicUseCase = comicUseCase
     }
     
-    public func create(with criteria: CreateItemCriteria<Comic>) -> EventLoopFuture<Void> {
+    public func create(with criteria: CreateItemCriteria<Comic>) -> EventLoopFuture<Comic> {
         getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-            .flatMap { [weak self] (characters, series) -> EventLoopFuture<([Character], [Series])> in
+            .flatMap { [weak self] (characters, series) -> EventLoopFuture<(Comic, [Character], [Series])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createRepository.create(with: criteria)
-                    .map { (characters, series) }
+                    .map { ($0, characters, series) }
             }
-            .flatMap { [weak self] characters, series -> EventLoopFuture<([Character], [Series])> in
+            .flatMap { [weak self] comic, characters, series -> EventLoopFuture<(Comic, [Character], [Series])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createLinksSummaries(for: criteria.item, characters: characters, series: series, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-                    .map { (characters, series) }
+                    .map {
+                        var comic = comic
+                        comic.characters = $0?.0
+                        comic.series = $0?.1
+                        return (comic, characters, series)
+                    }
             }
-            .flatMap { [weak self] characters, series in
+            .flatMap { [weak self] comic, characters, series in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.getCharacterSummariesForSeries(characters: characters, series: series, on: criteria.eventLoop, from: criteria.table, logger: criteria.logger)
                     .flatMap {
                         self.updateSummaries(between: characters, and: series, characterSummaries: $0, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
                     }
-                    .map { _ in }
+                    .map { _ in comic }
             }
             .hop(to: criteria.eventLoop)
     }

@@ -19,7 +19,7 @@ protocol CreateSeriesLinksSummaries: CreateSeriesSummariesForCharacters, CreateS
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Void>
+    ) -> EventLoopFuture<([CharacterSummary], [ComicSummary])?>
     
 }
 
@@ -32,10 +32,15 @@ extension CreateSeriesLinksSummaries {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<([CharacterSummary], [ComicSummary])?> {
         createSummaries(for: characters, item: item, on: eventLoop, in: table, logger: logger)
             .and(createSummaries(for: comics, item: item, on: eventLoop, in: table, logger: logger))
-            .map { _ in }
+            .map {
+                guard let characterSummaries = $0?.0, let comicSummaries = $1?.0 else {
+                    return nil
+                }
+                return (characterSummaries, comicSummaries)
+            }
     }
     
 }

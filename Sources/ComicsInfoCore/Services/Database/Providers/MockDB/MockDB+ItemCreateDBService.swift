@@ -11,7 +11,7 @@ import NIO
 
 extension MockDB: ItemCreateDBService {
 
-    func create<Item: ComicInfoItem>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Void> {
+    func create<Item: ComicInfoItem>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Item> {
         let mockQuery = query.mockDBQuery
 
         guard MockDB[mockQuery.id] == nil,
@@ -20,10 +20,12 @@ extension MockDB: ItemCreateDBService {
         }
 
         MockDB[mockQuery.id] = itemData
-        return eventLoop.submit { }
+        return eventLoop.submit { mockQuery.item }
     }
 
-    func createSummaries<Summary: ItemSummary>(_ query: CreateSummariesQuery<Summary>) -> EventLoopFuture<Void> {
+    func createSummaries<Summary: ItemSummary>(
+        _ query: CreateSummariesQuery<Summary>
+    ) -> EventLoopFuture<[Summary]> {
         for summary in query.summaries {
             let id = "\(summary.itemID)|\(summary.summaryID)"
             
@@ -34,7 +36,7 @@ extension MockDB: ItemCreateDBService {
             MockDB[id] = summaryData
         }
         
-        return eventLoop.submit { }
+        return eventLoop.submit { query.summaries }
     }
 
 }

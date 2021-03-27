@@ -32,13 +32,15 @@ final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
 
     func test_whenCrateComic_comicIsCreated() throws {
         // Given
-        let criteria = CreateItemCriteria(item: ComicFactory.make(), on: eventLoop, in: table)
+        let givenComic = ComicFactory.make()
+        let criteria = CreateItemCriteria(item: givenComic, on: eventLoop, in: table)
         
         // When
         let feature = sut.create(with: criteria)
+        let comic = try feature.wait()
 
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(comic.id, givenComic.id)
     }
     
     func test_whenCrateComicWithNotExistingCharacterID_throwsItemsNotFound() throws {
@@ -99,20 +101,17 @@ final class ComicCreateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
         try createCharacter(character)
         let series = SeriesFactory.make(id: "SeriesID")
         try createSeries(series)
-        let criteria = CreateItemCriteria(
-            item: ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id]),
-            on: eventLoop,
-            in: table
-        )
+        let givenComic = ComicFactory.make(id: "ComicID", charactersID: [character.id], seriesID: [series.id])
+        let criteria = CreateItemCriteria(item: givenComic, on: eventLoop, in: table)
 
         // When
         let feature = sut.create(with: criteria)
+        let comic = try feature.wait()
 
         // Then
-        XCTAssertNoThrow(try feature.wait())
-        XCTAssertNotNil(MockDB["Comic#ComicID"])
-        XCTAssertNotNil(MockDB["CharacterSummary#CharacterID|ComicSummary#ComicID"])
-        XCTAssertNotNil(MockDB["SeriesSummary#SeriesID|ComicSummary#ComicID"])
+        XCTAssertEqual(comic.id, givenComic.id)
+        XCTAssertEqual(comic.characters?.first?.itemID, String.comicInfoSummaryID(for: character))
+        XCTAssertEqual(comic.series?.first?.itemID, String.comicInfoSummaryID(for: series))
     }
 
     func test_whenCrateComicWithOneNotExistingSeriesID_throwsItemNotFound() throws {

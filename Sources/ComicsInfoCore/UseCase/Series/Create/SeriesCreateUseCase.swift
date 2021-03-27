@@ -28,16 +28,22 @@ public final class SeriesCreateUseCase: CreateUseCase, GetSeriesLinks, CreateSer
         self.comicUseCase = comicUseCase
     }
     
-    public func create(with criteria: CreateItemCriteria<Series>) -> EventLoopFuture<Void> {
+    public func create(with criteria: CreateItemCriteria<Series>) -> EventLoopFuture<Series> {
         getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-            .flatMap { [weak self] (characters, comics) -> EventLoopFuture<([Character], [Comic])> in
+            .flatMap { [weak self] (characters, comics) -> EventLoopFuture<(Series, [Character], [Comic])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createRepository.create(with: criteria)
-                    .map { (characters, comics) }
+                    .map { ($0, characters, comics) }
             }
-            .flatMap { [weak self] characters, comics -> EventLoopFuture<Void> in
+            .flatMap { [weak self] series, characters, comics -> EventLoopFuture<Series> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createLinksSummaries(for: criteria.item, characters: characters, comics: comics, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
+                    .map {
+                        var series = series
+                        series.characters = $0?.0
+                        series.comics = $0?.1
+                        return series
+                    }
             }
             .hop(to: criteria.eventLoop)
     }

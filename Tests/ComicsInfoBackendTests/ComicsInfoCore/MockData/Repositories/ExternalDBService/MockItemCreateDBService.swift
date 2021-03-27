@@ -25,7 +25,7 @@ struct MockItemCreateDBService: ItemCreateDBService {
         }
     }
     
-    func create<Item: ComicInfoItem>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Void> {
+    func create<Item: ComicInfoItem>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Item> {
         let mockQuery = query.mockDBQuery
         guard TestDatabase.items[mockQuery.id] == nil else {
             return eventLoop.makeFailedFuture(DatabaseError.itemAlreadyExists(withID: mockQuery.id))
@@ -34,13 +34,13 @@ struct MockItemCreateDBService: ItemCreateDBService {
         do {
             let encodedItem = try JSONEncoder().encode(mockQuery.item)
             TestDatabase.items[mockQuery.id] = encodedItem
-            return eventLoop.submit { }
+            return eventLoop.submit { mockQuery.item }
         } catch {
             return eventLoop.makeFailedFuture(error)
         }
     }
     
-    func createSummaries<Summary: ItemSummary>(_ query: CreateSummariesQuery<Summary>) -> EventLoopFuture<Void> {
+    func createSummaries<Summary: ItemSummary>(_ query: CreateSummariesQuery<Summary>) -> EventLoopFuture<[Summary]> {
         do {
             for summary in query.summaries {
                 let id = "\(summary.itemID)|\(summary.summaryID)"
@@ -51,7 +51,7 @@ struct MockItemCreateDBService: ItemCreateDBService {
                 let encodedSummary = try JSONEncoder().encode(summary)
                 TestDatabase.items[id] = encodedSummary
             }
-            return eventLoop.submit { }
+            return eventLoop.submit { query.summaries }
         } catch {
             return eventLoop.makeFailedFuture(error)
         }

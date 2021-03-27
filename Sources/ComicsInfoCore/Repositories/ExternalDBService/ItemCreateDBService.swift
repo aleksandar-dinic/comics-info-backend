@@ -11,8 +11,10 @@ import Foundation
 
 protocol ItemCreateDBService {
     
-    func create<Item: ComicInfoItem>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Void>
+    func create<Item: ComicInfoItem>(_ query: CreateItemQuery<Item>) -> EventLoopFuture<Item>
 
-    func createSummaries<Summary: ItemSummary>(_ query: CreateSummariesQuery<Summary>) -> EventLoopFuture<Void>
+    func createSummaries<Summary: ItemSummary>(
+        _ query: CreateSummariesQuery<Summary>
+    ) -> EventLoopFuture<[Summary]>
     
 }

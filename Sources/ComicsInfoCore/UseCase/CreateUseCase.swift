@@ -15,11 +15,11 @@ public protocol CreateUseCase {
 
     var createRepository: CreateRepository { get }
 
-    func create(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Void>
+    func create(with criteria: CreateItemCriteria<Item>) -> EventLoopFuture<Item>
     
     func createSummaries<Summary: ItemSummary>(
         with criteria: CreateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void>
+    ) -> EventLoopFuture<[Summary]>
     
 }
 
@@ -27,7 +27,7 @@ extension CreateUseCase {
     
     public func createSummaries<Summary: ItemSummary>(
         with criteria: CreateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<[Summary]> {
         createRepository.createSummaries(with: criteria)
     }
     

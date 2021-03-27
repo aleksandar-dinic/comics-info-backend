@@ -19,7 +19,7 @@ protocol CreateComicLinksSummaries: CreateComicSummariesForCharacters, CreateCom
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Void>
+    ) -> EventLoopFuture<([CharacterSummary], [SeriesSummary])?>
     
 }
 
@@ -32,10 +32,15 @@ extension CreateComicLinksSummaries {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<([CharacterSummary], [SeriesSummary])?> {
         createSummaries(for: characters, item: item, on: eventLoop, in: table, logger: logger)
             .and(createSummaries(for: series, item: item, on: eventLoop, in: table, logger: logger))
-            .map { _ in }
+            .map {
+                guard let characterSummaries = $0?.0, let seriesSummaries = $1?.0 else {
+                    return nil
+                }
+                return (characterSummaries, seriesSummaries)
+            }
     }
     
 }

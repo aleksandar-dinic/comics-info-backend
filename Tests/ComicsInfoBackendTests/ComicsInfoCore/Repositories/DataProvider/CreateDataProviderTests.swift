@@ -38,9 +38,10 @@ final class CreateDataProviderTests: XCTestCase {
         
         // When
         let feature = sut.create(with: criteria)
+        let createdItem = try feature.wait()
         
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(createdItem.id, item.id)
     }
     
     // Create Summaries

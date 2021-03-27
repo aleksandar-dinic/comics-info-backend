@@ -22,6 +22,7 @@ final class ItemCreateDBWrapperTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
+        eventLoop = nil
         table = nil
     }
 
@@ -35,9 +36,10 @@ final class ItemCreateDBWrapperTests: XCTestCase {
         
         // When
         let feature = sut.create(with: criteria)
+        let createdItem = try feature.wait()
         
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(createdItem.id, item.id)
     }
     
     func test_whenCreateItem_throwsItemAlreadyExists() throws {
@@ -74,9 +76,10 @@ final class ItemCreateDBWrapperTests: XCTestCase {
         
         // When
         let feature = sut.createSummaries(with: criteria)
+        let createdSummaries = try feature.wait()
         
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(createdSummaries.first?.itemID, summary.itemID)
     }
     
     func test_whenCreateSummary_throwsItemAlreadyExists() throws {

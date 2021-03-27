@@ -37,9 +37,10 @@ final class CreateRepositoryTests: XCTestCase {
         
         // When
         let feature = sut.create(with: criteria)
+        let createdItem = try feature.wait()
         
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(createdItem.id, item.id)
     }
     
     // Create Summaries
@@ -52,9 +53,10 @@ final class CreateRepositoryTests: XCTestCase {
         
         // When
         let feature = sut.createSummaries(with: criteria)
+        let createdSummaries = try feature.wait()
         
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(createdSummaries.first?.itemID, summary.itemID)
     }
     
 }
