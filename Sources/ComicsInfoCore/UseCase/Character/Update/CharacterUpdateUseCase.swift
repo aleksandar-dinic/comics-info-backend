@@ -32,20 +32,24 @@ public final class CharacterUpdateUseCase: UpdateUseCase, GetCharacterLinks, Cre
         self.comicUseCase = comicUseCase
     }
     
-    public func update(with criteria: UpdateItemCriteria<Character>) -> EventLoopFuture<Void> {
+    public func update(with criteria: UpdateItemCriteria<Character>) -> EventLoopFuture<Character> {
         getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-            .flatMap { [weak self] (series, comics) -> EventLoopFuture<(Set<String>, [Series], [Comic])> in
+            .flatMap { [weak self] (series, comics) -> EventLoopFuture<((old: Character, new: Character), [Series], [Comic])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.updateItem(with: criteria)
                     .map { ($0, series, comics) }
             }
-            .flatMap { [weak self] fields, series, comics in
+            .flatMap { [weak self] character, series, comics in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createLinksSummaries(for: criteria.item, series: series, comics: comics, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-                    .and(self.updateSummaries(for: criteria.item, on: criteria.eventLoop, fields: fields, in: criteria.table, logger: criteria.logger))
-                    .map { _ in }
+                    .and(self.updateSummaries(for: criteria.item, on: criteria.eventLoop, fields: criteria.item.updatedFields(old: character.old), in: criteria.table, logger: criteria.logger))
+                    .map {
+                        var character = character.new
+                        character.series = $0.0?.0
+                        character.comics = $0.0?.1
+                        return character
+                    }
             }
-            .hop(to: criteria.eventLoop)
     }
     
     public func getItem(
@@ -75,8 +79,8 @@ extension CharacterUpdateUseCase {
         limit: Int = .queryLimit,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<Bool> {
-        guard item.shouldUpdateExistingSummaries(fields) else { return eventLoop.submit { false } }
+    ) -> EventLoopFuture<[CharacterSummary]?> {
+        guard item.shouldUpdateExistingSummaries(fields) else { return eventLoop.submit { nil } }
         
         let criteria = GetSummariesCriteria(
             CharacterSummary.self,
@@ -89,9 +93,9 @@ extension CharacterUpdateUseCase {
         )
 
         return characterUseCase.getSummaries(on: eventLoop, with: criteria)
-            .flatMap { [weak self] summaries -> EventLoopFuture<Bool> in
+            .flatMap { [weak self] summaries -> EventLoopFuture<[CharacterSummary]?> in
                 guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                guard let summaries = summaries, !summaries.isEmpty else { return eventLoop.submit { false } }
+                guard let summaries = summaries, !summaries.isEmpty else { return eventLoop.submit { nil } }
                 
                 var updatedSummaries = [CharacterSummary]()
                 for var summary in summaries {
@@ -101,7 +105,7 @@ extension CharacterUpdateUseCase {
             
                 let criteria = UpdateSummariesCriteria(items: updatedSummaries, table: table, logger: logger)
                 return self.updateSummaries(with: criteria)
-                    .map { true }
+                    .map { $0 }
             }
     }
 

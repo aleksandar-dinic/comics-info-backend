@@ -11,29 +11,26 @@ import SotoDynamoDB
 
 extension DynamoDB: ItemUpdateDBService {
 
-    public func update<Item: ComicInfoItem>(_ query: UpdateItemQuery<Item>) -> EventLoopFuture<Set<String>> {
+    public func update<Item: ComicInfoItem>(_ query: UpdateItemQuery<Item>) -> EventLoopFuture<Item> {
         deleteItem(query.dynamoDBQuery.deleteInput).flatMap { _ in
-            updateItem(query.dynamoDBQuery.input).flatMapThrowing {
-                print($0)
-                guard let keys = $0.attributes?.keys else { return [] }
-                return Set(keys)
-            }.flatMapErrorThrowing {
-                print($0)
-                throw $0
-            }
+            updateItem(query.dynamoDBQuery.input).map { _ in query.item }
         }
     }
     
     public func updateSummaries<Summary: ItemSummary>(
         _ query: UpdateSummariesQuery<Summary>
-    ) -> EventLoopFuture<Void> {
-        var futures = [EventLoopFuture<Void>]()
+    ) -> EventLoopFuture<[Summary]> {
+        var futures = [EventLoopFuture<Summary>]()
         
         for input in query.dynamoDBQuery.inputs {
-            futures.append(deleteItem(input.0).flatMap { _ in updateItem(input.1).map { _ in } } )
+            futures.append(deleteItem(input.0).flatMap { _ in updateItem(input.1).map { _ in input.2 } } )
         }
 
-        return EventLoopFuture.reduce((), futures, on: client.eventLoopGroup.next()) { (_, _) in }
+        return EventLoopFuture.reduce([], futures, on: client.eventLoopGroup.next()) { (items, item) in
+            var items = items
+            items.append(item)
+            return items
+        }
     }
     
 }

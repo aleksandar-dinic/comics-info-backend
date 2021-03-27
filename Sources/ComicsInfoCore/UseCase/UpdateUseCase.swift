@@ -16,11 +16,11 @@ public protocol UpdateUseCase {
 
     var repository: UpdateRepository { get }
     
-    func update(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Void>
+    func update(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Item>
 
     func updateSummaries<Summary: ItemSummary>(
         with criteria: UpdateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void>
+    ) -> EventLoopFuture<[Summary]>
     
     func getItem(
         withID ID: String,
@@ -35,15 +35,15 @@ extension UpdateUseCase {
     
     public func updateSummaries<Summary: ItemSummary>(
         with criteria: UpdateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<[Summary]> {
         repository.updateSummaries(with: criteria)
     }
     
-    func updateItem(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
+    func updateItem(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<(oldItem: Item, newItem: Item)> {
         getItem(withID: criteria.item.id, on: criteria.eventLoop, from: criteria.table, logger: criteria.logger)
             .flatMap { oldItem in
                 let fields = criteria.updatedFields(oldItem: oldItem)
-                guard !fields.isEmpty else { return criteria.eventLoop.submit { fields } }
+                guard !fields.isEmpty else { return criteria.eventLoop.submit { (oldItem, oldItem) } }
                 var newItem = oldItem
                 newItem.update(with: criteria.item)
                 let criteria = UpdateItemCriteria(
@@ -53,6 +53,7 @@ extension UpdateUseCase {
                     in: criteria.table
                 )
                 return repository.update(with: criteria)
+                    .map { (oldItem, $0) }
             }
     }
     

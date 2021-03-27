@@ -17,13 +17,13 @@ public final class UpdateRepository {
         self.dataProvider = dataProvider
     }
 
-    public func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
+    public func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Item> {
         dataProvider.update(with: criteria)
     }
     
     public func updateSummaries<Summary: ItemSummary>(
         with criteria: UpdateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<[Summary]> {
         dataProvider.updateSummaries(with: criteria)
     }
 

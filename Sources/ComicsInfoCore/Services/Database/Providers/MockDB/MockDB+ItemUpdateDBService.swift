@@ -11,24 +11,22 @@ import NIO
 
 extension MockDB: ItemUpdateDBService {
 
-    func update<Item: ComicInfoItem>(_ query: UpdateItemQuery<Item>) -> EventLoopFuture<Set<String>> {
-        guard let oldItemData = MockDB[query.id],
-              let oldItem = try? JSONDecoder().decode(Item.self, from: oldItemData),
-              let itemData = try? JSONEncoder().encode(query.item) else {
+    func update<Item: ComicInfoItem>(_ query: UpdateItemQuery<Item>) -> EventLoopFuture<Item> {
+        guard let itemData = try? JSONEncoder().encode(query.item) else {
             return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: query.id))
         }
         
         MockDB[query.id] = itemData
-        return eventLoop.submit { query.item.updatedFields(old: oldItem) }
+        return eventLoop.submit { query.item }
     }
     
-    func updateSummaries<Summary: ItemSummary>(_ query: UpdateSummariesQuery<Summary>) -> EventLoopFuture<Void> {
+    func updateSummaries<Summary: ItemSummary>(_ query: UpdateSummariesQuery<Summary>) -> EventLoopFuture<[Summary]> {
         for summary in query.summaries {
             guard let itemData = try? JSONEncoder().encode(summary) else { continue }
             MockDB[query.getID(for: summary)] = itemData
         }
 
-        return eventLoop.submit { }
+        return eventLoop.submit { query.summaries }
     }
 
 }

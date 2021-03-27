@@ -57,7 +57,6 @@ public final class ComicCreateUseCase: CreateUseCase, GetComicLinks, CreateComic
                     }
                     .map { _ in comic }
             }
-            .hop(to: criteria.eventLoop)
     }
     
 }

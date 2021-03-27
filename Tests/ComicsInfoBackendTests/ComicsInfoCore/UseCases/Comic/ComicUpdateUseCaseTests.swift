@@ -33,14 +33,15 @@ final class ComicUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Create
     func test_whenUpdateComic_comicIsUpdated() throws {
         // Given
         try createComic(ComicFactory.make(title: "Old Title"))
-        let item = ComicFactory.make()
+        let item = ComicFactory.make(title: "New Title")
         let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
 
         // When
         let feature = sut.update(with: criteria)
+        let comic = try feature.wait()
 
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(comic.title, item.title)
     }
 
     func test_whenUpdateComicWithNotExistingSeriesID_throwsItemsNotFound() throws {

@@ -13,7 +13,7 @@ struct ItemUpdateDBWrapper: LoggerProvider {
     
     let itemUpdateDBService: ItemUpdateDBService
 
-    func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
+    func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Item> {
         let query = UpdateItemQuery(
             item: criteria.item,
             oldSortValue: criteria.oldSortValue,
@@ -30,7 +30,7 @@ struct ItemUpdateDBWrapper: LoggerProvider {
     
     func updateSummaries<Summary: ItemSummary>(
         with criteria: UpdateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<[Summary]> {
         let query = UpdateSummariesQuery(
             summaries: criteria.items,
             table: criteria.table,

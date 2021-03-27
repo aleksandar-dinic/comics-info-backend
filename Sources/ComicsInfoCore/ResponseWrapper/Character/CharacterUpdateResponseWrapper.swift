@@ -42,7 +42,7 @@ public struct CharacterUpdateResponseWrapper: UpdateResponseWrapper {
                 log: logger
             )
             return characterUseCase.update(with: criteria)
-                .map { Response(with: ResponseStatus("\(type(of: item.self)) updated"), statusCode: .ok) }
+                .map { Response(with: $0, statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {

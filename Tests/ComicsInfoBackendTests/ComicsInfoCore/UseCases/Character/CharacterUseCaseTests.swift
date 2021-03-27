@@ -151,7 +151,7 @@ final class CharacterUseCaseTests: XCTestCase {
         let givenItem = CharacterFactory.make(seriesID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
         let criteria = UpdateItemCriteria(item: givenItem, oldSortValue: givenItem.sortValue, on: eventLoop, in: table)
-        try updateUseCase.update(with: criteria).wait()
+        _ = try updateUseCase.update(with: criteria).wait()
 
         // When
         let featureGet = sut.getItem(
@@ -184,7 +184,7 @@ final class CharacterUseCaseTests: XCTestCase {
         let givenItem = CharacterFactory.make(comicsID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
         let criteria = UpdateItemCriteria(item: givenItem, oldSortValue: givenItem.sortValue, on: eventLoop, in: table)
-        try updateUseCase.update(with: criteria).wait()
+        _ = try updateUseCase.update(with: criteria).wait()
 
         // When
         let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)
@@ -209,14 +209,13 @@ final class CharacterUseCaseTests: XCTestCase {
         for comic in comicItems {
             items[comic.key] = comic.value
         }
-
         
         sut = CharacterUseCaseFactoryMock(items: items).makeUseCase()
         
         let givenItem = CharacterFactory.make(seriesID: ["1"], comicsID: ["1"])
         let updateUseCase = CharacterUpdateUseCaseFactoryMock().makeUseCase()
         let criteria = UpdateItemCriteria(item: givenItem, oldSortValue: givenItem.sortValue, on: eventLoop, in: table)
-        try updateUseCase.update(with: criteria).wait()
+        _ = try updateUseCase.update(with: criteria).wait()
 
         // When
         let featureGet = sut.getItem(on: eventLoop, withID: givenItem.id, fields: fields, from: table, logger: nil, dataSource: .database)

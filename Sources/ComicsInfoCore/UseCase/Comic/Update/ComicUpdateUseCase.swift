@@ -32,28 +32,32 @@ public final class ComicUpdateUseCase: UpdateUseCase, GetComicLinks, CreateComic
         self.comicUseCase = comicUseCase
     }
     
-    public func update(with criteria: UpdateItemCriteria<Comic>) -> EventLoopFuture<Void> {
+    public func update(with criteria: UpdateItemCriteria<Comic>) -> EventLoopFuture<Comic> {
         getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-            .flatMap { [weak self] (characters, series) -> EventLoopFuture<(Set<String>, [Character], [Series])> in
+            .flatMap { [weak self] (characters, series) -> EventLoopFuture<((old: Comic, new: Comic), [Character], [Series])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.updateItem(with: criteria)
                     .map { ($0, characters, series) }
             }
-            .flatMap { [weak self] fields, characters, series -> EventLoopFuture<([Character], [Series])> in
+            .flatMap { [weak self] comic, characters, series -> EventLoopFuture<(Comic, [Character], [Series])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createLinksSummaries(for: criteria.item, characters: characters, series: series, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-                    .and(self.updateSummaries(for: criteria.item, on: criteria.eventLoop, fields: fields, in: criteria.table, logger: criteria.logger))
-                    .map { _ in (characters, series) }
+                    .and(self.updateSummaries(with: criteria, oldItem: comic.old))
+                    .map {
+                        var comic = comic.new
+                        comic.characters = $0.0?.0
+                        comic.series = $0.0?.1
+                        return (comic, characters, series)
+                    }
             }
-            .flatMap { [weak self] characters, series in
+            .flatMap { [weak self] comic, characters, series in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.getCharacterSummariesForSeries(characters: characters, series: series, on: criteria.eventLoop, from: criteria.table, logger: criteria.logger)
                     .flatMap {
                         self.updateSummaries(between: characters, and: series, characterSummaries: $0, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
                     }
-                    .map { _ in }
+                    .map { _ in comic }
             }
-            .hop(to: criteria.eventLoop)
     }
     
     public func getItem(
@@ -77,39 +81,41 @@ public final class ComicUpdateUseCase: UpdateUseCase, GetComicLinks, CreateComic
 extension ComicUpdateUseCase {
     
     private func updateSummaries(
-        for item: Item,
-        on eventLoop: EventLoop,
-        fields: Set<String>,
-        limit: Int = .queryLimit,
-        in table: String,
-        logger: Logger?
-    ) -> EventLoopFuture<Bool> {
-        guard item.shouldUpdateExistingSummaries(fields) else { return eventLoop.submit { false } }
+        with criteria: UpdateItemCriteria<Comic>,
+        oldItem: Comic,
+        limit: Int = .queryLimit
+    ) -> EventLoopFuture<[ComicSummary]?> {
+        let fields = criteria.item.updatedFields(old: oldItem)
+        guard criteria.item.shouldUpdateExistingSummaries(fields) else { return criteria.eventLoop.submit { nil } }
         
-        let criteria = GetSummariesCriteria(
+        let getCriteria = GetSummariesCriteria(
             ComicSummary.self,
-            ID: item.id,
+            ID: criteria.item.id,
             dataSource: .database,
             limit: limit,
-            table: table,
+            table: criteria.table,
             strategy: .itemID,
-            logger: logger
+            logger: criteria.logger
         )
         
-        return comicUseCase.getSummaries(on: eventLoop, with: criteria)
-            .flatMap { [weak self] summaries -> EventLoopFuture<Bool> in
-                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                guard let summaries = summaries, !summaries.isEmpty else { return eventLoop.submit { false } }
+        return comicUseCase.getSummaries(on: criteria.eventLoop, with: getCriteria)
+            .flatMap { [weak self] summaries -> EventLoopFuture<[ComicSummary]?> in
+                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                guard let summaries = summaries, !summaries.isEmpty else { return criteria.eventLoop.submit { nil } }
 
                 var updatedSummaries = [ComicSummary]()
                 for var summary in summaries {
-                    summary.update(with: item)
+                    summary.update(with: criteria.item)
                     updatedSummaries.append(summary)
                 }
             
-                let criteria = UpdateSummariesCriteria(items: updatedSummaries, table: table, logger: logger)
+                let criteria = UpdateSummariesCriteria(
+                    items: updatedSummaries,
+                    table: criteria.table,
+                    logger: criteria.logger
+                )
                 return self.updateSummaries(with: criteria)
-                    .map { true }
+                    .map { $0 }
             }
     }
     

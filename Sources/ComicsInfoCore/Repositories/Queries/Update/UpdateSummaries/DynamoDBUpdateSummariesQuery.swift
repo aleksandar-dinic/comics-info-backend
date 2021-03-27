@@ -14,8 +14,8 @@ struct DynamoDBUpdateSummariesQuery<Summary: ItemSummary>: Loggable {
     let summaries: [Summary]
     let table: String
     
-    var inputs: [(DynamoDB.DeleteItemInput, DynamoDB.UpdateItemCodableInput<Summary>)] {
-        var inputs = [(DynamoDB.DeleteItemInput, DynamoDB.UpdateItemCodableInput<Summary>)]()
+    var inputs: [(DynamoDB.DeleteItemInput, DynamoDB.UpdateItemCodableInput<Summary>, Summary)] {
+        var inputs = [(DynamoDB.DeleteItemInput, DynamoDB.UpdateItemCodableInput<Summary>, Summary)]()
         
         for summary in summaries {
             let delete = DynamoDB.DeleteItemInput(
@@ -27,7 +27,7 @@ struct DynamoDBUpdateSummariesQuery<Summary: ItemSummary>: Loggable {
                 tableName: table,
                 updateItem: summary
             )
-            inputs.append((delete, update))
+            inputs.append((delete, update, summary))
         }
         return inputs
     }

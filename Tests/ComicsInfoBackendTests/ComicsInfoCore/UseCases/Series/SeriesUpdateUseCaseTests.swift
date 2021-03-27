@@ -33,14 +33,15 @@ final class SeriesUpdateUseCaseTests: XCTestCase, CreateCharacterProtocol, Creat
     func test_whenUpdateSeries_seriesIsUpdated() throws {
         // Given
         try createSeries(SeriesFactory.make(title: "Old Title"))
-        let item = SeriesFactory.make()
+        let item = SeriesFactory.make(title: "New Title")
         let criteria = UpdateItemCriteria(item: item, oldSortValue: item.sortValue, on: eventLoop, in: table)
 
         // When
         let feature = sut.update(with: criteria)
+        let series = try feature.wait()
 
         // Then
-        XCTAssertNoThrow(try feature.wait())
+        XCTAssertEqual(series.title, item.title)
     }
 
     func test_whenUpdateSeriesWithNotExistingCharacterID_throwsItemsNotFound() throws {

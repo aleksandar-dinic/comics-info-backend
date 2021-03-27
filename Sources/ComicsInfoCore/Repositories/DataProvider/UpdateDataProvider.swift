@@ -13,13 +13,13 @@ struct UpdateDataProvider {
 
     let itemUpdateDBWrapper: ItemUpdateDBWrapper
 
-    func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Set<String>> {
+    func update<Item: ComicInfoItem>(with criteria: UpdateItemCriteria<Item>) -> EventLoopFuture<Item> {
         itemUpdateDBWrapper.update(with: criteria)
     }
     
     func updateSummaries<Summary: ItemSummary>(
         with criteria: UpdateSummariesCriteria<Summary>
-    ) -> EventLoopFuture<Void> {
+    ) -> EventLoopFuture<[Summary]> {
         itemUpdateDBWrapper.updateSummaries(with: criteria)
     }
 
