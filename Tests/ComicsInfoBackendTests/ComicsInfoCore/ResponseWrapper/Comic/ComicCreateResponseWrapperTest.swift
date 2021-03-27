@@ -70,7 +70,7 @@ final class ComicCreateResponseWrapperTest: XCTestCase {
         XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.created.code)
     }
 
-    func test_whenHandleCreateSameItemTwice_statusIsForbidden() throws {
+    func test_whenHandleCreateSameItemTwice_statusIsConflict() throws {
         // Given
         let request = Request(body: ComicFactory.requestBody)
         var feature = sut.handleCreate(on: eventLoop, request: request, environment: environment, logger: logger)
@@ -81,7 +81,7 @@ final class ComicCreateResponseWrapperTest: XCTestCase {
         let response = try feature.wait()
 
         // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.forbidden.code)
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.conflict.code)
     }
 
 }

@@ -33,7 +33,7 @@ extension ComicInfoError {
             return .badRequest
             
         case .itemAlreadyExists:
-            return .forbidden
+            return .conflict
             
         case .itemNotFound:
             return .noContent
@@ -42,7 +42,7 @@ extension ComicInfoError {
             return .noContent
             
         case .summariesAlreadyExist:
-            return .forbidden
+            return .conflict
             
         case .invalidFields:
             return .badRequest
