@@ -35,7 +35,7 @@ public struct SeriesCreateResponseWrapper: CreateResponseWrapper {
             let item = try JSONDecoder().decode(Domain.Series.self, from: data)
             let criteria = CreateItemCriteria(item: Series(from: item), on: eventLoop, in: table, log: logger)
             return useCase.create(with: criteria)
-                .map { Response(with: $0, statusCode: .created) }
+                .map { Response(with: Domain.Series(from: $0), statusCode: .created) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {

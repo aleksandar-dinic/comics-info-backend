@@ -35,7 +35,7 @@ public struct CharacterReadResponseWrapper: ReadResponseWrapper {
         let table = String.tableName(for: environment)
         return characterUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table, logger: logger)
             .map { Response(with: Domain.Character(from: $0), statusCode: .ok) }
-            .flatMapErrorThrowing { self.catch($0) }
+            .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
     }
     
 }

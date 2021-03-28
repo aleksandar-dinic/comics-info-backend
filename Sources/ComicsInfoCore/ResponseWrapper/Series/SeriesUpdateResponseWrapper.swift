@@ -42,7 +42,7 @@ public struct SeriesUpdateResponseWrapper: GetQueryParameterLimit, UpdateRespons
                 log: logger
             )
             return seriesUseCase.update(with: criteria)
-                .map { Response(with: $0, statusCode: .ok) }
+                .map { Response(with: Domain.Series(from: $0), statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {

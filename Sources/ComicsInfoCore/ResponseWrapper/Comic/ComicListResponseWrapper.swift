@@ -35,7 +35,7 @@ public struct ComicListResponseWrapper: GetQueryParameterSeriesID, GetQueryParam
                 logger: logger
             )
                 .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }
-                .flatMapErrorThrowing { self.catch($0) }
+                .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
         } catch {
             guard let responseError = error as? ComicInfoError else {
                 let message = ResponseStatus(error.localizedDescription)

@@ -35,7 +35,7 @@ public struct SeriesReadResponseWrapper: ReadResponseWrapper {
         let table = String.tableName(for: environment)
         return seriesUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table, logger: logger)
             .map { Response(with: Domain.Series(from: $0), statusCode: .ok) }
-            .flatMapErrorThrowing { self.catch($0) }
+            .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
     }
     
 }

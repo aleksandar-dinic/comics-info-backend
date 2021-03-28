@@ -34,6 +34,19 @@ public final class ComicCreateUseCase: CreateUseCase, GetComicLinks, CreateComic
     
     public func create(with criteria: CreateItemCriteria<Comic>) -> EventLoopFuture<Comic> {
         getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
+            .flatMap { [weak self] (characters, series) -> EventLoopFuture<([Character], [Series])> in
+                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                return self.comicUseCase.getItem(on: criteria.eventLoop, withID: criteria.item.id, fields: nil, from: criteria.table, logger: criteria.logger)
+                    .flatMapThrowing { _ in
+                        throw ComicInfoError.itemAlreadyExists(withID: criteria.item.id, itemType: Comic.self)
+                    }
+                    .flatMapErrorThrowing {
+                        if case .itemNotFound = $0 as? ComicInfoError {
+                            return (characters, series)
+                        }
+                        throw $0
+                    }
+            }
             .flatMap { [weak self] (characters, series) -> EventLoopFuture<(Comic, [Character], [Series])> in
                 guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
                 return self.createRepository.create(with: criteria)

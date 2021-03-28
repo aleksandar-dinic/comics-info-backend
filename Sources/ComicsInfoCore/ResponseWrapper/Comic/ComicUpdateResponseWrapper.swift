@@ -42,7 +42,7 @@ public struct ComicUpdateResponseWrapper: GetQueryParameterLimit, UpdateResponse
                 log: logger
             )
             return comicUseCase.update(with: criteria)
-                .map { Response(with: $0, statusCode: .ok) }
+                .map { Response(with: Domain.Comic(from: $0), statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {
