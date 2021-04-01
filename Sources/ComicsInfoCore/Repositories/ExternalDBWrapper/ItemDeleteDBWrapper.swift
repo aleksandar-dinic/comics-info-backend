@@ -13,10 +13,12 @@ struct ItemDeleteDBWrapper: LoggerProvider {
     
     let itemDeleteDBService: ItemDeleteDBService
     
-    func delete<Item: ComicInfoItem>() -> EventLoopFuture<Item> {
+    func delete<Item: ComicInfoItem>(_ query: DeleteItemQuery<Item>) -> EventLoopFuture<Item> {
+        itemDeleteDBService.delete(query)
     }
 
-    func deleteSummaries<Summary: ItemSummary>() -> EventLoopFuture<[Summary]> {
+    func deleteSummaries<Summary: ItemSummary>(_ query: DeleteSummariesQuery<Summary>) -> EventLoopFuture<[Summary]> {
+        itemDeleteDBService.deleteSummaries(query)
     }
 
 }
