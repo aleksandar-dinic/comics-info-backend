@@ -12,7 +12,7 @@ import NIO
 
 public struct DatabaseFectory {
     
-    typealias DatabaseService = ItemGetDBService & ItemCreateDBService & ItemUpdateDBService
+    typealias DatabaseService = ItemGetDBService & ItemCreateDBService & ItemUpdateDBService & ItemDeleteDBService
 
     private let database: DatabaseService
 
