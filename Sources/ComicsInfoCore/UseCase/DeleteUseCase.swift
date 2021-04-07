@@ -15,4 +15,10 @@ public protocol DeleteUseCase {
 
     var deleteRepository: DeleteRepository { get }
     
+    func delete<Item: ComicInfoItem>(_ query: DeleteItemQuery<Item>) -> EventLoopFuture<Item>
+    
+    func deleteSummaries<Summary: ItemSummary>(
+        _ query: DeleteSummariesQuery<Summary>
+    ) -> EventLoopFuture<[Summary]>
+    
 }
