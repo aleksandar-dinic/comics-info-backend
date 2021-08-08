@@ -34,7 +34,10 @@ public final class CharacterInfo {
         case .update:
             Lambda.run { LambdaUpdateHandlerFactory.makeHandler($0) }
 
-        case .delete, .none:
+        case .delete:
+            Lambda.run { LambdaDeleteHandlerFactory.makeHandler($0) }
+            
+        case .none:
             throw ComicInfoError.handlerUnknown
         }
     }

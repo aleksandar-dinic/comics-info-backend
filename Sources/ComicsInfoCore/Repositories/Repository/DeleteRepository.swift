@@ -17,14 +17,14 @@ public final class DeleteRepository {
         self.dataProvider = dataProvider
     }
 
-    public func delete<Item: ComicInfoItem>(_ query: DeleteItemQuery<Item>) -> EventLoopFuture<Item> {
-        dataProvider.delete(query)
+    public func delete<Item: ComicInfoItem>(with criteria: DeleteItemCriteria<Item>) -> EventLoopFuture<Item> {
+        dataProvider.delete(with: criteria)
     }
     
     public func deleteSummaries<Summary: ItemSummary>(
-        _ query: DeleteSummariesQuery<Summary>
+        with criteria: DeleteSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]> {
-        dataProvider.deleteSummaries(query)
+        dataProvider.deleteSummaries(with: criteria)
     }
 
 }

@@ -23,5 +23,9 @@ public struct DeleteItemQuery<Item: ComicInfoItem>: LoggerProvider {
         }
         return log(logger, loggable: query)
     }
+    
+    var id: String {
+        item.itemID
+    }
             
 }

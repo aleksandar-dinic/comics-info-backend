@@ -12,13 +12,23 @@ import SotoDynamoDB
 extension DynamoDB: ItemDeleteDBService {
     
     func delete<Item: ComicInfoItem>(_ query: DeleteItemQuery<Item>) -> EventLoopFuture<Item> {
-        client.eventLoopGroup.next().submit { query.item }
+        deleteItem(query.dynamoDBQuery.input).map { _ in query.item }
     }
     
     func deleteSummaries<Summary: ItemSummary>(
         _ query: DeleteSummariesQuery<Summary>
     ) -> EventLoopFuture<[Summary]> {
-        client.eventLoopGroup.next().submit { query.summaries }
+        var futures = [EventLoopFuture<Summary>]()
+        
+        for input in query.dynamoDBQuery.inputs {
+            futures.append(deleteItem(input.0).map { _ in input.1 })
+        }
+
+        return EventLoopFuture.reduce([], futures, on: client.eventLoopGroup.next()) { (items, item) in
+            var items = items
+            items.append(item)
+            return items
+        }
     }
 
 }

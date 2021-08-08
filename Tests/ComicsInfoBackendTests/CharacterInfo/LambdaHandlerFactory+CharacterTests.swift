@@ -71,5 +71,15 @@ final class LambdaHandlerFactory_CharacterTests: XCTestCase, LambdaMockFactory {
         // Then
         XCTAssert(sut is UpdateLambdaHandler)
     }
+    
+    func test_whenMakeDeleteLambdaHandler_isDeleteLambdaHandler() throws {
+        // Given
+
+        // When
+        let sut = LambdaDeleteHandlerFactory.makeHandler(context)
+
+        // Then
+        XCTAssert(sut is DeleteLambdaHandler)
+    }
 
 }

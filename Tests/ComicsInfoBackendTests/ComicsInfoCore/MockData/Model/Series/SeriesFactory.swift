@@ -15,7 +15,7 @@ enum SeriesFactory {
         "{ \"identifier\": \"1\", \"title\": \"Series Title\", \"popularity\": 0 }"
     }
     
-    static func makeDatabaseItems() -> [String: Data] {
+    static func makeDatabaseItems(ID: String = "1") -> [String: Data] {
         let series = make()
         return [series.itemID: try! JSONEncoder().encode(series)]
     }

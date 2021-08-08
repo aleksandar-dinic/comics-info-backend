@@ -44,7 +44,6 @@ public extension GetUseCase {
             let criteria = GetItemCriteria(ID: ID, dataSource: dataSource, table: table, logger: logger)
             return repository.getItem(with: criteria)
                 .flatMap { appendSummaries(for: $0, on: eventLoop, fields: fields, table: table, logger: logger) }
-                .hop(to: eventLoop)
         } catch {
             return eventLoop.makeFailedFuture(error)
         }

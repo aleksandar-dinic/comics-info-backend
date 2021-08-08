@@ -12,13 +12,39 @@ import NIO
 extension MockDB: ItemDeleteDBService {
     
     func delete<Item: ComicInfoItem>(_ query: DeleteItemQuery<Item>) -> EventLoopFuture<Item> {
-        eventLoop.submit { query.item }
+        guard MockDB[query.id] != nil else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemNotFound(withID: query.item.itemID))
+        }
+
+        MockDB[query.id] = nil
+        return eventLoop.submit { query.item }
     }
     
     func deleteSummaries<Summary: ItemSummary>(
         _ query: DeleteSummariesQuery<Summary>
     ) -> EventLoopFuture<[Summary]> {
-        eventLoop.submit { query.summaries }
+        var ids = Set<String>()
+        var missingIDs = Set<String>()
+        
+        for summary in query.summaries {
+            let id = query.getID(for: summary)
+            
+            if MockDB[id] != nil {
+                ids.insert(id)
+            } else {
+                missingIDs.insert(id)
+            }
+        }
+        
+        guard missingIDs.isEmpty else {
+            return eventLoop.makeFailedFuture(DatabaseError.itemsNotFound(withIDs: missingIDs))
+        }
+        
+        for id in ids {
+            MockDB[id] = nil
+        }
+        
+        return eventLoop.submit { query.summaries }
     }
 
 }

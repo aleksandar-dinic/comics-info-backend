@@ -9,7 +9,7 @@
 import Foundation
 import NIO
 
-public struct CharacterUpdateUseCaseFactory: UpdateUseCaseFactory, CreateRepositoryBuilder , CharacterUseCaseBuilder, SeriesUseCaseBuilder, ComicUseCaseBuilder  {
+public struct CharacterUpdateUseCaseFactory: UpdateUseCaseFactory, CreateRepositoryBuilder, CharacterUseCaseBuilder, SeriesUseCaseBuilder, ComicUseCaseBuilder  {
 
     public let eventLoop: EventLoop
     public let isLocalServer: Bool

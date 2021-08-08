@@ -15,8 +15,8 @@ enum CharacterFactory {
         "{ \"identifier\": \"1\", \"name\": \"Character Name\", \"popularity\": 0 }"
     }
 
-    static func makeDatabaseItems() -> [String: Data] {
-        let character = make()
+    static func makeDatabaseItems(ID: String = "1") -> [String: Data] {
+        let character = make(ID: ID)
         return [character.itemID: try! JSONEncoder().encode(character)]
     }
     

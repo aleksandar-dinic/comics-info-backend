@@ -13,12 +13,14 @@ struct DeleteDataProvider {
 
     let itemDeleteDBWrapper: ItemDeleteDBWrapper
 
-    func delete<Item: ComicInfoItem>(_ query: DeleteItemQuery<Item>) -> EventLoopFuture<Item> {
-        itemDeleteDBWrapper.delete(query)
+    func delete<Item: ComicInfoItem>(with criteria: DeleteItemCriteria<Item>) -> EventLoopFuture<Item> {
+        itemDeleteDBWrapper.delete(with: criteria)
     }
     
-    func deleteSummaries<Summary: ItemSummary>(_ query: DeleteSummariesQuery<Summary>) -> EventLoopFuture<[Summary]> {
-        itemDeleteDBWrapper.deleteSummaries(query)
+    func deleteSummaries<Summary: ItemSummary>(
+        with criteria: DeleteSummariesCriteria<Summary>
+    ) -> EventLoopFuture<[Summary]> {
+        itemDeleteDBWrapper.deleteSummaries(with: criteria)
     }
 
 }
