@@ -10,16 +10,8 @@ let package = Package(
     ],
     products: [
         .executable(
-            name: "CharacterHandler",
-            targets: ["CharacterHandler"]
-        ),
-        .executable(
-            name: "ComicHandler",
-            targets: ["ComicHandler"]
-        ),
-        .executable(
-            name: "SeriesHandler",
-            targets: ["SeriesHandler"]
+            name: "ComicsInfoHandler",
+            targets: ["ComicsInfoHandler"]
         )
     ],
     dependencies: [
@@ -44,44 +36,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages
         // which this package depends on.
         .target(
-            name: "CharacterHandler",
-            dependencies: ["CharacterInfo", "ComicsInfoCore"]
+            name: "ComicsInfoHandler",
+            dependencies: ["ComicsInfoCore"]
         ),
-        .target(
-            name: "ComicHandler",
-            dependencies: ["ComicInfo", "ComicsInfoCore"]
-        ),
-        .target(
-            name: "SeriesHandler",
-            dependencies: ["SeriesInfo", "ComicsInfoCore"]
-        ),
-        .target(
-            name: "CharacterInfo",
-            dependencies: [
-                .target(name: "ComicsInfoCore"),
-                .product(name: "Domain", package: "Domain"),
-                .product(name: "SotoDynamoDB", package: "soto"),
-                .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime"),
-                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
-            ]),
-        .target(
-            name: "ComicInfo",
-            dependencies: [
-                .target(name: "ComicsInfoCore"),
-                .product(name: "Domain", package: "Domain"),
-                .product(name: "SotoDynamoDB", package: "soto"),
-                .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime"),
-                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
-            ]),
-        .target(
-            name: "SeriesInfo",
-            dependencies: [
-                .target(name: "ComicsInfoCore"),
-                .product(name: "Domain", package: "Domain"),
-                .product(name: "SotoDynamoDB", package: "soto"),
-                .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime"),
-                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
-            ]),
         .target(
             name: "ComicsInfoCore",
             dependencies: [
@@ -92,7 +49,7 @@ let package = Package(
             ]),
         .testTarget(
             name: "ComicsInfoBackendTests",
-            dependencies: ["CharacterInfo", "ComicsInfoCore"]
+            dependencies: ["ComicsInfoCore"]
         )
     ]
 )

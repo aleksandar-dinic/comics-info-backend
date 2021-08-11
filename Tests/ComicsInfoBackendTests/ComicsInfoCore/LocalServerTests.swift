@@ -6,7 +6,6 @@
 //  Copyright © 2020 Aleksandar Dinic. All rights reserved.
 //
 
-@testable import CharacterInfo
 @testable import ComicsInfoCore
 import XCTest
 

@@ -15,7 +15,7 @@ extension APIGateway.V2.Response {
         self.init(
             statusCode: AWSLambdaEvents.HTTPResponseStatus(code: response.statusCode.code),
             headers: response.headers,
-            multiValueHeaders: response.multiValueHeaders,
+//            multiValueHeaders: response.multiValueHeaders,
             body: response.body,
             isBase64Encoded: response.isBase64Encoded,
             cookies: response.cookies

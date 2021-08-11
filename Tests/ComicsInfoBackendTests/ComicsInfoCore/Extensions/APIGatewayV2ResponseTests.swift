@@ -40,9 +40,9 @@ final class APIGatewayV2ResponseTests: XCTestCase {
         XCTAssertEqual(apiGatewayV2Response.headers, response.headers)
     }
 
-    func testAPIGatewayV2Response_whenInitFromResponse_multiValueHeadersIsEqual() {
-        XCTAssertEqual(apiGatewayV2Response.multiValueHeaders, response.multiValueHeaders)
-    }
+//    func testAPIGatewayV2Response_whenInitFromResponse_multiValueHeadersIsEqual() {
+//        XCTAssertEqual(apiGatewayV2Response.multiValueHeaders, response.multiValueHeaders)
+//    }
 
     func testAPIGatewayV2Response_whenInitFromResponse_bodyIsEqual() {
         XCTAssertEqual(apiGatewayV2Response.body, response.body)
