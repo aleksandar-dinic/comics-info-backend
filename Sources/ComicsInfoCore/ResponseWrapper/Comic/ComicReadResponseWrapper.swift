@@ -11,7 +11,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct ComicReadResponseWrapper: GetPathParameterID, ReadResponseWrapper {
+public struct ComicReadResponseWrapper: GetPathParameterID, GetQueryParameterSeriesID, GetQueryParameterAfterID, GetQueryParameterLimit, ReadResponseWrapper {
 
     private let comicUseCase: ComicUseCase
 
@@ -25,15 +25,39 @@ public struct ComicReadResponseWrapper: GetPathParameterID, ReadResponseWrapper 
         environment: String?,
         logger: Logger?
     ) -> EventLoopFuture<Response> {
+        guard let id = try? getID(from: request.pathParameters) else {
+            return handleList(
+                on: eventLoop,
+                request: request,
+                environment: environment,
+                logger: logger
+            )
+        }
+        let fields = getFields(from: request.queryParameters)
+            
+        let table = String.tableName(for: environment)
+        return comicUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table, logger: logger)
+            .map { Response(with: Domain.Comic(from: $0), statusCode: .ok) }
+            .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
+    }
+    
+    private func handleList(
+        on eventLoop: EventLoop,
+        request: Request,
+        environment: String?,
+        logger: Logger?
+    ) -> EventLoopFuture<Response> {
         do {
-            let id = try getID(from: request.pathParameters)
-            let fields = getFields(from: request.queryParameters)
-            
-            let table = String.tableName(for: environment)
-            return comicUseCase.getItem(on: eventLoop, withID: id, fields: fields, from: table, logger: logger)
-                .map { Response(with: Domain.Comic(from: $0), statusCode: .ok) }
+            return comicUseCase.getAllItems(
+                on: eventLoop,
+                afterID: getAfterID(from: request.queryParameters),
+                fields: getFields(from: request.queryParameters),
+                limit: try getLimit(from: request.queryParameters),
+                from: String.tableName(for: environment),
+                logger: logger
+            )
+                .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
-            
         } catch {
             guard let responseError = error as? ComicInfoError else {
                 let message = ResponseStatus(error.localizedDescription)

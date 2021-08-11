@@ -32,30 +32,6 @@ final class SeriesReadResponseWrapperTests: XCTestCase {
         environment = nil
     }
 
-    func test_whenHandleReadWithoutPathParameters_statusIsBadRequest() throws {
-        // Given
-        let request = Request()
-
-        // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
-        let response = try feature.wait()
-
-        // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
-    }
-
-    func test_whenHandleReadWithInvalidPathParameters_statusIsBadRequest() throws {
-        // Given
-        let request = Request(pathParameters: ["invalidID": "-1"])
-
-        // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
-        let response = try feature.wait()
-
-        // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
-    }
-
     func test_whenHandleReadWithoutItems_statusIsNoContent() throws {
         // Given
         let request = Request(pathParameters: ["id": "1"])
@@ -69,7 +45,7 @@ final class SeriesReadResponseWrapperTests: XCTestCase {
     }
 
 
-    func test_whenHandleList_statusIsOk() throws {
+    func test_whenHandleRead_statusIsOk() throws {
         // Given
         try createSeries(SeriesFactory.make())
         let request = Request(pathParameters: ["id": "1"])
@@ -214,4 +190,34 @@ extension SeriesReadResponseWrapperTests: CreateCharacterProtocol, CreateSeriesP
         XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
     }
 
+}
+
+// List
+
+extension SeriesReadResponseWrapperTests {
+    
+    func test_whenHandleListWithoutItems_statusIsNoContent() throws {
+        // Given
+
+        // When
+        let feature = sut.handleRead(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let response = try feature.wait()
+
+        // Then
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
+    }
+
+    func test_whenHandleList_statusIsOk() throws {
+        // Given
+        try createSeries(SeriesFactory.make())
+
+        // When
+        let feature = sut.handleRead(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let response = try feature.wait()
+
+        // Then
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.ok.code)
+    }
+
+    
 }

@@ -13,6 +13,5 @@ public enum CRUDOperation: String {
     case read
     case update
     case delete
-    case list
     
 }

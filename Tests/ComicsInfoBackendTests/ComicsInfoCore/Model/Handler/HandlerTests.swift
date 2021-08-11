@@ -64,17 +64,6 @@ final class HandlerTests: XCTestCase {
         XCTAssertEqual(handler, Handler.character(operation: .read))
     }
     
-    func testCharacterList_whenInitHandler_isEqualToCharacterList() throws {
-        // Given
-        let handlerString = "character.list"
-        
-        // When
-        let handler = Handler(for: handlerString)
-        
-        // Then
-        XCTAssertEqual(handler, Handler.character(operation: .list))
-    }
-    
     func testCharacterUpdate_whenInitHandler_isEqualToCharacterUpdate() throws {
         // Given
         let handlerString = "character.update"
@@ -121,17 +110,6 @@ final class HandlerTests: XCTestCase {
         XCTAssertEqual(handler, Handler.series(operation: .read))
     }
     
-    func testSeriesList_whenInitHandler_isEqualToSeriesList() throws {
-        // Given
-        let handlerString = "series.list"
-        
-        // When
-        let handler = Handler(for: handlerString)
-        
-        // Then
-        XCTAssertEqual(handler, Handler.series(operation: .list))
-    }
-    
     func testSeriesUpdate_whenInitHandler_isEqualToSeriesUpdate() throws {
         // Given
         let handlerString = "series.update"
@@ -176,17 +154,6 @@ final class HandlerTests: XCTestCase {
         
         // Then
         XCTAssertEqual(handler, Handler.comic(operation: .read))
-    }
-    
-    func testComicList_whenInitHandler_isEqualToComicList() throws {
-        // Given
-        let handlerString = "comic.list"
-        
-        // When
-        let handler = Handler(for: handlerString)
-        
-        // Then
-        XCTAssertEqual(handler, Handler.comic(operation: .list))
     }
     
     func testComicUpdate_whenInitHandler_isEqualToComicUpdate() throws {

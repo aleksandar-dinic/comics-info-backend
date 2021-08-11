@@ -21,7 +21,7 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
         _ = LocalServer(enabled: true)
         MockDB.removeAll()
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        let useCase = CharacterUseCaseFactoryMock(on: eventLoop).makeUseCase()
+        let useCase = CharacterUseCaseFactoryMock(items: [:], on: eventLoop).makeUseCase()
         sut = CharacterReadResponseWrapper(characterUseCase: useCase)
         environment = "TEST"
     }
@@ -30,30 +30,6 @@ final class CharacterReadResponseWrapperTests: XCTestCase {
         eventLoop = nil
         sut = nil
         environment = nil
-    }
-
-    func test_whenHandleReadWithoutPathParameters_statusIsBadRequest() throws {
-        // Given
-        let request = Request()
-
-        // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
-        let response = try feature.wait()
-
-        // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
-    }
-
-    func test_whenHandleReadWithInvalidPathParameters_statusIsBadRequest() throws {
-        // Given
-        let request = Request(pathParameters: ["invalidID": "-1"])
-
-        // When
-        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
-        let response = try feature.wait()
-
-        // Then
-        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
     }
 
     func test_whenHandleReadWithoutItems_statusIsNoContent() throws {
@@ -213,6 +189,35 @@ extension CharacterReadResponseWrapperTests: CreateCharacterProtocol, CreateSeri
         
         // Then
         XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.badRequest.code)
+    }
+
+}
+
+// List
+
+extension CharacterReadResponseWrapperTests {
+    
+    func test_whenHandleListWithoutItems_statusIsNoContent() throws {
+        // Given
+
+        // When
+        let feature = sut.handleRead(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let response = try feature.wait()
+
+        // Then
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.noContent.code)
+    }
+
+    func test_whenHandleList_statusIsOk() throws {
+        // Given
+        try createCharacter(CharacterFactory.make())
+
+        // When
+        let feature = sut.handleRead(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let response = try feature.wait()
+
+        // Then
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.ok.code)
     }
 
 }

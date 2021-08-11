@@ -45,9 +45,6 @@ public final class ComicsInfo {
         case .read:
             Lambda.run { ReadLambdaHandlerFactory.makeCharacterReadLambdaHandler($0) }
 
-        case .list:
-            Lambda.run { ReadLambdaHandlerFactory.makeCharacterListLambdaHandler($0) }
-
         case .update:
             Lambda.run { UpdateLambdaHandlerFactory.makeCharacterHandler($0) }
 
@@ -64,9 +61,6 @@ public final class ComicsInfo {
         case .read:
             Lambda.run { ReadLambdaHandlerFactory.makeSeriesReadLambdaHandler($0) }
 
-        case .list:
-            Lambda.run { ReadLambdaHandlerFactory.makeSeriesListLambdaHandler($0) }
-
         case .update:
             Lambda.run { UpdateLambdaHandlerFactory.makeSeriesHandler($0) }
 
@@ -82,9 +76,6 @@ public final class ComicsInfo {
             
         case .read:
             Lambda.run { ReadLambdaHandlerFactory.makeComicReadLambdaHandler($0) }
-
-        case .list:
-            Lambda.run { ReadLambdaHandlerFactory.makeComicListLambdaHandler($0) }
 
         case .update:
             Lambda.run { UpdateLambdaHandlerFactory.makeComicHandler($0) }

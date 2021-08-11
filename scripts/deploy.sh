@@ -32,10 +32,82 @@ echo "-------------------------------------------------------------------------"
 echo "updating AWS Lambda to use \"$executable\""
 echo "-------------------------------------------------------------------------"
 
-read -p "Lambda Function name (must exist in AWS Lambda): " lambda_name
-lambda_name=${lambda_name:-SwiftSample} # default for easy testing
+#read -p "Lambda Function name (must exist in AWS Lambda): " lambda_name
+
+# ci-character
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-character-create}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+    
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-character-read}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+        
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-character-list}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
 
 aws lambda update-function-code \
-    --function "$lambda_name" \
+    --function "${lambda_name:-ci-character-update}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-character-delete}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+    
+# ci-series
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-series-create}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+    
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-series-read}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+        
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-series-list}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-series-update}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-series-delete}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+# ci-comic
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-comic-create}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+    
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-comic-read}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+        
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-comic-list}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-comic-update}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-comic-delete}" \
     --s3-bucket "$s3_bucket" \
     --s3-key lambda.zip

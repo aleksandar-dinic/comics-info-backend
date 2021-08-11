@@ -21,13 +21,6 @@ enum ReadLambdaHandlerFactory {
         return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
     }
 
-    static func makeCharacterListLambdaHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeCharacterUseCaseFactory(on: context.eventLoop)
-        let listResponseWrapper = CharacterListResponseWrapper(characterUseCase: useCaseFactory.makeUseCase())
-
-        return ListLambdaHandler(context, listResponseWrapper: listResponseWrapper)
-    }
-
     private static func makeCharacterUseCaseFactory(on eventLoop: EventLoop) -> CharacterUseCaseFactory {
         CharacterUseCaseFactory(
             on: eventLoop,
@@ -45,13 +38,6 @@ enum ReadLambdaHandlerFactory {
         return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
     }
 
-    static func makeComicListLambdaHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeComicUseCaseFactory(on: context.eventLoop)
-        let listResponseWrapper = ComicListResponseWrapper(comicUseCase: useCaseFactory.makeUseCase())
-
-        return ListLambdaHandler(context, listResponseWrapper: listResponseWrapper)
-    }
-
     private static func makeComicUseCaseFactory(on eventLoop: EventLoop) -> ComicUseCaseFactory {
         ComicUseCaseFactory(
             on: eventLoop,
@@ -67,13 +53,6 @@ enum ReadLambdaHandlerFactory {
         let readResponseWrapper = SeriesReadResponseWrapper(seriesUseCase: seriesUseCaseFactory.makeUseCase())
 
         return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
-    }
-
-    static func makeSeriesListLambdaHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let seriesUseCaseFactory = makeSeriesUseCaseFactory(on: context.eventLoop)
-        let listResponseWrapper = SeriesListResponseWrapper(seriesUseCase: seriesUseCaseFactory.makeUseCase())
-
-        return ListLambdaHandler(context, listResponseWrapper: listResponseWrapper)
     }
 
     private static func makeSeriesUseCaseFactory(on eventLoop: EventLoop) -> SeriesUseCaseFactory {

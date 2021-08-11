@@ -21,6 +21,7 @@ final class ReadLambdaHandlerTests: XCTestCase, LambdaMockFactory {
         _ = LocalServer(enabled: true)
         eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
         logger = Logger(label: self.className)
+        MockDB.removeAll()
     }
 
     override func tearDownWithError() throws {
@@ -29,7 +30,7 @@ final class ReadLambdaHandlerTests: XCTestCase, LambdaMockFactory {
         logger = nil
     }
 
-    func test_whenHandle_responseStatusIsOk() throws {
+    func test_whenHandleRead_responseStatusIsOk() throws {
         // Given
         request = Request(pathParameters: ["id": "1"])
         let useCase = CharacterUseCaseFactoryMock(
@@ -44,6 +45,28 @@ final class ReadLambdaHandlerTests: XCTestCase, LambdaMockFactory {
 
         // When
         let responseFuture = sut.handle(context: makeLambdaContext(logger: logger, on: eventLoop), event: request)
+
+        // Then
+        let response = try responseFuture.wait()
+        XCTAssertEqual(response.statusCode.code, ComicsInfoCore.HTTPResponseStatus.ok.code)
+    }
+    
+    func test_whenHandleList_responseStatusIsOK() throws {
+        // Given
+        request = Request()
+        let items = CharacterFactory.makeDatabaseItems()
+        let useCase = CharacterUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
+        let readResponseWrapper = CharacterReadResponseWrapper(characterUseCase: useCase)
+        let sut = ReadLambdaHandler(
+            makeLambdaInitializationContext(logger: logger, on: eventLoop),
+            readResponseWrapper: readResponseWrapper
+        )
+
+        // When
+        let responseFuture = sut.handle(
+            context: makeLambdaContext(logger: logger, on: eventLoop),
+            event: request
+        )
 
         // Then
         let response = try responseFuture.wait()
