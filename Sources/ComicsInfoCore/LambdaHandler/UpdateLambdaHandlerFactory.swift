@@ -15,7 +15,10 @@ enum UpdateLambdaHandlerFactory {
     // Character
 
     static func makeCharacterHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeCharacterUpdateUseCaseFactory(on: context.eventLoop)
+        let useCaseFactory = CharacterUpdateUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled
+        )
         let updateResponseWrapper = CharacterUpdateResponseWrapper(
             characterUseCase: useCaseFactory.makeUseCase()
         )
@@ -23,37 +26,28 @@ enum UpdateLambdaHandlerFactory {
         return UpdateLambdaHandler(context, updateResponseWrapper: updateResponseWrapper)
     }
 
-    private static func makeCharacterUpdateUseCaseFactory(on eventLoop: EventLoop) -> CharacterUpdateUseCaseFactory {
-        CharacterUpdateUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled
-        )
-    }
-    
     // Comic
     
     static func makeComicHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeComicUseCaseFactory(on: context.eventLoop)
+        let useCaseFactory = ComicUpdateUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled
+        )
         let updateResponseWrapper = ComicUpdateResponseWrapper(comicUseCase: useCaseFactory.makeUseCase())
 
         return UpdateLambdaHandler(context, updateResponseWrapper: updateResponseWrapper)
     }
 
-    private static func makeComicUseCaseFactory(on eventLoop: EventLoop) -> ComicUpdateUseCaseFactory {
-        ComicUpdateUseCaseFactory(on: eventLoop, isLocalServer: LocalServer.isEnabled)
-    }
-    
     // Series
     
     static func makeSeriesHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeSeriesUseCaseFactory(on: context.eventLoop)
+        let useCaseFactory = SeriesUpdateUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled
+        )
         let updateResponseWrapper = SeriesUpdateResponseWrapper(seriesUseCase: useCaseFactory.makeUseCase())
 
         return UpdateLambdaHandler(context, updateResponseWrapper: updateResponseWrapper)
-    }
-
-    private static func makeSeriesUseCaseFactory(on eventLoop: EventLoop) -> SeriesUpdateUseCaseFactory {
-        SeriesUpdateUseCaseFactory(on: eventLoop, isLocalServer: LocalServer.isEnabled)
     }
 
 }

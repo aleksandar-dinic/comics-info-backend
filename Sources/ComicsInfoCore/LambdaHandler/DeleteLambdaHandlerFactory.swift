@@ -15,7 +15,10 @@ enum DeleteLambdaHandlerFactory {
     // Character
 
     static func makeCharacterHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeCharacterDeleteUseCaseFactory(on: context.eventLoop)
+        let useCaseFactory = CharacterDeleteUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled
+        )
         let deleteResponseWrapper = CharacterDeleteResponseWrapper(
             useCase: useCaseFactory.makeUseCase()
         )
@@ -23,17 +26,13 @@ enum DeleteLambdaHandlerFactory {
         return DeleteLambdaHandler(context, deleteResponseWrapper: deleteResponseWrapper)
     }
 
-    private static func makeCharacterDeleteUseCaseFactory(on eventLoop: EventLoop) -> CharacterDeleteUseCaseFactory {
-        CharacterDeleteUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled
-        )
-    }
-    
     // Comic
     
     static func makeComicHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeComicDeleteUseCaseFactory(on: context.eventLoop)
+        let useCaseFactory = ComicDeleteUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled
+        )
         let deleteResponseWrapper = ComicDeleteResponseWrapper(
             useCase: useCaseFactory.makeUseCase()
         )
@@ -41,17 +40,13 @@ enum DeleteLambdaHandlerFactory {
         return DeleteLambdaHandler(context, deleteResponseWrapper: deleteResponseWrapper)
     }
 
-    private static func makeComicDeleteUseCaseFactory(on eventLoop: EventLoop) -> ComicDeleteUseCaseFactory {
-        ComicDeleteUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled
-        )
-    }
-
     // Series
     
     static func makeSeriesHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeSeriesDeleteUseCaseFactory(on: context.eventLoop)
+        let useCaseFactory = SeriesDeleteUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled
+        )
         let deleteResponseWrapper = SeriesDeleteResponseWrapper(
             useCase: useCaseFactory.makeUseCase()
         )
@@ -59,11 +54,4 @@ enum DeleteLambdaHandlerFactory {
         return DeleteLambdaHandler(context, deleteResponseWrapper: deleteResponseWrapper)
     }
 
-    private static func makeSeriesDeleteUseCaseFactory(on eventLoop: EventLoop) -> SeriesDeleteUseCaseFactory {
-        SeriesDeleteUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled
-        )
-    }
-    
 }

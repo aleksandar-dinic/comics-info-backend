@@ -15,53 +15,44 @@ enum ReadLambdaHandlerFactory {
     // Character
 
     static func makeCharacterReadLambdaHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeCharacterUseCaseFactory(on: context.eventLoop)
-        let readResponseWrapper = CharacterReadResponseWrapper(characterUseCase: useCaseFactory.makeUseCase())
+        let useCaseFactory = CharacterUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled,
+            cacheProvider: ComicsInfo.characterInMemoryCache
+        )
+        let readResponseWrapper = CharacterReadResponseWrapper(
+            characterUseCase: useCaseFactory.makeUseCase()
+        )
 
         return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
     }
 
-    private static func makeCharacterUseCaseFactory(on eventLoop: EventLoop) -> CharacterUseCaseFactory {
-        CharacterUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: ComicsInfo.characterInMemoryCache
-        )
-    }
-    
     // Comic
     
     static func makeComicReadLambdaHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let useCaseFactory = makeComicUseCaseFactory(on: context.eventLoop)
+        let useCaseFactory = ComicUseCaseFactory(
+            on: context.eventLoop,
+            isLocalServer: LocalServer.isEnabled,
+            cacheProvider: ComicsInfo.comicInMemoryCache
+        )
         let readResponseWrapper = ComicReadResponseWrapper(comicUseCase: useCaseFactory.makeUseCase())
 
         return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
     }
 
-    private static func makeComicUseCaseFactory(on eventLoop: EventLoop) -> ComicUseCaseFactory {
-        ComicUseCaseFactory(
-            on: eventLoop,
-            isLocalServer: LocalServer.isEnabled,
-            cacheProvider: ComicsInfo.comicInMemoryCache
-        )
-    }
-    
     // Series
     
     static func makeSeriesReadLambdaHandler(_ context: Lambda.InitializationContext) -> Lambda.Handler {
-        let seriesUseCaseFactory = makeSeriesUseCaseFactory(on: context.eventLoop)
-        let readResponseWrapper = SeriesReadResponseWrapper(seriesUseCase: seriesUseCaseFactory.makeUseCase())
-
-        return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
-    }
-
-    private static func makeSeriesUseCaseFactory(on eventLoop: EventLoop) -> SeriesUseCaseFactory {
-        SeriesUseCaseFactory(
-            on: eventLoop,
+        let seriesUseCaseFactory = SeriesUseCaseFactory(
+            on: context.eventLoop,
             isLocalServer: LocalServer.isEnabled,
             cacheProvider: ComicsInfo.seriesInMemoryCache
         )
-    }
+        let readResponseWrapper = SeriesReadResponseWrapper(
+            seriesUseCase: seriesUseCaseFactory.makeUseCase()
+        )
 
+        return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
+    }
 
 }

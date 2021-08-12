@@ -12,9 +12,7 @@ public struct Response: Codable {
 
     public static let defaultHeaders = [
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
-        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE"
     ]
 
     public let statusCode: HTTPResponseStatus
