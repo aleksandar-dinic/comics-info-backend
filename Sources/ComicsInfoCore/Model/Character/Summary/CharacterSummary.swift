@@ -8,21 +8,21 @@
 
 import Foundation
 
-struct CharacterSummary: ItemSummary {
+public struct CharacterSummary: ItemSummary {
     
-    let itemID: String
-    private(set) var sortValue: String
-    let summaryID: String
-    let itemType: String
+    public let itemID: String
+    public private(set) var sortValue: String
+    public let summaryID: String
+    public let itemType: String
     
-    let dateAdded: Date
-    private(set) var dateLastUpdated: Date
-    private(set) var popularity: Int
-    private(set) var name: String
-    private(set) var thumbnail: String?
-    private(set) var description: String?
-    private(set) var count: Int?
-    private(set) var oldSortValue: String?
+    public let dateAdded: Date
+    public private(set) var dateLastUpdated: Date
+    public private(set) var popularity: Int
+    public private(set) var name: String
+    public private(set) var thumbnail: String?
+    public private(set) var description: String?
+    public private(set) var count: Int?
+    public private(set) var oldSortValue: String?
     
     init<Link: Identifiable>(
         ID: String,

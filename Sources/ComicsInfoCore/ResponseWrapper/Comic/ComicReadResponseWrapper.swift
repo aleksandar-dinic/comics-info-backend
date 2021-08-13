@@ -7,6 +7,7 @@
 //
 
 import struct Domain.Comic
+import struct Domain.ItemSummary
 import struct Logging.Logger
 import Foundation
 import NIO
@@ -48,15 +49,16 @@ public struct ComicReadResponseWrapper: GetPathParameterID, GetQueryParameterSer
         logger: Logger?
     ) -> EventLoopFuture<Response> {
         do {
-            return comicUseCase.getAllItems(
+            let seriesID = try getSeriesSummaryID(from: request.queryParameters)
+            return comicUseCase.getAllSummaries(
                 on: eventLoop,
+                summaryID: seriesID,
                 afterID: getAfterID(from: request.queryParameters),
-                fields: getFields(from: request.queryParameters),
                 limit: try getLimit(from: request.queryParameters),
                 from: String.tableName(for: environment),
                 logger: logger
             )
-                .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }
+                .map { Response(with: $0.map { Domain.ItemSummary(from: $0) }, statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
         } catch {
             guard let responseError = error as? ComicInfoError else {
@@ -68,5 +70,33 @@ public struct ComicReadResponseWrapper: GetPathParameterID, GetQueryParameterSer
             return eventLoop.submit { Response(with: message, statusCode: responseError.responseStatus) }
         }
     }
+    
+//    private func handleList(
+//        on eventLoop: EventLoop,
+//        request: Request,
+//        environment: String?,
+//        logger: Logger?
+//    ) -> EventLoopFuture<Response> {
+//        do {
+//            return comicUseCase.getAllItems(
+//                on: eventLoop,
+//                afterID: getAfterID(from: request.queryParameters),
+//                fields: getFields(from: request.queryParameters),
+//                limit: try getLimit(from: request.queryParameters),
+//                from: String.tableName(for: environment),
+//                logger: logger
+//            )
+//                .map { Response(with: $0.map { Domain.Comic(from: $0) }, statusCode: .ok) }
+//                .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
+//        } catch {
+//            guard let responseError = error as? ComicInfoError else {
+//                let message = ResponseStatus(error.localizedDescription)
+//                return eventLoop.submit { Response(with: message, statusCode: .badRequest) }
+//            }
+//
+//            let message = ResponseStatus(for: responseError)
+//            return eventLoop.submit { Response(with: message, statusCode: responseError.responseStatus) }
+//        }
+//    }
     
 }

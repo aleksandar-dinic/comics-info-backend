@@ -42,4 +42,22 @@ public struct GetSummariesCriteria<Summary: ItemSummary> {
         self.logger = logger
     }
     
+    init(
+        _ summaryType: Summary.Type,
+        summaryID: String,
+        dataSource: DataSourceLayer,
+        limit: Int,
+        table: String,
+        strategy: GetSummariesStrategy,
+        logger: Logger? = nil
+    ) {
+        itemType = .getType(from: Summary.self)
+        ID = summaryID
+        self.dataSource = dataSource
+        self.limit = limit
+        self.table = table
+        self.strategy = strategy
+        self.logger = logger
+    }
+    
 }

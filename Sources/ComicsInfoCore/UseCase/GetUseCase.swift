@@ -13,6 +13,7 @@ import NIO
 public protocol GetUseCase {
 
     associatedtype CacheService: Cacheable
+    associatedtype Summary: ItemSummary
 
     typealias Item = CacheService.Item
 
@@ -58,7 +59,6 @@ public extension GetUseCase {
     ) -> EventLoopFuture<[Item]> {
         let criteria = GetItemsCriteria(IDs: IDs, dataSource: dataSource, table: table, logger: logger)
         return repository.getItems(with: criteria)
-            .hop(to: eventLoop)
     }
     
     func getAllItems(
@@ -93,6 +93,48 @@ public extension GetUseCase {
         } catch {
             return eventLoop.makeFailedFuture(error)
         }
+    }
+    
+    func getAllSummaries(
+        on eventLoop: EventLoop,
+        summaryID: String,
+        afterID: String?,
+        limit: Int,
+        from table: String,
+        logger: Logger?,
+        dataSource: DataSourceLayer = .memory
+    ) -> EventLoopFuture<[Summary]> {
+        let criteria = GetSummariesCriteria<Summary>(
+//                afterID: afterID,
+            Summary.self,
+            summaryID: summaryID,
+            dataSource: dataSource,
+            limit: limit,
+            table: table,
+            strategy: .summaryID
+        )
+        
+        guard let afterID = afterID else {
+            return repository.getSummaries(with: criteria).flatMapThrowing {
+                guard let summaries = $0 else {
+                    throw ComicInfoError.itemNotFound(withID: summaryID, itemType: Summary.self)
+                }
+                
+                return summaries
+            }
+        }
+        
+        return getItem(on: eventLoop, withID: afterID, fields: nil, from: table, logger: logger)
+            .flatMap { _ in
+//                    criteria.sortValue = $0.sortValue
+                return repository.getSummaries(with: criteria).flatMapThrowing {
+                    guard let summaries = $0 else {
+                        throw ComicInfoError.itemNotFound(withID: summaryID, itemType: Summary.self)
+                    }
+                    
+                    return summaries
+                }
+            }
     }
     
     private func getAll(
@@ -142,7 +184,6 @@ public extension GetUseCase {
         with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
         repository.getSummaries(with: criteria)
-            .hop(to: eventLoop)
     }
     
     func getSummary<Summary: ItemSummary>(
@@ -150,7 +191,6 @@ public extension GetUseCase {
         with criteria: GetSummaryCriteria
     ) -> EventLoopFuture<[Summary]?> {
         repository.getSummary(with: criteria)
-            .hop(to: eventLoop)
     }
 
 }

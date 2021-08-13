@@ -11,6 +11,8 @@ import Foundation
 import NIO
 
 public final class CharacterUseCase: GetUseCase {
+    
+    public typealias Summary = CharacterSummary
 
     public let repository: GetRepository<Character, InMemoryCacheProvider<Character>>
     public var availableFields: Set<String> {

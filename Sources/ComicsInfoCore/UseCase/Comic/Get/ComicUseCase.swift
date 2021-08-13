@@ -12,6 +12,8 @@ import NIO
 
 public final class ComicUseCase: GetUseCase {
     
+    public typealias Summary = ComicSummary
+    
     public let repository: GetRepository<Comic, InMemoryCacheProvider<Comic>>
     public var availableFields: Set<String> {
         ["characters", "series"]
