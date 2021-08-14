@@ -9,17 +9,29 @@
 import struct Logging.Logger
 import Foundation
 
-public struct GetSummariesQuery: LoggerProvider {
+public struct GetSummariesQuery<Summary: ItemSummary>: LoggerProvider {
     
     let itemType: String
     let ID: String
+    let afterID: String?
+    let sortValue: String?
     let limit: Int
     let table: String
     let strategy: GetSummariesStrategy
     let logger: Logger?
     
+    var initialValue: [Summary]
+    
     var dynamoDBQuery: DynamoDBGetSummariesQuery {
-        let query = DynamoDBGetSummariesQuery(itemType: itemType, ID: ID, limit: limit, table: table, strategy: strategy)
+        let query = DynamoDBGetSummariesQuery(
+            itemType: itemType,
+            ID: ID,
+            afterID: getAfterID(),
+            sortValue: getSortValue(),
+            limit: getLimit(),
+            table: table,
+            strategy: strategy
+        )
         
         guard let logger = logger else {
             return query
@@ -34,6 +46,24 @@ public struct GetSummariesQuery: LoggerProvider {
         case .summaryID:
             return key.hasSuffix(ID)
         }
+    }
+    
+    private func getAfterID() -> String? {
+        guard let last = initialValue.last else {
+            return afterID
+        }
+        return last.itemID
+    }
+    
+    private func getSortValue() -> String? {
+        guard let last = initialValue.last else {
+            return sortValue
+        }
+        return last.sortValue
+    }
+    
+    private func getLimit() -> Int {
+        limit - initialValue.count
     }
             
 }

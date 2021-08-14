@@ -82,7 +82,12 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
         }
     }
     
-    public func getSummaries<Summary: ItemSummary>(forID ID: String, from table: String) -> Result<[Summary], CacheError<Item>> {
+    public func getSummaries<Summary: ItemSummary>(
+        forID ID: String,
+        afterID: String?,
+        limit: Int,
+        from table: String
+    ) -> Result<[Summary], CacheError<Item>> {
         guard let cache = itemsSummaries[table], !cache.isEmpty else {
             return .failure(.summariesNotFound(String.getType(from: Summary.self)))
         }
@@ -92,9 +97,20 @@ public final class InMemoryCacheProvider<Item: ComicInfoItem>: Cacheable {
             guard el.key.hasSuffix(ID), let item = el.value as? Summary else { continue }
             items.append(item)
         }
-
+        items.sort()
+        var start = 0
+        let count = items.count
+        
+        if let afterID = afterID {
+            guard let firstIndex = items.firstIndex(where: { $0.itemID == afterID }) else {
+                return .failure(.itemsNotFound(itemType: Item.self))
+            }
+            start = firstIndex + 1
+        }
+        
+        items = Array(items[start..<min(count, start+limit)])
         return !items.isEmpty ?
-            .success(items.sorted { $0.popularity < $1.popularity }) :
+            .success(items) :
             .failure(.summariesNotFound(String.getType(from: Summary.self)))
     }
     

@@ -448,6 +448,7 @@ extension GetDataProviderTests {
     
     func test_whenGetSummariesFromEmptyMemory_saveSummariesInCache() throws {
         // Given
+        let givenLimit = 20
         let givenItem = MockItemSummaryFactory.make()
         let criteria = GetSummariesCriteria(
             MockItemSummary.self,
@@ -466,7 +467,12 @@ extension GetDataProviderTests {
         XCTAssertNoThrow(try feature.wait())
         
         // Then
-        let result: Result<[MockItemSummary], CacheError<MockComicInfoItem>> = cache.getSummaries(forID: givenItem.id, from: table)
+        let result: Result<[MockItemSummary], CacheError<MockComicInfoItem>> = cache.getSummaries(
+            forID: givenItem.id,
+            afterID: nil,
+            limit: givenLimit,
+            from: table
+        )
         switch result {
         case let .success(items):
             XCTAssertEqual(items.map { $0.itemID }, [givenItem.itemID])

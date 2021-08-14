@@ -17,15 +17,15 @@ final class ProcessInfo_EnvironmentTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
-    func testIsLocalServerEnabled_whenKeyIsDefault_assertTrue() {
-        // Given
-        
-        // When
-        let isLocalServer = ProcessInfo.isLocalServerEnabled()
-        
-        // Then
-        XCTAssertTrue(isLocalServer)
-    }
+//    func testIsLocalServerEnabled_whenKeyIsDefault_assertTrue() {
+//        // Given
+//
+//        // When
+//        let isLocalServer = ProcessInfo.isLocalServerEnabled()
+//
+//        // Then
+//        XCTAssertTrue(isLocalServer)
+//    }
     
     func testIsLocalServerEnabled_when_assertFalse() {
         // Given

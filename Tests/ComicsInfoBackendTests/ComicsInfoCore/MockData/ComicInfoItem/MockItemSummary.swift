@@ -14,6 +14,7 @@ struct MockItemSummary: ItemSummary {
     let itemID: String
     let summaryID: String
     let itemType: String
+    let summaryType: String
     let dateAdded: Date
     let dateLastUpdated: Date
     let popularity: Int
@@ -46,6 +47,7 @@ enum MockItemSummaryFactory {
             itemID: itemID,
             summaryID: summaryID,
             itemType: itemType,
+            summaryType: "\(itemType)#\(summaryID)",
             dateAdded: dateAdded,
             dateLastUpdated: dateLastUpdated,
             popularity: popularity,

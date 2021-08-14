@@ -85,7 +85,7 @@ struct MockItemGetDBService: ItemGetDBService {
         return eventLoop.submit { databaseItems }
     }
     
-    func getSummaries<Summary: ItemSummary>(_ query: GetSummariesQuery) -> EventLoopFuture<[Summary]?> {
+    func getSummaries<Summary: ItemSummary>(_ query: GetSummariesQuery<Summary>) -> EventLoopFuture<[Summary]?> {
         var items = [Summary]()
         for (_, el) in TestDatabase.items.enumerated() {
             guard query.isValidKey(el.key),

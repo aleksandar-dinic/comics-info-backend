@@ -62,13 +62,16 @@ struct ItemGetDBWrapper<Item: ComicInfoItem>: LoggerProvider {
     func getSummaries<Summary: ItemSummary>(
         with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?> {
-        let query = GetSummariesQuery(
+        let query = GetSummariesQuery<Summary>(
             itemType: criteria.itemType,
             ID: criteria.ID,
+            afterID: criteria.afterID,
+            sortValue: criteria.sortValue,
             limit: criteria.limit,
             table: criteria.table,
             strategy: criteria.strategy,
-            logger: criteria.logger
+            logger: criteria.logger,
+            initialValue: criteria.initialValue
         )
         return itemGetDBService.getSummaries(query)
             .flatMapErrorThrowing {

@@ -13,7 +13,7 @@ extension Domain.ItemSummary {
 
     init(from summary: CharacterSummary) {
         self.init(
-            identifier: summary.itemID.getIDFromComicInfoID(for: Character.self),
+            identifier: summary.itemID.getIDFromComicInfoID(for: CharacterSummary.self),
             popularity: summary.popularity,
             name: summary.name,
             thumbnail: summary.thumbnail,

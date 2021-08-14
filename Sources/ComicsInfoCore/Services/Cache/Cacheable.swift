@@ -25,6 +25,8 @@ public protocol Cacheable {
     
     func getSummaries<Summary: ItemSummary>(
         forID ID: String,
+        afterID: String?,
+        limit: Int,
         from table: String
     ) -> Result<[Summary], CacheError<Item>>
     

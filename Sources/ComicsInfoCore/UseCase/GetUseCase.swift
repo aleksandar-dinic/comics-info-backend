@@ -104,14 +104,16 @@ public extension GetUseCase {
         logger: Logger?,
         dataSource: DataSourceLayer = .memory
     ) -> EventLoopFuture<[Summary]> {
-        let criteria = GetSummariesCriteria<Summary>(
-//                afterID: afterID,
+        var criteria = GetSummariesCriteria<Summary>(
             Summary.self,
             summaryID: summaryID,
+            afterID: afterID,
+            sortValue: nil,
             dataSource: dataSource,
             limit: limit,
             table: table,
-            strategy: .summaryID
+            strategy: .summaryID,
+            initialValue: []
         )
         
         guard let afterID = afterID else {
@@ -124,17 +126,28 @@ public extension GetUseCase {
             }
         }
         
-        return getItem(on: eventLoop, withID: afterID, fields: nil, from: table, logger: logger)
-            .flatMap { _ in
-//                    criteria.sortValue = $0.sortValue
-                return repository.getSummaries(with: criteria).flatMapThrowing {
-                    guard let summaries = $0 else {
-                        throw ComicInfoError.itemNotFound(withID: summaryID, itemType: Summary.self)
-                    }
-                    
-                    return summaries
-                }
+        let getSummaryCriteria = GetSummaryCriteria(
+            items: [(itemID: .comicInfoID(for: Summary.self, ID: afterID), summaryID: summaryID)],
+            table: table,
+            logger: logger
+        )
+        
+        let summary: EventLoopFuture<[Summary]?> = getSummary(on: eventLoop, with: getSummaryCriteria)
+        return summary.flatMapThrowing { summaries -> Summary in
+            guard let summary = summaries?.first else {
+                throw ComicInfoError.itemNotFound(withID: summaryID, itemType: Summary.self)
             }
+            return summary
+        }.flatMap {
+            criteria.sortValue = $0.sortValue
+            return repository.getSummaries(with: criteria).flatMapThrowing {
+                guard let summaries = $0 else {
+                    throw ComicInfoError.itemNotFound(withID: summaryID, itemType: Summary.self)
+                }
+                
+                return summaries
+            }
+        }
     }
     
     private func getAll(

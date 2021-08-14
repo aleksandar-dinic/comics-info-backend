@@ -63,7 +63,12 @@ final class TestCache<Item: ComicInfoItem>: Cacheable {
         }
     }
     
-    func getSummaries<Summary: ItemSummary>(forID ID: String, from table: String) -> Result<[Summary], CacheError<Item>> {
+    func getSummaries<Summary: ItemSummary>(
+        forID ID: String,
+        afterID: String?,
+        limit: Int,
+        from table: String
+    ) -> Result<[Summary], CacheError<Item>> {
         guard let cache = itemsSummaries[table], !cache.isEmpty else {
             return .failure(.summariesNotFound(String.getType(from: Summary.self)))
         }

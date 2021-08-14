@@ -136,12 +136,23 @@ struct GetDataProvider<Item, CacheProvider: Cacheable> where CacheProvider.Item 
     private func getSummariesFromMemory<Summary: ItemSummary>(
         with criteria: GetSummariesCriteria<Summary>
     ) -> EventLoopFuture<[Summary]?>  {
-        let result: Result<[Summary], CacheError<Item>> = cacheProvider.getSummaries(forID: criteria.ID, from: criteria.table)
+        let result: Result<[Summary], CacheError<Item>> = cacheProvider.getSummaries(
+            forID: criteria.ID,
+            afterID: criteria.afterID,
+            limit: criteria.limit,
+            from: criteria.table
+        )
         
         switch result {
         case let .success(items):
-            return eventLoop.submit { items }
-
+            guard items.count < criteria.limit else {
+                return eventLoop.submit { items }
+            }
+            
+            var criteria = criteria
+            criteria.initialValue = items
+            return getSummariesFromDatabase(with: criteria)
+            
         case .failure:
             return getSummariesFromDatabase(with: criteria)
         }

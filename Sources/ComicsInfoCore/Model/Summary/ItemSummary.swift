@@ -8,12 +8,13 @@
 
 import Foundation
 
-public protocol ItemSummary: Codable {
+public protocol ItemSummary: Codable, Comparable {
     
     var itemID: String { get }
     var sortValue: String { get }
     var summaryID: String { get }
     var itemType: String { get }
+    var summaryType: String { get }
     
     var dateAdded: Date { get }
     var dateLastUpdated: Date { get }
@@ -22,5 +23,17 @@ public protocol ItemSummary: Codable {
     var thumbnail: String? { get }
     var description: String? { get }
     var oldSortValue: String? { get }
+    
+}
+
+public extension ItemSummary {
+    
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.sortValue < rhs.sortValue
+    }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.itemID == rhs.itemID
+    }
     
 }

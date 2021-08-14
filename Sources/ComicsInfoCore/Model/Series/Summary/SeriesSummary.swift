@@ -14,6 +14,7 @@ public struct SeriesSummary: ItemSummary {
     public private(set) var sortValue: String
     public let summaryID: String
     public let itemType: String
+    public let summaryType: String
     
     public let dateAdded: Date
     public private(set) var dateLastUpdated: Date
@@ -35,8 +36,9 @@ public struct SeriesSummary: ItemSummary {
         
         self.itemID = .comicInfoID(for: SeriesSummary.self, ID: ID)
         self.summaryID = .comicInfoSummaryID(for: link)
-        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)#SummaryID=\(summaryID)"
+        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)"
         itemType = .getType(from: SeriesSummary.self)
+        summaryType = "\(itemType)#\(summaryID)"
         dateAdded = now
         dateLastUpdated = now
         self.popularity = popularity
@@ -53,7 +55,7 @@ public struct SeriesSummary: ItemSummary {
         thumbnail = series.thumbnail
         description = series.description
         oldSortValue = sortValue
-        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)#SummaryID=\(summaryID)"
+        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)"
     }
 
 }

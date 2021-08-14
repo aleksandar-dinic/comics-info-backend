@@ -18,7 +18,7 @@ enum ReadLambdaHandlerFactory {
         let useCaseFactory = CharacterUseCaseFactory(
             on: context.eventLoop,
             isLocalServer: LocalServer.isEnabled,
-            cacheProvider: ComicsInfo.characterInMemoryCache
+            cacheProvider: LocalServer.characterInMemoryCache
         )
         let readResponseWrapper = CharacterReadResponseWrapper(
             characterUseCase: useCaseFactory.makeUseCase()
@@ -33,9 +33,11 @@ enum ReadLambdaHandlerFactory {
         let useCaseFactory = ComicUseCaseFactory(
             on: context.eventLoop,
             isLocalServer: LocalServer.isEnabled,
-            cacheProvider: ComicsInfo.comicInMemoryCache
+            cacheProvider: LocalServer.comicInMemoryCache
         )
-        let readResponseWrapper = ComicReadResponseWrapper(comicUseCase: useCaseFactory.makeUseCase())
+        let readResponseWrapper = ComicReadResponseWrapper(
+            comicUseCase: useCaseFactory.makeUseCase()
+        )
 
         return ReadLambdaHandler(context, readResponseWrapper: readResponseWrapper)
     }
@@ -46,7 +48,7 @@ enum ReadLambdaHandlerFactory {
         let seriesUseCaseFactory = SeriesUseCaseFactory(
             on: context.eventLoop,
             isLocalServer: LocalServer.isEnabled,
-            cacheProvider: ComicsInfo.seriesInMemoryCache
+            cacheProvider: LocalServer.seriesInMemoryCache
         )
         let readResponseWrapper = SeriesReadResponseWrapper(
             seriesUseCase: seriesUseCaseFactory.makeUseCase()

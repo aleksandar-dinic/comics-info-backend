@@ -13,6 +13,8 @@ struct DynamoDBGetSummariesQuery: Loggable {
 
     let itemType: String
     let ID: String
+    let afterID: String?
+    let sortValue: String?
     let limit: Int
     let table: String
     let strategy: GetSummariesStrategy
@@ -29,7 +31,20 @@ struct DynamoDBGetSummariesQuery: Loggable {
     }
     
     private var exclusiveStartKey: [String: DynamoDB.AttributeValue]? {
-        nil
+        guard let afterID = afterID, let sortValue = sortValue else { return nil }
+        var keys: [String: DynamoDB.AttributeValue] = [
+            "itemID": .s("\(itemType)#\(afterID)")
+        ]
+        
+        switch strategy {
+        case .itemID:
+            keys["itemType"] = .s(itemType)
+        case .summaryID:
+            keys["summaryType"] = .s("\(itemType)#\(ID)")
+            keys["sortValue"] = .s(sortValue)
+        }
+        
+        return keys
     }
     
     private var expressionAttributeValues: [String: DynamoDB.AttributeValue] {
@@ -37,7 +52,7 @@ struct DynamoDBGetSummariesQuery: Loggable {
         case .itemID:
             return [":itemType": .s(itemType), ":itemID": .s(ID)]
         case .summaryID:
-            return [":itemType": .s(itemType), ":summaryID": .s(ID)]
+            return [":summaryType": .s("\(itemType)#\(ID)")]
         }
     }
     
@@ -46,7 +61,7 @@ struct DynamoDBGetSummariesQuery: Loggable {
         case .itemID:
             return "itemType-itemID-index"
         case .summaryID:
-            return "itemType-summaryID-index"
+            return "summaryType-sortValue-index"
         }
     }
     
@@ -55,7 +70,7 @@ struct DynamoDBGetSummariesQuery: Loggable {
         case .itemID:
             return "itemType = :itemType AND itemID = :itemID"
         case .summaryID:
-            return "itemType = :itemType AND summaryID = :summaryID"
+            return "summaryType = :summaryType"
         }
     }
     

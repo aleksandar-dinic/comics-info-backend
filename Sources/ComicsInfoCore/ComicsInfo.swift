@@ -11,10 +11,6 @@ import enum AWSLambdaRuntime.Lambda
 
 public final class ComicsInfo {
 
-    static let characterInMemoryCache = InMemoryCacheProvider<Character>()
-    static let comicInMemoryCache = InMemoryCacheProvider<Comic>()
-    static let seriesInMemoryCache = InMemoryCacheProvider<Series>()
-
     private let localServer: LocalServer
 
     public init(localServer: LocalServer = LocalServer()) {

@@ -28,7 +28,7 @@ final class DomainItemSummary_SeriesSummaryTests: XCTestCase {
     func testIdentifier_whenInitFromSummary() {
         XCTAssertEqual(
             sut.identifier,
-            summary.itemID.replacingOccurrences(of: "\(String.getType(from: Series.self))#", with: "")
+            summary.itemID.replacingOccurrences(of: "\(String.getType(from: SeriesSummary.self))#", with: "")
         )
     }
     

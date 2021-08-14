@@ -13,7 +13,12 @@ extension DynamoDB: ItemUpdateDBService {
 
     public func update<Item: ComicInfoItem>(_ query: UpdateItemQuery<Item>) -> EventLoopFuture<Item> {
         deleteItem(query.dynamoDBQuery.deleteInput).flatMap { _ in
-            updateItem(query.dynamoDBQuery.input).map { _ in query.item }
+            updateItem(query.dynamoDBQuery.input)
+                .map { _ in query.item }
+                .flatMapErrorThrowing {
+                    print("Update ERROR: \($0)")
+                    throw $0
+                }
         }
     }
     
@@ -23,7 +28,21 @@ extension DynamoDB: ItemUpdateDBService {
         var futures = [EventLoopFuture<Summary>]()
         
         for input in query.dynamoDBQuery.inputs {
-            futures.append(deleteItem(input.0).flatMap { _ in updateItem(input.1).map { _ in input.2 } } )
+            futures.append(
+                deleteItem(input.0)
+                    .flatMap { _ in
+                        updateItem(input.1)
+                            .map { _ in input.2 }
+                            .flatMapErrorThrowing {
+                                print("UpdateSummaries - UpdateItem ERROR: \($0)")
+                                throw $0
+                            }
+                    }
+                    .flatMapErrorThrowing {
+                        print("UpdateSummaries - DeleteItem ERROR: \($0)")
+                        throw $0
+                    }
+            )
         }
 
         return EventLoopFuture.reduce([], futures, on: client.eventLoopGroup.next()) { (items, item) in
