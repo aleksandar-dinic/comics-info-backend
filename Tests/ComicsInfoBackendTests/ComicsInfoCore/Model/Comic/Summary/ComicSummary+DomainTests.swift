@@ -7,21 +7,21 @@
 //
 
 @testable import ComicsInfoCore
-import struct Domain.ItemSummary
+import struct Domain.ComicSummary
 import XCTest
 
 final class ComicSummary_DomainTests: XCTestCase {
 
-    private var item: Domain.ItemSummary!
+    private var item: Domain.ComicSummary!
     private var series: Series!
     private var number: String!
-    private var sut: ComicSummary!
+    private var sut: ComicsInfoCore.ComicSummary!
     
     override func setUpWithError() throws {
-        item = DomainItemSummaryFactory.make()
+        item = DomainSummaryFactory.makeComicSummary()
         series = SeriesFactory.make(ID: "SeriesID")
         number = "1"
-        sut = ComicSummary(from: item, link: series, number: number)
+        sut = ComicsInfoCore.ComicSummary(from: item, link: series, number: number)
     }
 
     override func tearDownWithError() throws {
@@ -62,7 +62,7 @@ final class ComicSummary_DomainTests: XCTestCase {
     }
     
     func testName_whenInitFromItem() {
-        XCTAssertEqual(sut.name, item.name)
+        XCTAssertEqual(sut.name, item.title)
     }
     
     func testThumbnail_whenInitFromItem() {

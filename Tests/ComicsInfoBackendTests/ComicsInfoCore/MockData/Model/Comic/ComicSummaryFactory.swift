@@ -31,7 +31,8 @@ enum ComicSummaryFactory {
         name: String = "ComicSummary 1 Name",
         thumbnail: String? = nil,
         description: String? = nil,
-        number: String? = nil
+        number: String? = nil,
+        published: Date? = Date()
     ) -> ComicSummary {
         ComicSummary(
             ID: ID,
@@ -40,7 +41,8 @@ enum ComicSummaryFactory {
             name: name,
             thumbnail: thumbnail,
             description: description,
-            number: number
+            number: number,
+            published: published
         )
     }
     

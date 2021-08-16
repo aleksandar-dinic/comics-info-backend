@@ -18,7 +18,8 @@ extension ComicSummary {
             name: comic.name,
             thumbnail: comic.thumbnail,
             description: comic.description,
-            number: comic.number
+            number: comic.number,
+            published: comic.published
         )
     }
 

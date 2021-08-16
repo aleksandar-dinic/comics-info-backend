@@ -1,5 +1,5 @@
 //
-//  DomainItemSummary+CharacterSummaryTests.swift
+//  DomainCharacterSummary+CharacterSummaryTests.swift
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 05/02/2021.
@@ -7,17 +7,17 @@
 //
 
 @testable import ComicsInfoCore
-import struct Domain.ItemSummary
+import struct Domain.CharacterSummary
 import XCTest
 
-final class DomainItemSummary_CharacterSummaryTests: XCTestCase {
+final class DomainCharacterSummary_CharacterSummaryTests: XCTestCase {
     
-    private var summary: CharacterSummary!
-    private var sut: Domain.ItemSummary!
+    private var summary: ComicsInfoCore.CharacterSummary!
+    private var sut: Domain.CharacterSummary!
     
     override func setUpWithError() throws {
         summary = CharacterSummaryFactory.make()
-        sut = Domain.ItemSummary(from: summary)
+        sut = Domain.CharacterSummary(from: summary)
     }
 
     override func tearDownWithError() throws {
@@ -52,12 +52,4 @@ final class DomainItemSummary_CharacterSummaryTests: XCTestCase {
         XCTAssertEqual(sut.count, summary.count)
     }
     
-    func testNumber_whenInitFromSummary() {
-        XCTAssertNil(sut.number)
-    }
-    
-    func testRoles_whenInitFromSummary() {
-        XCTAssertNil(sut.roles)
-    }
-
 }

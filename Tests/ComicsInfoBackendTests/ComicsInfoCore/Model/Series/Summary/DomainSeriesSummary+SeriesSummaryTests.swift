@@ -1,5 +1,5 @@
 //
-//  DomainItemSummary+SeriesSummaryTests.swift
+//  DomainSeriesSummary+SeriesSummaryTests.swift
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 05/02/2021.
@@ -7,17 +7,17 @@
 //
 
 @testable import ComicsInfoCore
-import struct Domain.ItemSummary
+import struct Domain.SeriesSummary
 import XCTest
 
-final class DomainItemSummary_SeriesSummaryTests: XCTestCase {
+final class DomainSeriesSummary_SeriesSummaryTests: XCTestCase {
     
-    private var summary: SeriesSummary!
-    private var sut: Domain.ItemSummary!
+    private var summary: ComicsInfoCore.SeriesSummary!
+    private var sut: Domain.SeriesSummary!
     
     override func setUpWithError() throws {
         summary = SeriesSummaryFactory.make()
-        sut = Domain.ItemSummary(from: summary)
+        sut = Domain.SeriesSummary(from: summary)
     }
 
     override func tearDownWithError() throws {
@@ -36,8 +36,8 @@ final class DomainItemSummary_SeriesSummaryTests: XCTestCase {
         XCTAssertEqual(sut.popularity, summary.popularity)
     }
     
-    func testName_whenInitFromSummary() {
-        XCTAssertEqual(sut.name, summary.name)
+    func testTitle_whenInitFromSummary() {
+        XCTAssertEqual(sut.title, summary.name)
     }
     
     func testThumbnail_whenInitFromSummary() {
@@ -48,16 +48,4 @@ final class DomainItemSummary_SeriesSummaryTests: XCTestCase {
         XCTAssertEqual(sut.description, summary.description)
     }
     
-    func testCount_whenInitFromSummary() {
-        XCTAssertNil(sut.count)
-    }
-    
-    func testNumber_whenInitFromSummary() {
-        XCTAssertNil(sut.number)
-    }
-    
-    func testRoles_whenInitFromSummary() {
-        XCTAssertNil(sut.roles)
-    }
-
 }

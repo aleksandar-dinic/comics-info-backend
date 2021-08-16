@@ -8,7 +8,8 @@
 
 @testable import struct ComicsInfoCore.Character
 @testable import struct Domain.Character
-@testable import struct Domain.ItemSummary
+@testable import struct Domain.SeriesSummary
+@testable import struct Domain.ComicSummary
 import XCTest
 
 final class Character_DomainTests: XCTestCase {
@@ -27,27 +28,23 @@ final class Character_DomainTests: XCTestCase {
             aliases: ["Character Aliases"],
             birth: Date(),
             series: [
-                ItemSummary(
+                Domain.SeriesSummary(
                     identifier: "1",
                     popularity: 0,
-                    name: "Series Name",
+                    title: "Series Title",
                     thumbnail: "Series thumbnail",
-                    description: "Series Description",
-                    count: nil,
-                    number: nil,
-                    roles: nil
+                    description: "Series Description"
                 )
             ],
             comics: [
-                ItemSummary(
+                Domain.ComicSummary(
                     identifier: "1",
                     popularity: 0,
-                    name: "Comic Name",
+                    title: "Comic Title",
                     thumbnail: "Comic thumbnail",
                     description: "Comic Description",
-                    count: nil,
                     number: nil,
-                    roles: nil
+                    published: nil
                 )
             ]
         )

@@ -23,6 +23,7 @@ public struct ComicSummary: ItemSummary {
     public private(set) var thumbnail: String?
     public private(set) var description: String?
     public private(set) var number: String?
+    public private(set) var published: Date?
     public private(set) var oldSortValue: String?
     
     init<Link: Identifiable>(
@@ -32,7 +33,8 @@ public struct ComicSummary: ItemSummary {
         name: String,
         thumbnail: String?,
         description: String?,
-        number: String?
+        number: String?,
+        published: Date?
     ) {
         let now = Date()
         
@@ -48,6 +50,7 @@ public struct ComicSummary: ItemSummary {
         self.thumbnail = thumbnail
         self.description = description
         self.number = number
+        self.published = published
         oldSortValue = nil
     }
     
@@ -58,6 +61,7 @@ public struct ComicSummary: ItemSummary {
         thumbnail = comic.thumbnail
         description = comic.description
         number = comic.number
+        published = comic.published
         oldSortValue = sortValue
         sortValue = "Popularity=\(abs(popularity-100))#Number=\(number ?? "~")#Name=\(name)"
     }

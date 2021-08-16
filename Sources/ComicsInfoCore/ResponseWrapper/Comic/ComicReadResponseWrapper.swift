@@ -7,7 +7,7 @@
 //
 
 import struct Domain.Comic
-import struct Domain.ItemSummary
+import struct Domain.ComicSummary
 import struct Logging.Logger
 import Foundation
 import NIO
@@ -58,7 +58,7 @@ public struct ComicReadResponseWrapper: GetPathParameterID, GetQueryParameterSer
                 from: String.tableName(for: environment),
                 logger: logger
             )
-                .map { Response(with: $0.map { Domain.ItemSummary(from: $0) }, statusCode: .ok) }
+                .map { Response(with: $0.map { Domain.ComicSummary(from: $0) }, statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
         } catch {
             guard let responseError = error as? ComicInfoError else {

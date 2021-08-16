@@ -1,5 +1,5 @@
 //
-//  ComicSummary+Domain.swift
+//  DomainComicSummary+ComicSummary.swift
 //  ComicsInfoCore
 //
 //  Created by Aleksandar Dinic on 05/02/2021.
@@ -9,19 +9,18 @@
 import struct Domain.ComicSummary
 import Foundation
 
-extension ComicSummary {
-    
-    init<Summary: Identifiable>(from comicSummary: Domain.ComicSummary, link: Summary, number: String?) {
+extension Domain.ComicSummary {
+
+    init(from comicSummary: ComicSummary) {
         self.init(
-            ID: comicSummary.identifier,
-            link: link,
+            identifier: comicSummary.itemID.getIDFromComicInfoID(for: ComicSummary.self),
             popularity: comicSummary.popularity,
-            name: comicSummary.title,
+            title: comicSummary.name,
             thumbnail: comicSummary.thumbnail,
             description: comicSummary.description,
-            number: number,
+            number: comicSummary.number,
             published: comicSummary.published
         )
     }
-    
+
 }

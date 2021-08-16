@@ -7,14 +7,15 @@
 //
 
 import struct Domain.Comic
-import struct Domain.ItemSummary
+import struct Domain.CharacterSummary
+import struct Domain.SeriesSummary
 import Foundation
 
 extension Domain.Comic {
 
     init(from comic: Comic) {
-        let characters = comic.characters?.map { Domain.ItemSummary(from: $0) }
-        let series = comic.series?.map { Domain.ItemSummary(from: $0) }
+        let characters = comic.characters?.map { Domain.CharacterSummary(from: $0) }
+        let series = comic.series?.map { Domain.SeriesSummary(from: $0) }
 
         self.init(
             identifier: comic.id,

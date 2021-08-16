@@ -6,19 +6,19 @@
 //  Copyright © 2021 Aleksandar Dinic. All rights reserved.
 //
 
-import struct Domain.ItemSummary
+import struct Domain.CharacterSummary
 import Foundation
 
 extension CharacterSummary {
     
-    init<Summary: Identifiable>(from item: Domain.ItemSummary, link: Summary, count: Int?) {
+    init<Summary: Identifiable>(from characterSummary: Domain.CharacterSummary, link: Summary, count: Int?) {
         self.init(
-            ID: item.identifier,
+            ID: characterSummary.identifier,
             link: link,
-            popularity: item.popularity,
-            name: item.name,
-            thumbnail: item.thumbnail,
-            description: item.description,
+            popularity: characterSummary.popularity,
+            name: characterSummary.name,
+            thumbnail: characterSummary.thumbnail,
+            description: characterSummary.description,
             count: count
         )
     }
