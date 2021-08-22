@@ -52,7 +52,7 @@ public struct GetSummariesQuery<Summary: ItemSummary>: LoggerProvider {
         guard let last = initialValue.last else {
             return afterID
         }
-        return last.itemID
+        return last.itemID.getIDFromComicInfoID(for: Summary.self)
     }
     
     private func getSortValue() -> String? {

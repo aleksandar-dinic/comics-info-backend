@@ -29,7 +29,7 @@ extension GetQueryParameterSeriesID {
             throw ComicInfoError.queryParameterSeriesIDIsMissing
         }
         
-        return "SeriesSummary#\(seriesSummaryID)"
+        return .comicInfoID(for: SeriesSummary.self, ID: seriesSummaryID)
     }
     
 }

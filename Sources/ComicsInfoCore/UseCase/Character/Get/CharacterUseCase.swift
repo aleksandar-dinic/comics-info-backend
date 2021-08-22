@@ -56,15 +56,24 @@ extension CharacterUseCase {
         guard fields.contains("series") else { return eventLoop.submit { nil } }
         let criteria = GetSummariesCriteria(
             SeriesSummary.self,
-            ID: item.id,
+            summaryID: .comicInfoID(for: Summary.self, ID: item.id),
+            afterID: nil,
+            sortValue: nil,
             dataSource: dataSource,
             limit: limit,
             table: table,
-            strategy: .itemID,
+            strategy: .summaryID,
+            initialValue: [],
             logger: logger
         )
         
         return getSummaries(on: eventLoop, with: criteria)
+            .flatMapErrorThrowing {
+                guard let comicInfoError = $0 as? ComicInfoError, case .itemsNotFound = comicInfoError else {
+                    throw $0
+                }
+                return nil
+            }
     }
     
     private func appendComicsSummaries(
@@ -79,15 +88,24 @@ extension CharacterUseCase {
         guard fields.contains("comics") else { return eventLoop.submit { nil } }
         let criteria = GetSummariesCriteria(
             ComicSummary.self,
-            ID: item.id,
+            summaryID: .comicInfoID(for: Summary.self, ID: item.id),
+            afterID: nil,
+            sortValue: nil,
             dataSource: dataSource,
             limit: limit,
             table: table,
-            strategy: .itemID,
+            strategy: .summaryID,
+            initialValue: [],
             logger: logger
         )
         
         return getSummaries(on: eventLoop, with: criteria)
+            .flatMapErrorThrowing {
+                guard let comicInfoError = $0 as? ComicInfoError, case .itemsNotFound = comicInfoError else {
+                    throw $0
+                }
+                return nil
+            }
     }
 
 }
