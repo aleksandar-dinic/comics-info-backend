@@ -16,7 +16,7 @@ enum SeriesFactory {
     }
     
     static func makeDatabaseItems(ID: String = "1") -> [String: Data] {
-        let series = make()
+        let series = make(ID: ID)
         return [series.itemID: try! JSONEncoder().encode(series)]
     }
     

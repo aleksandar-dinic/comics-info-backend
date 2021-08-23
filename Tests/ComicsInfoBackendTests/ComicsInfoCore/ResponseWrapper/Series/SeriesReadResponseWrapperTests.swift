@@ -198,9 +198,10 @@ extension SeriesReadResponseWrapperTests {
     
     func test_whenHandleListWithoutItems_statusIsNoContent() throws {
         // Given
+        let request = Request(queryParameters: ["characterID": "1"])
 
         // When
-        let feature = sut.handleRead(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then
@@ -209,10 +210,14 @@ extension SeriesReadResponseWrapperTests {
 
     func test_whenHandleList_statusIsOk() throws {
         // Given
-        try createSeries(SeriesFactory.make())
-
+        let character = CharacterFactory.make(ID: "1")
+        try createCharacter(character)
+        let series = SeriesFactory.make(id: "1", charactersID: ["1"])
+        try createSeries(series)
+        let request = Request(queryParameters: ["characterID": "1"])
+        
         // When
-        let feature = sut.handleRead(on: eventLoop, request: Request(), environment: environment, logger: nil)
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
         let response = try feature.wait()
 
         // Then

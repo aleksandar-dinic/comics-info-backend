@@ -113,7 +113,8 @@ public extension GetUseCase {
             limit: limit,
             table: table,
             strategy: .summaryID,
-            initialValue: []
+            initialValue: [],
+            logger: logger
         )
         
         guard let afterID = afterID else {

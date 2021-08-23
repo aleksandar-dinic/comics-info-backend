@@ -7,11 +7,12 @@
 //
 
 import struct Domain.Series
+import struct Domain.SeriesSummary
 import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct SeriesReadResponseWrapper: GetPathParameterID, GetQueryParameterAfterID, GetQueryParameterLimit, ReadResponseWrapper {
+public struct SeriesReadResponseWrapper: GetPathParameterID, GetQueryParameterCharacterID, GetQueryParameterAfterID, GetQueryParameterLimit, ReadResponseWrapper {
 
     private let seriesUseCase: SeriesUseCase
 
@@ -49,15 +50,16 @@ public struct SeriesReadResponseWrapper: GetPathParameterID, GetQueryParameterAf
         logger: Logger?
     ) -> EventLoopFuture<Response> {
         do {
-            return seriesUseCase.getAllItems(
+            let characterID = try getCharacterSummaryID(from: request.queryParameters)
+            return seriesUseCase.getAllSummaries(
                 on: eventLoop,
+                summaryID: characterID,
                 afterID: getAfterID(from: request.queryParameters),
-                fields: getFields(from: request.queryParameters),
                 limit: try getLimit(from: request.queryParameters),
                 from: String.tableName(for: environment),
                 logger: logger
             )
-                .map { Response(with: $0.map { Domain.Series(from: $0) }, statusCode: .ok) }
+                .map { Response(with: $0.map { Domain.SeriesSummary(from: $0) }, statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
         } catch {
             guard let responseError = error as? ComicInfoError else {

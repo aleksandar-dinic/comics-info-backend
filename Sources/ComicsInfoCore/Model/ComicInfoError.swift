@@ -17,7 +17,7 @@ public enum ComicInfoError: Error {
     case summariesAlreadyExist(_ IDs: Set<String>)
     case invalidFields(_ fields: Set<String>)
     case pathParameterIDIsMissing
-    case queryParameterSeriesIDIsMissing
+    case queryParameterIsMissing(type: Any.Type)
     case invalidQueryParameterLimit(message: String)
     case invalidQueryParameterOffset(message: String)
     case handlerUnknown
@@ -50,7 +50,7 @@ extension ComicInfoError {
         case .pathParameterIDIsMissing:
             return .badRequest
             
-        case .queryParameterSeriesIDIsMissing:
+        case .queryParameterIsMissing:
             return .methodNotAllowed
             
         case .invalidQueryParameterLimit:
@@ -99,8 +99,8 @@ extension ComicInfoError: LocalizedError {
         case .pathParameterIDIsMissing:
             return "Required path parameter id is missing."
             
-        case .queryParameterSeriesIDIsMissing:
-            return "Method not allowed: You need to specify query parameter seriesID."
+        case let .queryParameterIsMissing(type):
+            return "Method not allowed: You need to specify query parameter \(String.getType(from: type).lowercased())ID."
             
         case let .invalidQueryParameterLimit(message):
             return "Invalid query parameter limit: \(message)"

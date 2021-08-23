@@ -217,8 +217,11 @@ extension ComicReadResponseWrapperTests {
 
     func test_whenHandleList_statusIsOk() throws {
         // Given
-        let items = ComicFactory.makeDatabaseItems()
-        let useCase = ComicUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
+        let series = SeriesFactory.make(ID: "1")
+        try createSeries(series)
+        let comic = ComicFactory.make(id: "1", seriesID: ["1"])
+        try createComic(comic)
+        let useCase = ComicUseCaseFactoryMock(on: eventLoop).makeUseCase()
         sut = ComicReadResponseWrapper(comicUseCase: useCase)
         let request = Request(queryParameters: ["seriesID": "1"])
 
@@ -233,22 +236,22 @@ extension ComicReadResponseWrapperTests {
         )
     }
     
-//    func test_whenHandleListWithoutSeriesID_statusIsMethodNotAllowed() throws {
-//        // Given
-//        let items = ComicFactory.makeDatabaseItems()
-//        let useCase = ComicUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
-//        sut = ComicReadResponseWrapper(comicUseCase: useCase)
-//        let request = Request()
-//
-//        // When
-//        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
-//        let response = try feature.wait()
-//
-//        // Then
-//        XCTAssertEqual(
-//            response.statusCode.code,
-//            ComicsInfoCore.HTTPResponseStatus.methodNotAllowed.code
-//        )
-//    }
+    func test_whenHandleListWithoutSeriesID_statusIsMethodNotAllowed() throws {
+        // Given
+        let items = ComicFactory.makeDatabaseItems()
+        let useCase = ComicUseCaseFactoryMock(items: items, on: eventLoop).makeUseCase()
+        sut = ComicReadResponseWrapper(comicUseCase: useCase)
+        let request = Request()
+
+        // When
+        let feature = sut.handleRead(on: eventLoop, request: request, environment: environment, logger: nil)
+        let response = try feature.wait()
+
+        // Then
+        XCTAssertEqual(
+            response.statusCode.code,
+            ComicsInfoCore.HTTPResponseStatus.methodNotAllowed.code
+        )
+    }
     
 }
