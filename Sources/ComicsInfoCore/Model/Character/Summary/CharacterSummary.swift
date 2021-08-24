@@ -38,7 +38,7 @@ public struct CharacterSummary: ItemSummary {
         
         self.itemID = .comicInfoID(for: CharacterSummary.self, ID: ID)
         self.summaryID = .comicInfoSummaryID(for: link)
-        sortValue = "Popularity=\(abs(popularity-100))#Count=\(count ?? 10_000_000)#Name=\(name)"
+        sortValue = "Popularity=\(abs(popularity-100))#Count=\(count ?? 10_000_000)#Name=\(name)#SummaryID=\(summaryID)"
         itemType = .getType(from: CharacterSummary.self)
         summaryType = "\(itemType)#\(summaryID)"
         dateAdded = now
