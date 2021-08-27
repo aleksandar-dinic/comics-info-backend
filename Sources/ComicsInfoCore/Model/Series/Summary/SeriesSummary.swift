@@ -22,6 +22,8 @@ public struct SeriesSummary: ItemSummary {
     public private(set) var name: String
     public private(set) var thumbnail: String?
     public private(set) var description: String?
+    public private(set) var startYear: Int?
+    public private(set) var endYear: Int?
     public private(set) var oldSortValue: String?
     
     init<Link: Identifiable>(
@@ -30,7 +32,9 @@ public struct SeriesSummary: ItemSummary {
         popularity: Int,
         name: String,
         thumbnail: String?,
-        description: String?
+        description: String?,
+        startYear: Int?,
+        endYear: Int?
     ) {
         let now = Date()
         
@@ -45,6 +49,8 @@ public struct SeriesSummary: ItemSummary {
         self.name = name
         self.thumbnail = thumbnail
         self.description = description
+        self.startYear = startYear
+        self.endYear = endYear
         oldSortValue = nil
     }
     
@@ -54,6 +60,8 @@ public struct SeriesSummary: ItemSummary {
         name = series.name
         thumbnail = series.thumbnail
         description = series.description
+        startYear = series.startYear
+        endYear = series.endYear
         oldSortValue = sortValue
         sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)"
     }

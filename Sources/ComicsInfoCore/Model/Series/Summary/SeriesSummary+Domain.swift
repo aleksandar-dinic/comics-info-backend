@@ -18,7 +18,9 @@ extension SeriesSummary {
             popularity: seriesSummary.popularity,
             name: seriesSummary.title,
             thumbnail: seriesSummary.thumbnail,
-            description: seriesSummary.description
+            description: seriesSummary.description,
+            startYear: seriesSummary.startYear,
+            endYear: seriesSummary.endYear
         )
     }
     

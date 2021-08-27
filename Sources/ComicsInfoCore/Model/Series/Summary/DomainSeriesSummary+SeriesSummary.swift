@@ -17,7 +17,9 @@ extension Domain.SeriesSummary {
             popularity: seriesSummary.popularity,
             title: seriesSummary.name,
             thumbnail: seriesSummary.thumbnail,
-            description: seriesSummary.description
+            description: seriesSummary.description,
+            startYear: seriesSummary.startYear,
+            endYear: seriesSummary.endYear
         )
     }
 
