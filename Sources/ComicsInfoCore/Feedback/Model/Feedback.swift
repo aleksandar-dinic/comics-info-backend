@@ -13,6 +13,7 @@ struct Feedback: Codable {
     let message: String
     let email: String?
     let dateAdded: Date
+    let itemType: String
     let sortValue: String
     
     init(
@@ -24,7 +25,8 @@ struct Feedback: Codable {
         self.message = message
         self.email = email
         self.dateAdded = Date()
-        self.sortValue = "Email=\(email ?? "")#ItemID=\(itemID)"
+        itemType = .getType(from: Self.self)
+        sortValue = "Email=\(email ?? "")#ItemID=\(itemID)"
     }
     
 }
