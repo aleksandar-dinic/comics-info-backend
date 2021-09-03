@@ -111,3 +111,10 @@ aws lambda update-function-code \
     --function "${lambda_name:-ci-comic-delete}" \
     --s3-bucket "$s3_bucket" \
     --s3-key lambda.zip
+
+# ci-feedback
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-feedback-create}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
