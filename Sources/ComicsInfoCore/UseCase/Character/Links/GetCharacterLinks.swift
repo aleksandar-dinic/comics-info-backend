@@ -17,7 +17,7 @@ protocol GetCharacterLinks: GetCharacterSummaries, GetSeries, GetComics {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<([Series], [Comic])>
+    ) -> EventLoopFuture<(mainSeries: [Series], series: [Series], comic: [Comic])>
     
 }
 
@@ -28,13 +28,15 @@ extension GetCharacterLinks {
         on eventLoop: EventLoop,
         in table: String,
         logger: Logger?
-    ) -> EventLoopFuture<([Series], [Comic])> {
-        getSeries(on: eventLoop, forIDs: item.seriesID, from: table, logger: logger)
+    ) -> EventLoopFuture<(mainSeries: [Series], series: [Series], comic: [Comic])> {
+        return
+            getSeries(on: eventLoop, forIDs: item.mainSeriesID, from: table, logger: logger)
+            .and(getSeries(on: eventLoop, forIDs: item.seriesID, from: table, logger: logger))
             .and(getComics(on: eventLoop, forIDs: item.comicsID, from: table, logger: logger))
             .and(getSummaries(item, on: eventLoop, in: table, logger: logger))
-            .flatMapThrowing { (arg0, summaries) -> ([Series], [Comic]) in
-                let (series, comic) = arg0
-                guard let summaries = summaries else { return (series, comic) }
+            .flatMapThrowing { (arg0, summaries) -> ([Series], [Series], [Comic]) in
+                let ((mainSeries, series), comic) = arg0
+                guard let summaries = summaries else { return (mainSeries, series, comic) }
                 
                 throw ComicInfoError.summariesAlreadyExist(Set(summaries.map { $0.itemID }))
             }

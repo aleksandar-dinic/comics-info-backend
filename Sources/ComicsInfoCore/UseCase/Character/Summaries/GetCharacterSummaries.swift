@@ -21,6 +21,13 @@ protocol GetCharacterSummaries {
         logger: Logger?
     ) -> EventLoopFuture<[CharacterSummary]?>
     
+    func getMainSeriesSummaries(
+        _ item: Character,
+        on eventLoop: EventLoop,
+        in table: String,
+        logger: Logger?
+    ) -> EventLoopFuture<[SeriesSummary]?>
+    
 }
 
 extension GetCharacterSummaries {
@@ -41,6 +48,24 @@ extension GetCharacterSummaries {
             items.append((.comicInfoID(for: ComicSummary.self, ID: id), .comicInfoSummaryID(for: item)))
         }
         
+        guard !items.isEmpty else { return eventLoop.submit { nil } }
+        
+        let criteria = GetSummaryCriteria(items: items, table: table, logger: logger)
+        return characterUseCase.getSummary(on: eventLoop, with: criteria)
+    }
+    
+    func getMainSeriesSummaries(
+        _ item: Character,
+        on eventLoop: EventLoop,
+        in table: String,
+        logger: Logger?
+    ) -> EventLoopFuture<[SeriesSummary]?> {
+        var items = [(itemID: String, summaryID: String)]()
+        
+        for id in item.mainSeriesID ?? [] {
+            items.append((.comicInfoID(for: SeriesSummary.self, ID: id), .comicInfoSummaryID(for: item)))
+        }
+
         guard !items.isEmpty else { return eventLoop.submit { nil } }
         
         let criteria = GetSummaryCriteria(items: items, table: table, logger: logger)

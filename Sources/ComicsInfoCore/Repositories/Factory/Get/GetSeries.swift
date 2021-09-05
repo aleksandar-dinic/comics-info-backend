@@ -24,7 +24,7 @@ extension GetSeries {
         from table: String,
         logger: Logger?
     ) -> EventLoopFuture<[Series]> {
-        guard let seriesID = seriesID else {
+        guard let seriesID = seriesID, !seriesID.isEmpty else {
             return eventLoop.submit { [] }
         }
 

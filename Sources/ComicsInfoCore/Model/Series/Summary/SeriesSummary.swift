@@ -63,7 +63,7 @@ public struct SeriesSummary: ItemSummary {
         startYear = series.startYear
         endYear = series.endYear
         oldSortValue = sortValue
-        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)"
+        sortValue = "Popularity=\(abs(popularity-100))#Name=\(name)#SummaryID=\(summaryID)"
     }
 
 }

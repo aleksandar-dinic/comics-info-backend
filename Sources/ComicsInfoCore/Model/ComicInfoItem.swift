@@ -61,6 +61,9 @@ extension ComicInfoItem {
                     
                 (isType(type: String.self, lhs: oldVal, rhs: new.value) &&
                 !isEqual(type: String.self, lhs: oldVal, rhs: new.value)) ||
+                    
+                (isType(type: [SeriesSummary].self, lhs: oldVal, rhs: new.value) &&
+                !isEqual(type: [SeriesSummary].self, lhs: oldVal, rhs: new.value)) ||
             
                 (isNil(oldVal) && !isNil(new.value))
             else { continue }

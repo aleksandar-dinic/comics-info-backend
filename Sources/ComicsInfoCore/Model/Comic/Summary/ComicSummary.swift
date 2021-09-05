@@ -63,7 +63,7 @@ public struct ComicSummary: ItemSummary {
         number = comic.number
         published = comic.published
         oldSortValue = sortValue
-        sortValue = "Popularity=\(abs(popularity-100))#Number=\(number ?? "~")#Name=\(name)"
+        sortValue = "Popularity=\(abs(popularity-100))#Number=\(number ?? "~")#Name=\(name)#SummaryID=\(summaryID)"
     }
     
 }

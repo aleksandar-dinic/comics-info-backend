@@ -14,6 +14,7 @@ import Foundation
 extension Domain.Character {
 
     init(from character: Character) {
+        let mainSeries = character.mainSeries?.map { Domain.SeriesSummary(from: $0) }
         let series = character.series?.map { Domain.SeriesSummary(from: $0) }
         let comics = character.comics?.map { Domain.ComicSummary(from: $0) }
 
@@ -26,8 +27,9 @@ extension Domain.Character {
             realName: character.realName,
             aliases: character.aliases,
             birth: character.birth,
-            series: series?.sorted(by: { $0.popularity > $1.popularity }),
-            comics: comics?.sorted(by: { $0.popularity > $1.popularity })
+            mainSeries: mainSeries,
+            series: series,
+            comics: comics
         )
     }
 

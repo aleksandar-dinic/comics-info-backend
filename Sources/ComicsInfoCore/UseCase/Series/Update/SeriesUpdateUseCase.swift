@@ -35,12 +35,18 @@ public final class SeriesUpdateUseCase: UpdateUseCase, GetSeriesLinks, CreateSer
     public func update(with criteria: UpdateItemCriteria<Series>) -> EventLoopFuture<Series> {
         getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
             .flatMap { [weak self] (characters, comics) -> EventLoopFuture<((old: Series, new: Series), [Character], [Comic])> in
-                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                guard let self = self else {
+                    return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
+                }
+
                 return self.updateItem(with: criteria)
                     .map { ($0, characters, comics) }
             }
             .flatMap { [weak self] series, characters, comics in
-                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                guard let self = self else {
+                    return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
+                }
+
                 return self.createLinksSummaries(for: criteria.item, characters: characters, comics: comics, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
                     .and(self.updateSummaries(for: criteria.item, on: criteria.eventLoop, fields: criteria.item.updatedFields(old: series.old), in: criteria.table, logger: criteria.logger))
                     .map {

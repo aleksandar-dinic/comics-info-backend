@@ -33,8 +33,8 @@ extension Domain.Comic {
             collectedIdentifiers: comic.collectedIdentifiers,
             images: comic.images,
             published: comic.published,
-            characters: characters?.sorted(by: { $0.popularity > $1.popularity }),
-            series: series?.sorted(by: { $0.popularity > $1.popularity })
+            characters: characters,
+            series: series
         )
     }
 

@@ -58,7 +58,7 @@ public struct CharacterSummary: ItemSummary {
         thumbnail = character.thumbnail
         description = character.description
         oldSortValue = sortValue
-        sortValue = "Popularity=\(abs(popularity-100))#Count=\(count ?? 10_000_000)#Name=\(name)"
+        sortValue = "Popularity=\(abs(popularity-100))#Count=\(count ?? 10_000_000)#Name=\(name)#SummaryID=\(summaryID)"
     }
     
 }

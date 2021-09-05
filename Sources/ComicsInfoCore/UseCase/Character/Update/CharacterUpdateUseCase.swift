@@ -34,13 +34,34 @@ public final class CharacterUpdateUseCase: UpdateUseCase, GetCharacterLinks, Cre
     
     public func update(with criteria: UpdateItemCriteria<Character>) -> EventLoopFuture<Character> {
         getLinks(for: criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
-            .flatMap { [weak self] (series, comics) -> EventLoopFuture<((old: Character, new: Character), [Series], [Comic])> in
-                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
-                return self.updateItem(with: criteria)
-                    .map { ($0, series, comics) }
+            .flatMap { [weak self] (mainSeries, series, comics) -> EventLoopFuture<((old: Character, new: Character), [Series], [Comic])> in
+                guard let self = self else {
+                    return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
+                }
+
+                return self.getMainSeriesSummaries(criteria.item, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
+                    .flatMap {
+                        var item = criteria.item
+                        item.mainSeries = $0
+                        
+                        let newCriteria = UpdateItemCriteria(
+                            item: item,
+                            oldSortValue: item.sortValue,
+                            on: criteria.eventLoop,
+                            in: criteria.table,
+                            log: criteria.logger
+                        )
+
+                        return self.updateItem(with: newCriteria)
+                            .map { ($0, series, comics) }
+                    }
+                
             }
             .flatMap { [weak self] character, series, comics in
-                guard let self = self else { return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                guard let self = self else {
+                    return criteria.eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
+                }
+
                 return self.createLinksSummaries(for: criteria.item, series: series, comics: comics, on: criteria.eventLoop, in: criteria.table, logger: criteria.logger)
                     .and(self.updateSummaries(for: criteria.item, on: criteria.eventLoop, fields: criteria.item.updatedFields(old: character.old), in: criteria.table, logger: criteria.logger))
                     .map {
@@ -94,7 +115,9 @@ extension CharacterUpdateUseCase {
 
         return characterUseCase.getSummaries(on: eventLoop, with: criteria)
             .flatMap { [weak self] summaries -> EventLoopFuture<[CharacterSummary]?> in
-                guard let self = self else { return eventLoop.makeFailedFuture(ComicInfoError.internalServerError) }
+                guard let self = self else {
+                    return eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
+                }
                 guard let summaries = summaries, !summaries.isEmpty else { return eventLoop.submit { nil } }
                 
                 var updatedSummaries = [CharacterSummary]()

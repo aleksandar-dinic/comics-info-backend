@@ -42,6 +42,12 @@ public struct Character: SummaryMapper {
     /// A date, that the character was born on. Not an origin date.
     private(set) var birth: Date?
 
+    /// A resource list of the main seriesID of this character.
+    private(set) var mainSeriesID: Set<String>?
+
+    /// A resource list of the main series of this character.
+    var mainSeries: [SeriesSummary]?
+    
     /// A resource list of seriesID in which this character appears.
     private(set) var seriesID: Set<String>?
 
@@ -67,6 +73,7 @@ public struct Character: SummaryMapper {
         realName: String?,
         aliases: [String]?,
         birth: Date?,
+        mainSeriesID: Set<String>?,
         seriesID: Set<String>?,
         comicsID: Set<String>?
     ) {
@@ -81,6 +88,7 @@ public struct Character: SummaryMapper {
         self.realName = realName
         self.aliases = aliases
         self.birth = birth
+        self.mainSeriesID = mainSeriesID
         self.seriesID = seriesID
         self.comicsID = comicsID
         itemID = .comicInfoID(for: Character.self, ID: id)
@@ -110,6 +118,13 @@ extension Character {
         if let birth = newItem.birth {
             self.birth = birth
         }
+        mainSeriesID = newItem.mainSeriesID
+        var newMainSeries = mainSeries ?? []
+        for series in newItem.mainSeries ?? [] {
+            guard !newMainSeries.contains(series) else { continue }
+            newMainSeries.append(series)
+        }
+        mainSeries = newMainSeries
         seriesID = newItem.seriesID
         series = newItem.series
         comicsID = newItem.comicsID
@@ -131,6 +146,7 @@ extension Character {
         case realName
         case aliases
         case birth
+        case mainSeries
         case itemID
         case itemType
         case sortValue

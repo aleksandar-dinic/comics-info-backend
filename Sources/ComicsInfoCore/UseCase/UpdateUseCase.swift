@@ -50,7 +50,8 @@ extension UpdateUseCase {
                     item: newItem,
                     oldSortValue: oldItem.sortValue,
                     on: criteria.eventLoop,
-                    in: criteria.table
+                    in: criteria.table,
+                    log: criteria.logger
                 )
                 return repository.update(with: criteria)
                     .map { (oldItem, $0) }

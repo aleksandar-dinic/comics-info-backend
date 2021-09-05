@@ -12,6 +12,10 @@ import Foundation
 extension Character {
     
     init(from character: Domain.Character) {
+        var mainSeriesID: Set<String>?
+        if let IDs = character.mainSeries?.map({ $0.identifier }), !IDs.isEmpty {
+            mainSeriesID = Set(IDs)
+        }
         var seriesID: Set<String>?
         if let IDs = character.series?.map({ $0.identifier }), !IDs.isEmpty {
             seriesID = Set(IDs)
@@ -30,6 +34,7 @@ extension Character {
             realName: character.realName,
             aliases: character.aliases,
             birth: character.birth,
+            mainSeriesID: mainSeriesID,
             seriesID: seriesID,
             comicsID: comicsID
         )

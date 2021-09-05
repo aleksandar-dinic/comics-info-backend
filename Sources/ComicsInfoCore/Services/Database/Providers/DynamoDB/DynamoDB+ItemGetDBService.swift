@@ -98,9 +98,13 @@ extension DynamoDB: ItemGetDBService {
         var futures = [EventLoopFuture<Summary?>]()
         
         for input in query.dynamoDBQuery.inputs {
+            print("GetSummary INPUT: \(input)")
             futures.append(
                 self.query(input, type: Summary.self)
-                    .map { $0.items?.first }
+                    .map {
+                        print("GetSummary OUTPUT: \($0)")
+                        return $0.items?.first
+                    }
                     .flatMapErrorThrowing {
                         print("GetSummary ERROR: \($0)")
                         throw $0
