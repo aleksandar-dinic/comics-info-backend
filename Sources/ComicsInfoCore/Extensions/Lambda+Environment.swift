@@ -30,5 +30,9 @@ public extension Lambda {
     static var queryLimit: String? {
         Lambda.env("QUERY_LIMIT")
     }
+    
+    static var email: String? {
+        Lambda.env("EMAIL")
+    }
 
 }

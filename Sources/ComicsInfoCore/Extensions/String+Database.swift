@@ -34,5 +34,13 @@ public extension String {
     func getIDFromComicInfoID(for item: Any.Type) -> String {
         self.replacingOccurrences(of: "\(String.getType(from: item.self))#", with: "")
     }
+    
+    static var email: String {
+        Lambda.email ?? ""
+    }
+    
+    static var feedbackSubject: String {
+        "ComicsInfo Feedback"
+    }
 
 }

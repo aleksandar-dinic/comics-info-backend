@@ -7,6 +7,7 @@
 //
 
 import struct SotoDynamoDB.DynamoDB
+import struct SotoSES.SES
 import Foundation
 import NIO
 
@@ -28,6 +29,10 @@ extension FeedbackRepositoryBuilder {
 
     private func makeDBService() -> FeedbackDBService {
         SotoDynamoDB.DynamoDB(eventLoop: eventLoop)
+    }
+    
+    func makeEmailService() -> EmailService {
+        SotoSES.SES(eventLoop: eventLoop)
     }
 
 }

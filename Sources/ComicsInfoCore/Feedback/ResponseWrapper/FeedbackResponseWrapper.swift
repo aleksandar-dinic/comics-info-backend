@@ -31,7 +31,7 @@ public struct FeedbackResponseWrapper: ErrorResponseWrapper {
         let table = String.tableName(for: environment)
         do {
             let item = try JSONDecoder().decode(Domain.Feedback.self, from: data)
-            return useCase.create(Feedback(from: item), in: table)
+            return useCase.create(Feedback(from: item, headers: request.headers), in: table)
                 .map { Response(with: Domain.Feedback(from: $0), statusCode: .created) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
@@ -42,4 +42,3 @@ public struct FeedbackResponseWrapper: ErrorResponseWrapper {
     }
 
 }
-

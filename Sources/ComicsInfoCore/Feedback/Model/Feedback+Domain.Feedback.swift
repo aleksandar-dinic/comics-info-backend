@@ -10,10 +10,11 @@ import Foundation
 
 extension Feedback {
     
-    init(from feedback: Domain.Feedback) {
+    init(from feedback: Domain.Feedback, headers: [String: String]?) {
         self.init(
             message: feedback.message,
-            email: feedback.email
+            email: feedback.email,
+            headers: headers
         )
     }
     

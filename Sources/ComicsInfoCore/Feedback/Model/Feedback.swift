@@ -15,11 +15,13 @@ struct Feedback: Codable {
     let dateAdded: Date
     let itemType: String
     let sortValue: String
+    let headers: [String: String]?
     
     init(
         id: String = UUID().uuidString,
         message: String,
-        email: String?
+        email: String?,
+        headers: [String: String]? = nil
     ) {
         self.itemID = .comicInfoID(for: Self.self, ID: id)
         self.message = message
@@ -27,6 +29,21 @@ struct Feedback: Codable {
         self.dateAdded = Date()
         itemType = .getType(from: Self.self)
         sortValue = "Email=\(email ?? "")#ItemID=\(itemID)"
+        self.headers = headers
+    }
+    
+}
+
+extension Feedback: CustomStringConvertible {
+    
+    public var description: String {
+        """
+        itemID = \(itemID)
+        message = \(message)
+        email = \(String(describing: email))
+        dateAdded = \(dateAdded.toDefaultString())
+        headers = \(String(describing: headers))
+        """
     }
     
 }

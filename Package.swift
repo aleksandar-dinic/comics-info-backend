@@ -44,6 +44,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
                 .product(name: "SotoDynamoDB", package: "soto"),
+                .product(name: "SotoSES", package: "soto"),
                 .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime"),
                 .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
             ]),

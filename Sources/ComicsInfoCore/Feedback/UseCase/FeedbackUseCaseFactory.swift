@@ -20,7 +20,10 @@ public struct FeedbackUseCaseFactory: FeedbackRepositoryBuilder {
     }
 
     public func makeUseCase() -> FeedbackUseCase {
-        FeedbackUseCase(feedbackRepository: makeRepository())
+        FeedbackUseCase(
+            feedbackRepository: makeRepository(),
+            emailService: makeEmailService()
+        )
     }
 
 }
