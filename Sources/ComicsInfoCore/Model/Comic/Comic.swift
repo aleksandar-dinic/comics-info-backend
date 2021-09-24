@@ -131,6 +131,36 @@ public struct Comic: SummaryMapper {
         sortValue = "Popularity=\(abs(popularity-100))#Title=\(title)"
     }
     
+    public func updatedFields(old: Self) -> Set<String> {
+        var ans = Set<String>()
+        if popularity != old.popularity {
+            ans.insert("popularity")
+        }
+        if name != old.name {
+            ans.insert("name")
+        }
+        if thumbnail != old.thumbnail {
+            ans.insert("thumbnail")
+        }
+        if description != old.description {
+            ans.insert("description")
+        }
+        if number != old.number {
+            ans.insert("number")
+        }
+        if published != old.published {
+            ans.insert("published")
+        }
+        
+        return ans
+    }
+    
+    public func shouldUpdateExistingSummaries(_ updatedFields: Set<String>) -> Bool {
+        !Set(arrayLiteral: "popularity", "name", "thumbnail", "description", "number", "published")
+            .intersection(updatedFields)
+            .isEmpty
+    }
+    
 }
 
 extension Comic {

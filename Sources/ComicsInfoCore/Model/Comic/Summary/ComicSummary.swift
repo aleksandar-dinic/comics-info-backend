@@ -40,7 +40,12 @@ public struct ComicSummary: ItemSummary {
         
         self.itemID = .comicInfoID(for: ComicSummary.self, ID: ID)
         self.summaryID = .comicInfoSummaryID(for: link)
-        sortValue = "Popularity=\(abs(popularity-100))#Number=\(number ?? "~")#Name=\(name)#SummaryID=\(summaryID)"
+        sortValue = Self.makeSortValue(
+            popularity: popularity,
+            number: number,
+            name: name,
+            summaryID: summaryID
+        )
         itemType = .getType(from: ComicSummary.self)
         summaryType = "\(itemType)#\(summaryID)"
         dateAdded = now
@@ -63,7 +68,30 @@ public struct ComicSummary: ItemSummary {
         number = comic.number
         published = comic.published
         oldSortValue = sortValue
-        sortValue = "Popularity=\(abs(popularity-100))#Number=\(number ?? "~")#Name=\(name)#SummaryID=\(summaryID)"
+        sortValue = Self.makeSortValue(
+            popularity: popularity,
+            number: number,
+            name: name,
+            summaryID: summaryID
+        )
+    }
+    
+    static private func makeSortValue(
+        popularity: Int,
+        number: String?,
+        name: String,
+        summaryID: String
+    ) -> String {
+        var num = "~"
+        if let numberStr = number {
+            if let number = Int(numberStr) {
+                num = String(format: "%011d", number)
+            } else {
+                num = numberStr
+            }
+        }
+
+        return "Popularity=\(abs(popularity-100))#Number=\(num)#Name=\(name)#SummaryID=\(summaryID)"
     }
     
 }

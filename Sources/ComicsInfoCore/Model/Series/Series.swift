@@ -97,6 +97,36 @@ public struct Series: SummaryMapper {
         sortValue = "Popularity=\(abs(popularity-100))#Title=\(title)"
     }
     
+    public func updatedFields(old: Self) -> Set<String> {
+        var ans = Set<String>()
+        if popularity != old.popularity {
+            ans.insert("popularity")
+        }
+        if title != old.title {
+            ans.insert("title")
+        }
+        if thumbnail != old.thumbnail {
+            ans.insert("thumbnail")
+        }
+        if description != old.description {
+            ans.insert("description")
+        }
+        if startYear != old.startYear {
+            ans.insert("startYear")
+        }
+        if endYear != old.endYear {
+            ans.insert("endYear")
+        }
+        
+        return ans
+    }
+    
+    public func shouldUpdateExistingSummaries(_ updatedFields: Set<String>) -> Bool {
+        !Set(arrayLiteral: "popularity", "title", "thumbnail", "description", "startYear", "endYear")
+            .intersection(updatedFields)
+            .isEmpty
+    }
+    
 }
 
 extension Series {

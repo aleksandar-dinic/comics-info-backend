@@ -23,11 +23,11 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/swift-server/swift-aws-lambda-runtime.git",
-            .upToNextMajor(from:"0.2.0")
+            .exact("0.2.0")
         ),
         .package(
             url: "https://github.com/soto-project/soto.git",
-            from: "5.1.0"
+            .exact("5.1.0")
         )
     ],
     targets: [
