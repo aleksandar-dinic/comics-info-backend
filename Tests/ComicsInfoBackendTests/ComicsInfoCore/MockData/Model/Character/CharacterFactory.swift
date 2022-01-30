@@ -52,6 +52,7 @@ enum CharacterFactory {
         realName: String? = nil,
         aliases: [String]? = nil,
         birth: Date? = nil,
+        mainSeriesID: Set<String>? = nil,
         seriesID: Set<String>? = nil,
         comicsID: Set<String>? = nil
     ) -> Character {
@@ -64,6 +65,7 @@ enum CharacterFactory {
             realName: realName,
             aliases: aliases,
             birth: birth,
+            mainSeriesID: mainSeriesID,
             seriesID: seriesID,
             comicsID: comicsID
         )

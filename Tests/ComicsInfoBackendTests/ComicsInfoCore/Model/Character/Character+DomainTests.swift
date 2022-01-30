@@ -27,13 +27,16 @@ final class Character_DomainTests: XCTestCase {
             realName: "Character RealName",
             aliases: ["Character Aliases"],
             birth: Date(),
+            mainSeries: nil,
             series: [
                 Domain.SeriesSummary(
                     identifier: "1",
                     popularity: 0,
                     title: "Series Title",
                     thumbnail: "Series thumbnail",
-                    description: "Series Description"
+                    description: "Series Description",
+                    startYear: nil,
+                    endYear: nil
                 )
             ],
             comics: [
@@ -114,6 +117,7 @@ final class Character_DomainTests: XCTestCase {
             realName: "Character RealName",
             aliases: ["Character Aliases"],
             birth: Date(),
+            mainSeries: [],
             series: [],
             comics: []
         )
@@ -131,6 +135,7 @@ final class Character_DomainTests: XCTestCase {
             realName: "Character RealName",
             aliases: ["Character Aliases"],
             birth: Date(),
+            mainSeries: [],
             series: [],
             comics: []
         )

@@ -50,7 +50,9 @@ final class Comic_DomainTests: XCTestCase {
                     popularity: 0,
                     title: "Series Title",
                     thumbnail: "Series thumbnail",
-                    description: "Series Description"
+                    description: "Series Description",
+                    startYear: nil,
+                    endYear: nil
                 )
             ]
         )

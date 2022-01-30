@@ -34,6 +34,10 @@ struct MockSummaryMapper: SummaryMapper {
         sortValue = "\(summaryID)#Popularity=\(popularity)#Name=\(name)"
     }
     
+    func shouldUpdateExistingSummaries(_ updatedFields: Set<String>) -> Bool {
+        false
+    }
+    
 }
 
 enum MockSummaryMapperFactory {

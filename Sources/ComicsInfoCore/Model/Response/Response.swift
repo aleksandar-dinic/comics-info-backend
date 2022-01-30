@@ -51,7 +51,8 @@ extension Response {
         cookies: [String]? = nil
     ) {
         var body = "{}"
-        if let data = try? JSONEncoder().encode(object), let dataEncoded = String(data: data, encoding: .utf8) {
+        if let data = try? JSONEncoder().encode(object),
+            let dataEncoded = String(data: data, encoding: .utf8) {
             body = dataEncoded
         }
 

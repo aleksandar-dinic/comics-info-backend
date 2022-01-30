@@ -30,6 +30,14 @@ public final class ComicsInfo {
             
         case let .feedback(operation):
             try handleFeedback(for: operation)
+        
+        case let .myCharacters(operation):
+            Lambda.run { context in
+                MyCharactersLambdaHandler(context, operation: operation)
+            }
+            
+        case let .myComics(operation):
+            try handleMyComic(for: operation)
             
         case .none:
             throw ComicInfoError.handlerUnknown
@@ -92,6 +100,22 @@ public final class ComicsInfo {
         default:
             throw ComicInfoError.handlerUnknown
         }
+    }
+    
+    private func handleMyComic(for operation: CRUDOperation) throws {
+//        switch operation {
+//        case .create:
+//            Lambda.run { CreateLambdaHandlerFactory.makeComicHandler($0) }
+//
+//        case .read:
+//            Lambda.run { ReadLambdaHandlerFactory.makeComicReadLambdaHandler($0) }
+//
+//        case .update:
+//            throw ComicInfoError.handlerUnknown
+//
+//        case .delete:
+//            Lambda.run { DeleteLambdaHandlerFactory.makeComicHandler($0) }
+//        }
     }
 
 }

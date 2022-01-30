@@ -11,7 +11,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct CharacterReadResponseWrapper: GetPathParameterID, GetQueryParameterAfterID, GetQueryParameterLimit, ReadResponseWrapper {
+public struct CharacterReadResponseWrapper: ReadResponseWrapper {
 
     private let characterUseCase: CharacterUseCase
 
@@ -25,7 +25,7 @@ public struct CharacterReadResponseWrapper: GetPathParameterID, GetQueryParamete
         environment: String?,
         logger: Logger?
     ) -> EventLoopFuture<Response> {
-        guard let id = try? getID(from: request.pathParameters) else {
+        guard let id = try? request.getIDFromPathParameters() else {
             return handleList(
                 on: eventLoop,
                 request: request,
@@ -51,9 +51,9 @@ public struct CharacterReadResponseWrapper: GetPathParameterID, GetQueryParamete
         do {
             return characterUseCase.getAllItems(
                 on: eventLoop,
-                afterID: getAfterID(from: request.queryParameters),
+                afterID: request.getAfterIDFromQueryParameters(),
                 fields: getFields(from: request.queryParameters),
-                limit: try getLimit(from: request.queryParameters),
+                limit: try request.getLimitFromQueryParameters(),
                 from: String.tableName(for: environment),
                 logger: logger
             )
@@ -61,11 +61,11 @@ public struct CharacterReadResponseWrapper: GetPathParameterID, GetQueryParamete
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
         } catch {
             guard let responseError = error as? ComicInfoError else {
-                let message = ResponseStatus(error.localizedDescription)
+                let message = ResponseMessage(error.localizedDescription)
                 return eventLoop.submit { Response(with: message, statusCode: .badRequest) }
             }
             
-            let message = ResponseStatus(for: responseError)
+            let message = ResponseMessage(for: responseError)
             return eventLoop.submit { Response(with: message, statusCode: responseError.responseStatus) }
         }
     }

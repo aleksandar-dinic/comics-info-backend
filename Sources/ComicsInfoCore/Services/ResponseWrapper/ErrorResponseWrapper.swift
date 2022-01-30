@@ -18,11 +18,14 @@ extension ErrorResponseWrapper {
 
     public func `catch`(_ error: Error, statusCode: HTTPResponseStatus) -> Response {
         guard let comicInfoError = error as? ComicInfoError else {
-            return Response(with: ResponseStatus(error.localizedDescription), statusCode: statusCode)
+            return Response(
+                with: ResponseMessage(error.localizedDescription),
+                statusCode: statusCode
+            )
         }
         
         return Response(
-            with: ResponseStatus(comicInfoError.localizedDescription),
+            with: ResponseMessage(comicInfoError.localizedDescription),
             statusCode: comicInfoError.responseStatus
         )
     }

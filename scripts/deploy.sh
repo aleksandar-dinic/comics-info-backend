@@ -34,7 +34,9 @@ echo "-------------------------------------------------------------------------"
 
 #read -p "Lambda Function name (must exist in AWS Lambda): " lambda_name
 
-# ci-character
+echo "-------------------------------------------------------------------------"
+echo "updating ci-character AWS Lambda to use \"$executable\""
+echo "-------------------------------------------------------------------------"
 aws lambda update-function-code \
     --function "${lambda_name:-ci-character-create}" \
     --s3-bucket "$s3_bucket" \
@@ -60,7 +62,9 @@ aws lambda update-function-code \
     --s3-bucket "$s3_bucket" \
     --s3-key lambda.zip
     
-# ci-series
+echo "-------------------------------------------------------------------------"
+echo "updating ci-series AWS Lambda to use \"$executable\""
+echo "-------------------------------------------------------------------------"
 aws lambda update-function-code \
     --function "${lambda_name:-ci-series-create}" \
     --s3-bucket "$s3_bucket" \
@@ -85,8 +89,10 @@ aws lambda update-function-code \
     --function "${lambda_name:-ci-series-delete}" \
     --s3-bucket "$s3_bucket" \
     --s3-key lambda.zip
-
-# ci-comic
+    
+echo "-------------------------------------------------------------------------"
+echo "updating ci-comic AWS Lambda to use \"$executable\""
+echo "-------------------------------------------------------------------------"
 aws lambda update-function-code \
     --function "${lambda_name:-ci-comic-create}" \
     --s3-bucket "$s3_bucket" \
@@ -112,9 +118,38 @@ aws lambda update-function-code \
     --s3-bucket "$s3_bucket" \
     --s3-key lambda.zip
 
-# ci-feedback
-
+echo "-------------------------------------------------------------------------"
+echo "updating ci-feedback AWS Lambda to use \"$executable\""
+echo "-------------------------------------------------------------------------"
 aws lambda update-function-code \
     --function "${lambda_name:-ci-feedback-create}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+echo "-------------------------------------------------------------------------"
+echo "updating ci-my-characters AWS Lambda to use \"$executable\""
+echo "-------------------------------------------------------------------------"
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-characters-create}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-characters-read}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-characters-list}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-characters-update}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-characters-delete}" \
     --s3-bucket "$s3_bucket" \
     --s3-key lambda.zip

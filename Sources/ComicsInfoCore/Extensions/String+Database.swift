@@ -42,5 +42,22 @@ public extension String {
     static var feedbackSubject: String {
         "ComicsInfo Feedback"
     }
+    
+    static var cognitoUserPoolID: String {
+        Lambda.cognitoUserPoolID ?? ""
+    }
+    
+    static var cognitoClientID: String {
+        Lambda.cognitoClientID ?? ""
+    }
+    
+    static var cognitoClientSecret: String? {
+        guard
+            let secret = Lambda.cognitoClientSecret,
+            !secret.isEmpty
+        else { return nil }
+        
+        return secret
+    }
 
 }

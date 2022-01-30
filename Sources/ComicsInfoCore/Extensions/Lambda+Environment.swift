@@ -34,5 +34,17 @@ public extension Lambda {
     static var email: String? {
         Lambda.env("EMAIL")
     }
+    
+    static var cognitoUserPoolID: String? {
+        Lambda.env("COGNITO_USER_POOL_ID")
+    }
+    
+    static var cognitoClientID: String? {
+        Lambda.env("COGNITO_CLIENT_ID")
+    }
+    
+    static var cognitoClientSecret: String? {
+        Lambda.env("COGNITO_CLIENT_SECRET")
+    }
 
 }

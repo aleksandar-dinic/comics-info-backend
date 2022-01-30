@@ -63,7 +63,9 @@ enum DomainSummaryFactory {
             popularity: popularity,
             title: title,
             thumbnail: thumbnail,
-            description: description
+            description: description,
+            startYear: nil,
+            endYear: nil
         )
     }
     

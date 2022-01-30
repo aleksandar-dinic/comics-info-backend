@@ -1,5 +1,5 @@
 //
-//  ResponseStatusTests.swift
+//  ResponseMessageTests.swift
 //  ComicsInfoBackendTests
 //
 //  Created by Aleksandar Dinic on 29/01/2021.
@@ -9,7 +9,7 @@
 @testable import ComicsInfoCore
 import XCTest
 
-final class ResponseStatusTests: XCTestCase {
+final class ResponseMessageTests: XCTestCase {
 
     override func setUpWithError() throws {
     }
@@ -17,15 +17,15 @@ final class ResponseStatusTests: XCTestCase {
     override func tearDownWithError() throws {
     }
 
-    func testStatus_whenInitResponseStatus_isEqualToGivenStatus() {
+    func testMessage_whenInitResponseMessage_isEqualToGivenMessage() {
         // Given
-        let givenStatus = "Given Status"
+        let givenMessage = "Given Message"
         
         // When
-        let responseStatus = ResponseStatus(givenStatus)
+        let response = ResponseMessage(givenMessage)
         
         // Then
-        XCTAssertEqual(responseStatus.status, givenStatus)
+        XCTAssertEqual(response.message, givenMessage)
     }
     
 }

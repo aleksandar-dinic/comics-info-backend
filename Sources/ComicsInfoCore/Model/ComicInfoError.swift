@@ -16,11 +16,15 @@ public enum ComicInfoError: Error {
     case itemsNotFound(withIDs: Set<String>?, itemType: Any.Type)
     case summariesAlreadyExist(_ IDs: Set<String>)
     case invalidFields(_ fields: Set<String>)
+    case requestBodyIsMissing
     case pathParameterIDIsMissing
     case queryParameterIsMissing(type: Any.Type)
+    case userIDIsMissing
     case invalidQueryParameterLimit(message: String)
     case invalidQueryParameterOffset(message: String)
+    case cannotUpdateItemID(type: Any.Type)
     case handlerUnknown
+    case unauthorized
     case internalServerError
 
 }
@@ -29,42 +33,23 @@ extension ComicInfoError {
     
     var responseStatus: HTTPResponseStatus {
         switch self {
-        case .requestError:
-            return .badRequest
-            
-        case .itemAlreadyExists:
+        case .itemAlreadyExists, .summariesAlreadyExist:
             return .conflict
             
-        case .itemNotFound:
+        case .itemNotFound, .itemsNotFound:
             return .noContent
-            
-        case .itemsNotFound:
-            return .noContent
-            
-        case .summariesAlreadyExist:
-            return .conflict
-            
-        case .invalidFields:
-            return .badRequest
-            
-        case .pathParameterIDIsMissing:
-            return .badRequest
             
         case .queryParameterIsMissing:
             return .methodNotAllowed
             
-        case .invalidQueryParameterLimit:
-            return .badRequest
-            
-        case .invalidQueryParameterOffset:
-            return .badRequest
-            
-        case .handlerUnknown:
+        case .handlerUnknown, .internalServerError:
             return .internalServerError
+        
+        case .unauthorized:
+            return .unauthorized
             
-        case .internalServerError:
-            return .internalServerError
-            
+        default:
+            return .badRequest
         }
     }
     
@@ -96,20 +81,32 @@ extension ComicInfoError: LocalizedError {
         case let .invalidFields(fields):
             return "Invalid fields: \(fields.sorted())"
             
+        case .requestBodyIsMissing:
+            return "Required request body is missing"
+            
         case .pathParameterIDIsMissing:
             return "Required path parameter id is missing."
             
         case let .queryParameterIsMissing(type):
             return "Method not allowed: You need to specify query parameter \(String.getType(from: type).lowercased())ID."
+        
+        case .userIDIsMissing:
+            return "Required parameter user ID is missing."
             
         case let .invalidQueryParameterLimit(message):
             return "Invalid query parameter limit: \(message)"
             
         case let .invalidQueryParameterOffset(message):
             return "Invalid query parameter offset: \(message)"
-
+        
+        case let .cannotUpdateItemID(type):
+            return "Can not update \(String.getType(from: type).lowercased()) identifier"
+            
         case .handlerUnknown:
             return "Handler Unknown"
+            
+        case .unauthorized:
+            return "Unauthorized"
             
         case .internalServerError:
             return "Internal Server Error"

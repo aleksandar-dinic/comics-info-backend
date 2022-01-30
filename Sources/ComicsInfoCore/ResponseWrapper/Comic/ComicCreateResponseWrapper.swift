@@ -39,7 +39,7 @@ public struct ComicCreateResponseWrapper: CreateResponseWrapper {
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {
-            let response = Response(with: ResponseStatus(error.localizedDescription), statusCode: .badRequest)
+            let response = Response(with: ResponseMessage(error.localizedDescription), statusCode: .badRequest)
             return eventLoop.submit { response }
         }
     }

@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "ComicsInfoBackend",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v12)
     ],
     products: [
         .executable(
@@ -19,15 +19,19 @@ let package = Package(
         .package(
             name: "Domain",
             url: "https://github.com/AleksandarDinic/comics-info-domain.git",
-            from: "0.5.0"
+            from: "0.5.1"
         ),
         .package(
             url: "https://github.com/swift-server/swift-aws-lambda-runtime.git",
-            .exact("0.2.0")
+            .exact("0.5.2")
         ),
         .package(
             url: "https://github.com/soto-project/soto.git",
-            .exact("5.1.0")
+            .exact("5.12.1")
+        ),
+        .package(
+            url: "https://github.com/soto-project/soto-cognito-authentication-kit",
+            .exact("3.2.2")
         )
     ],
     targets: [
@@ -35,7 +39,7 @@ let package = Package(
         // test suite.
         // Targets can depend on other targets in this package, and on products in packages
         // which this package depends on.
-        .target(
+        .executableTarget(
             name: "ComicsInfoHandler",
             dependencies: ["ComicsInfoCore"]
         ),
@@ -46,7 +50,8 @@ let package = Package(
                 .product(name: "SotoDynamoDB", package: "soto"),
                 .product(name: "SotoSES", package: "soto"),
                 .product(name: "AWSLambdaEvents", package: "swift-aws-lambda-runtime"),
-                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime")
+                .product(name: "AWSLambdaRuntime", package: "swift-aws-lambda-runtime"),
+                .product(name: "SotoCognitoAuthenticationKit", package: "soto-cognito-authentication-kit")
             ]),
         .testTarget(
             name: "ComicsInfoBackendTests",

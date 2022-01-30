@@ -12,7 +12,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct SeriesReadResponseWrapper: GetPathParameterID, GetQueryParameterCharacterID, GetQueryParameterAfterID, GetQueryParameterLimit, ReadResponseWrapper {
+public struct SeriesReadResponseWrapper: ReadResponseWrapper {
 
     private let seriesUseCase: SeriesUseCase
 
@@ -26,7 +26,7 @@ public struct SeriesReadResponseWrapper: GetPathParameterID, GetQueryParameterCh
         environment: String?,
         logger: Logger?
     ) -> EventLoopFuture<Response> {
-        guard let id = try? getID(from: request.pathParameters) else {
+        guard let id = try? request.getIDFromPathParameters() else {
             return handleList(
                 on: eventLoop,
                 request: request,
@@ -50,25 +50,19 @@ public struct SeriesReadResponseWrapper: GetPathParameterID, GetQueryParameterCh
         logger: Logger?
     ) -> EventLoopFuture<Response> {
         do {
-            let characterID = try getCharacterSummaryID(from: request.queryParameters)
+            let characterID = try request.getCharacterSummaryIDFromQueryParameters()
             return seriesUseCase.getAllSummaries(
                 on: eventLoop,
                 summaryID: characterID,
-                afterID: getAfterID(from: request.queryParameters),
-                limit: try getLimit(from: request.queryParameters),
+                afterID: request.getAfterIDFromQueryParameters(),
+                limit: try request.getLimitFromQueryParameters(),
                 from: String.tableName(for: environment),
                 logger: logger
             )
                 .map { Response(with: $0.map { Domain.SeriesSummary(from: $0) }, statusCode: .ok) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
         } catch {
-            guard let responseError = error as? ComicInfoError else {
-                let message = ResponseStatus(error.localizedDescription)
-                return eventLoop.submit { Response(with: message, statusCode: .badRequest) }
-            }
-            
-            let message = ResponseStatus(for: responseError)
-            return eventLoop.submit { Response(with: message, statusCode: responseError.responseStatus) }
+            return eventLoop.submit { self.catch(error, statusCode: .badRequest) }
         }
     }
     

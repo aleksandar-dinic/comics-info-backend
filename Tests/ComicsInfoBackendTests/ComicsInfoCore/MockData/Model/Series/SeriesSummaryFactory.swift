@@ -37,7 +37,9 @@ enum SeriesSummaryFactory {
             popularity: popularity,
             name: name,
             thumbnail: thumbnail,
-            description: description
+            description: description,
+            startYear: nil,
+            endYear: nil
         )
     }
 

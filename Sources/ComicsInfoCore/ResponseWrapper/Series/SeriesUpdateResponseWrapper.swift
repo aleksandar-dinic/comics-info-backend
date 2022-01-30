@@ -11,7 +11,7 @@ import struct Logging.Logger
 import Foundation
 import NIO
 
-public struct SeriesUpdateResponseWrapper: GetQueryParameterLimit, UpdateResponseWrapper {
+public struct SeriesUpdateResponseWrapper: UpdateResponseWrapper {
 
     private let seriesUseCase: SeriesUpdateUseCase
 
@@ -46,8 +46,7 @@ public struct SeriesUpdateResponseWrapper: GetQueryParameterLimit, UpdateRespons
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {
-            let response = Response(with: ResponseStatus(error.localizedDescription), statusCode: .badRequest)
-            return eventLoop.submit { response }
+            return eventLoop.submit { self.catch(error, statusCode: .badRequest) }
         }
     }
 

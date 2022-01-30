@@ -57,4 +57,8 @@ struct SummaryMapperMock: SummaryMapper {
         )
     }
     
+    func shouldUpdateExistingSummaries(_ updatedFields: Set<String>) -> Bool {
+        false
+    }
+    
 }

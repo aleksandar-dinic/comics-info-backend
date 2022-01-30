@@ -14,6 +14,8 @@ public enum Handler: Equatable {
     case series(operation: CRUDOperation)
     case comic(operation: CRUDOperation)
     case feedback(operation: CRUDOperation)
+    case myCharacters(operation: CRUDOperation)
+    case myComics(operation: CRUDOperation)
     
     public init?(for handler: String) {
         let handlers = handler.split(separator: ".").compactMap { String($0) }
@@ -31,6 +33,10 @@ public enum Handler: Equatable {
             self = .comic(operation: operation)
         case "feedback":
             self = .feedback(operation: operation)
+        case "my-characters":
+            self = .myCharacters(operation: operation)
+        case "my-comics":
+            self = .myComics(operation: operation)
         default:
             return nil
         }
