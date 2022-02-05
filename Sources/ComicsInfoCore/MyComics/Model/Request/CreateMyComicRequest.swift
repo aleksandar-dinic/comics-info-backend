@@ -1,23 +1,24 @@
 //
-//  CreateMyCharacterRequest.swift
+//  CreateMyComicRequest.swift
 //  
 //
-//  Created by Aleksandar Dinic on 1/30/22.
+//  Created by Aleksandar Dinic on 2/5/22.
 //
 
 import Foundation
 import NIO
 
-struct CreateMyCharacterRequest {
+struct CreateMyComicRequest {
     
     let data: Data
+    let seriesID: String
     let token: String
     let table: String
     let eventLoop: EventLoop
     
 }
 
-extension CreateMyCharacterRequest {
+extension CreateMyComicRequest {
     
     init(
         request: Request,
@@ -26,6 +27,7 @@ extension CreateMyCharacterRequest {
     ) throws {
         do {
             data = try request.encodeBody()
+            seriesID = try request.getSeriesIDFromQueryParameters()
             token = try request.getTokenFromHeaders()
         } catch {
             throw error

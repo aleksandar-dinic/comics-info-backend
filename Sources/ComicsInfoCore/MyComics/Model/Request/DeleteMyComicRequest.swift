@@ -1,23 +1,24 @@
 //
-//  CreateMyCharacterRequest.swift
+//  DeleteMyComicRequest.swift
 //  
 //
-//  Created by Aleksandar Dinic on 1/30/22.
+//  Created by Aleksandar Dinic on 2/5/22.
 //
 
 import Foundation
 import NIO
 
-struct CreateMyCharacterRequest {
+struct DeleteMyComicRequest {
     
-    let data: Data
+    let comicID: String
+    let seriesID: String
     let token: String
     let table: String
     let eventLoop: EventLoop
     
 }
 
-extension CreateMyCharacterRequest {
+extension DeleteMyComicRequest {
     
     init(
         request: Request,
@@ -25,7 +26,8 @@ extension CreateMyCharacterRequest {
         eventLoop: EventLoop
     ) throws {
         do {
-            data = try request.encodeBody()
+            comicID = try request.getIDFromPathParameters()
+            seriesID = try request.getSeriesIDFromQueryParameters()
             token = try request.getTokenFromHeaders()
         } catch {
             throw error

@@ -153,3 +153,31 @@ aws lambda update-function-code \
     --function "${lambda_name:-ci-my-characters-delete}" \
     --s3-bucket "$s3_bucket" \
     --s3-key lambda.zip
+    
+echo "-------------------------------------------------------------------------"
+echo "updating ci-my-comics AWS Lambda to use \"$executable\""
+echo "-------------------------------------------------------------------------"
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-comics-create}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-comics-read}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-comics-list}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-comics-update}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip
+
+aws lambda update-function-code \
+    --function "${lambda_name:-ci-my-comics-delete}" \
+    --s3-bucket "$s3_bucket" \
+    --s3-key lambda.zip

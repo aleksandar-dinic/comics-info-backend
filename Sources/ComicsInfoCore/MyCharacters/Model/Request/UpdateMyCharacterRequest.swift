@@ -29,11 +29,12 @@ extension UpdateMyCharacterRequest {
             id = try request.getIDFromPathParameters()
             data = try request.encodeBody()
             token = try request.getTokenFromHeaders()
-            table = String.tableName(for: environment)
-            self.eventLoop = eventLoop
         } catch {
             throw error
         }
+        
+        table = String.tableName(for: environment)
+        self.eventLoop = eventLoop
     }
     
 }
