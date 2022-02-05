@@ -29,7 +29,9 @@ public final class ComicsInfo {
             handleComic(for: operation)
             
         case let .feedback(operation):
-            try handleFeedback(for: operation)
+            Lambda.run { context in
+                FeedbackLambdaHandler(context, operation: operation)
+            }
         
         case let .myCharacters(operation):
             Lambda.run { context in
@@ -91,16 +93,6 @@ public final class ComicsInfo {
 
         case .delete:
             Lambda.run { DeleteLambdaHandlerFactory.makeComicHandler($0) }
-        }
-    }
-    
-    private func handleFeedback(for operation: CRUDOperation) throws {
-        switch operation {
-        case .create:
-            Lambda.run { FeedbackLambdaHandlerFactory.makeHandler($0) }
-            
-        default:
-            throw ComicInfoError.handlerUnknown
         }
     }
     

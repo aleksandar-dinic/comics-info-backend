@@ -23,21 +23,19 @@ public struct FeedbackResponseWrapper: ErrorResponseWrapper {
         request: Request,
         environment: String?
     ) -> EventLoopFuture<Response> {
-        guard let data = request.body?.data(using: .utf8) else {
-            let response = Response(statusCode: .badRequest)
-            return eventLoop.submit { response }
-        }
-
-        let table = String.tableName(for: environment)
         do {
-            let item = try JSONDecoder().decode(Domain.Feedback.self, from: data)
-            return useCase.create(Feedback(from: item, headers: request.headers), in: table)
+            let request = try CreateFeedbackRequest(
+                request: request,
+                environment: environment,
+                eventLoop: eventLoop
+            )
+            
+            return useCase.create(with: request)
                 .map { Response(with: Domain.Feedback(from: $0), statusCode: .created) }
                 .flatMapErrorThrowing { self.catch($0, statusCode: .forbidden) }
 
         } catch {
-            let response = Response(with: ResponseMessage(error.localizedDescription), statusCode: .badRequest)
-            return eventLoop.submit { response }
+            return eventLoop.submit { self.catch(error, statusCode: .badRequest) }
         }
     }
 
