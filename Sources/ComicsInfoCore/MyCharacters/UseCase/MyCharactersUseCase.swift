@@ -82,7 +82,23 @@ public final class MyCharactersUseCase {
                 guard let self = self else {
                     return request.eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
                 }
-                return self.repository.update(myCharacter, in: request.table)
+                
+                return self.repository.getMyCharacter(withID: myCharacter.characterID, for: myCharacter.userID, in: request.table)
+                    .flatMap { [weak self] oldCharacter in
+                        guard let self = self else {
+                            return request.eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
+                        }
+                        
+                        var updatedCharacter = oldCharacter
+                        updatedCharacter.update(with: myCharacter)
+                        return self.repository.update(updatedCharacter, in: request.table)
+                    }
+                    .flatMapError { [weak self] _ in
+                        guard let self = self else {
+                            return request.eventLoop.makeFailedFuture(ComicInfoError.internalServerError)
+                        }
+                        return self.repository.create(myCharacter, in: request.table)
+                    }
             }
     }
 

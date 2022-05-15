@@ -83,26 +83,36 @@ extension DynamoDB: MyCharactersDBService {
         _ myCharacter: MyCharacter,
         in table: String
     ) -> EventLoopFuture<MyCharacter> {
-        delete(
-            withID: myCharacter.itemID,
-            for: myCharacter.userID,
-            in: table
-        ).flatMap { _ in
-            print("Update MyCharacter: \(myCharacter)")
-            
-            let updateInput = DynamoDB.UpdateItemCodableInput(
-                key: ["userID", "itemID"],
-                returnValues: .updatedOld,
-                tableName: table,
-                updateItem: myCharacter
-            )
-            return updateItem(updateInput)
-                .map { _ in myCharacter }
-                .flatMapErrorThrowing {
-                    print("Update MyCharacter ERROR: \($0)")
-                    throw $0
-                }
-        }
+        let input = DynamoDB.DeleteItemInput(
+            key: [
+                "userID": .s(myCharacter.userID),
+                "itemID": .s(myCharacter.itemID)
+            ],
+            tableName: table
+        )
+
+        print("Delete MyCharacter: \(input)")
+        return deleteItem(input)
+            .flatMap { _ in
+                print("Update MyCharacter: \(myCharacter)")
+                
+                let updateInput = DynamoDB.UpdateItemCodableInput(
+                    key: ["userID", "itemID"],
+                    returnValues: .updatedOld,
+                    tableName: table,
+                    updateItem: myCharacter
+                )
+                return updateItem(updateInput)
+                    .map { _ in myCharacter }
+                    .flatMapErrorThrowing {
+                        print("Update MyCharacter ERROR: \($0)")
+                        throw $0
+                    }
+            }
+            .flatMapErrorThrowing {
+                print("Delete MyCharacter ERROR: \($0)")
+                throw $0
+            }
     }
 
     func delete(
@@ -120,8 +130,7 @@ extension DynamoDB: MyCharactersDBService {
                     tableName: table
                 )
 
-                print("Delete MyCharacter with ID: \(myCharacterID)")
-                
+                print("Delete MyCharacter: \(input)")
                 return deleteItem(input)
                     .map { _ in myCharacter }
                     .flatMapErrorThrowing {

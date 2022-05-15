@@ -20,6 +20,14 @@ struct MySeriesSummary: Codable {
     
 }
 
+extension MySeriesSummary: Equatable {
+
+    static func == (lhs: MySeriesSummary, rhs: MySeriesSummary) -> Bool {
+        lhs.identifier == rhs.identifier
+    }
+    
+}
+
 extension MySeriesSummary {
     
     init(from seriesSummary: Domain.SeriesSummary) {
@@ -30,6 +38,30 @@ extension MySeriesSummary {
         description = seriesSummary.description
         startYear = seriesSummary.startYear
         endYear = seriesSummary.endYear
+    }
+    
+}
+
+extension MySeriesSummary {
+    
+    static func make(
+        identifier: String = "MySeries#1",
+        popularity: Int = 0,
+        title: String = "MySeries Title",
+        thumbnail: String? = nil,
+        description: String? = nil,
+        startYear: Int? = nil,
+        endYear: Int? = nil
+    ) -> MySeriesSummary {
+        self.init(
+            identifier: identifier,
+            popularity: popularity,
+            title: title,
+            thumbnail: thumbnail,
+            description: description,
+            startYear: startYear,
+            endYear: endYear
+        )
     }
     
 }
